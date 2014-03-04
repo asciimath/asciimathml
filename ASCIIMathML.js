@@ -7,7 +7,7 @@ loads, and should work with Internet Explorer 6 + MathPlayer
 (http://www.dessci.com/en/products/mathplayer/) and Mozilla/Netscape 7+.
 This is a convenient and inexpensive solution for authoring MathML.
 
-Version 1.4.1 Aug 8, 2004, (c) Peter Jipsen http://www.chapman.edu/~jipsen
+Version 1.4.1 Aug 16, 2004, (c) Peter Jipsen http://www.chapman.edu/~jipsen
 Latest version at http://www.chapman.edu/~jipsen/mathml/ASCIIMathML.js
 If you use it on a webpage, please send the URL to jipsen@chapman.edu
 
@@ -80,11 +80,9 @@ var AMsqrt = {input:"sqrt", tag:"msqrt", output:"sqrt", tex:null, ttype:UNARY},
   AMroot  = {input:"root", tag:"mroot", output:"root", tex:null, ttype:BINARY},
   AMfrac  = {input:"frac", tag:"mfrac", output:"/",    tex:null, ttype:BINARY},
   AMdiv   = {input:"/",    tag:"mfrac", output:"/",    tex:null, ttype:INFIX},
-  AMover  = {input:"stackrel", tag:"mover", output:"", tex:null, ttype:BINARY},
+  AMover  = {input:"stackrel", tag:"mover", output:"stackrel", tex:null, ttype:BINARY},
   AMsub   = {input:"_",    tag:"msub",  output:"_",    tex:null, ttype:INFIX},
   AMsup   = {input:"^",    tag:"msup",  output:"^",    tex:null, ttype:INFIX},
-  AMpsub  = {input:"_:",   tag:"msub",  output:"_:",   tex:null, ttype:INFIX},
-  AMpsup  = {input:"^:",   tag:"msup",  output:"^:",   tex:null, ttype:INFIX},
   AMtext  = {input:"text", tag:"mtext", output:"text", tex:null, ttype:UNARY},
   AMmbox  = {input:"mbox", tag:"mtext", output:"mbox", tex:null, ttype:UNARY},
   AMquote = {input:"\"",   tag:"mtext", output:"mbox", tex:null, ttype:UNARY};
@@ -262,7 +260,7 @@ var AMsymbols = [
 {input:"hArr", tag:"mo", output:"\u21D4", tex:"Leftrightarrow", ttype:CONST},
 
 //commands with argument
-AMsqrt, AMroot, AMfrac, AMdiv, AMover, AMsub, AMsup, AMpsub, AMpsup,
+AMsqrt, AMroot, AMfrac, AMdiv, AMover, AMsub, AMsup,
 {input:"hat", tag:"mover", output:"\u005E", tex:null, ttype:UNARY, acc:true},
 {input:"bar", tag:"mover", output:"\u00AF", tex:"overline", ttype:UNARY, acc:true},
 {input:"vec", tag:"mover", output:"\u2192", tex:null, ttype:UNARY, acc:true},
@@ -429,7 +427,7 @@ function AMremoveBrackets(node) {
 /*Parsing ASCII math expressions with the following grammar
 V ::= [A-Za-z] | greek letters | numbers | other constant symbols
 U ::= sqrt | text | bb | other unary symbols for font commands
-B ::= frac | root                    binary symbols
+B ::= frac | root | stackrel         binary symbols
 L ::= ( | [ | { | (: | {:            left brackets
 R ::= ) | ] | } | :) | :}            right brackets
 S ::= V | LER | US | BSS             simple expression
@@ -561,7 +559,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
 }
 
 function AMparseExpr(str) {
-  var symbol, sym1, sym2, node, node1, result, i, underover, nodeList = [],
+  var symbol, sym1, sym2, node, result, i, underover, nodeList = [],
   newFrag = document.createDocumentFragment();
   do {
     str = AMremoveCharsAndBlanks(str,0);
@@ -592,23 +590,6 @@ function AMparseExpr(str) {
           node = AMcreateMmlNode((underover?"munder":"msub"),node);
           node.appendChild(result[0]);
         }
-      } else if (symbol == AMpsub) {
-        sym2 = AMgetSymbol(str);
-        if (sym2 == AMpsup) {
-          str = AMremoveCharsAndBlanks(str,sym2.input.length);
-          var res2 = AMparseSexpr(str);
-          str = res2[1];
-          node1 = AMcreateMmlNode("mmultiscripts",res2[0]);
-          node1.appendChild(AMcreateElementMathML("mprescripts"));
-          node1.appendChild(node);
-          node1.appendChild(result[0]);
-        } else {
-          node1 = AMcreateMmlNode("mmultiscripts",result[0]);
-          node.appendChild(AMcreateElementMathML("mprescripts"));
-          node.appendChild(node);
-          node.appendChild(AMcreateElementMathML("none"));
-        }
-        node = node1;
       } else {
         node = AMcreateMmlNode(symbol.tag,node);
         node.appendChild(result[0]);

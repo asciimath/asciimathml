@@ -714,6 +714,8 @@ function AMprocessNode(n, linebreaks) {
       str = str.replace(/\\\$/g,function(st){mtch=true;return "\\dollar"});
       str = str.replace(/\\`/g,function(st){mtch=true;return "\\lq"});
       str = str.replace(/\$/g,"`");
+      str = str.replace(/\[math\]/g,"`");
+      str = str.replace(/\[\/math\]/g,"`");
       arr = str.split("`");
       if (arr.length>1 || mtch) {
         if (checkForMathML) {

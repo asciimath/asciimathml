@@ -7,7 +7,7 @@ loads, and should work with Internet Explorer 6 + MathPlayer
 (http://www.dessci.com/en/products/mathplayer/) and Mozilla/Netscape 7+.
 This is a convenient and inexpensive solution for authoring MathML.
 
-Version 1.1 Jan 9 2004, (c) Peter Jipsen http://www.chapman.edu/~jipsen
+Version 1.2 Jan 22 2004, (c) Peter Jipsen http://www.chapman.edu/~jipsen
 Latest version at http://www.chapman.edu/~jipsen/mathml/ASCIIMathML.js
 If you use it on a webpage, please send the URL to jipsen@chapman.edu
 
@@ -29,6 +29,9 @@ if (document.getElementById==null)
 
 mathcolor = "Red"; // change it to Black if you prefer that
 mathdelimit = "`"; // change it to $ if you prefer TeX
+displaystyle = true;
+
+isIE = document.createElementNS==null;
 
 // character lists for Mozilla/Netscape fonts
 cal = [0xEF35,0x212C,0xEF36,0xEF37,0x2130,0x2131,0xEF38,0x210B,0x2110,0xEF39,0xEF3A,0x2112,0x2133,0xEF3B,0xEF3C,0xEF3D,0xEF3E,0x211B,0xEF3F,0xEF40,0xEF41,0xEF42,0xEF43,0xEF44,0xEF45,0xEF46];
@@ -42,7 +45,7 @@ symbols = [
 {input:"chi",    tag:"mi", output:"\u03C7"},
 {input:"delta",  tag:"mi", output:"\u03B4"},
 {input:"Delta",  tag:"mo", output:"\u0394"},
-{input:"epsilon", tag:"mi", output:"\u03B5"},
+{input:"epsi",   tag:"mi", output:"\u03B5", tex:"epsilon"},
 {input:"varepsilon", tag:"mi", output:"\u025B"},
 {input:"eta",    tag:"mi", output:"\u03B7"},
 {input:"gamma",  tag:"mi", output:"\u03B3"},
@@ -204,10 +207,16 @@ frac = {input:"frac", tag:"mfrac", output:"/", binary:true},
 div = {input:"/", tag:"mfrac", output:"/", infix:true},
 sub = {input:"_", tag:"msub",  output:"_", infix:true},
 sup = {input:"^", tag:"msup",  output:"^", infix:true},
+hat = {input:"hat", tag:"mover", output:"\u005E", unary:true},
+bar = {input:"bar", tag:"mover", output:"\u00AF", unary:true},
+vec = {input:"vec", tag:"mover", output:"\u2192", unary:true},
+ul = {input:"ul", tag:"munder", output:"\u0332", unary:true},
 text = {input:"text", tag:"mtext", output:"text", unary:true},
 mbox = {input:"mbox", tag:"mtext", output:"mbox", unary:true},
 {input:"bb", tag:"mstyle", atname:"fontweight", atval:"bold", output:"bb", unary:true},
 {input:"mathbf", tag:"mstyle", atname:"fontweight", atval:"bold", output:"mathbf", unary:true},
+{input:"sf", tag:"mstyle", atname:"fontfamily", atval:"sans-serif", output:"sf", unary:true},
+{input:"mathsf", tag:"mstyle", atname:"fontfamily", atval:"sans-serif", output:"mathsf", unary:true},
 {input:"bbb", tag:"mstyle", atname:"mathvariant", atval:"double-struck", output:"bbb", unary:true, codes:bbb},
 {input:"mathbb", tag:"mstyle", atname:"mathvariant", atval:"double-struck", output:"mathbb", unary:true, codes:bbb},
 {input:"cc",  tag:"mstyle", atname:"mathvariant", atval:"script", output:"cal", unary:true, codes:cal},
@@ -237,17 +246,13 @@ function initSymbols() {
 }
 
 function myCreateElementXHTML(t) {
-  if (document.createElementNS==null)
-    return document.createElement(t);
-  else
-    return document.createElementNS("http://www.w3.org/1999/xhtml",t);
+  if (isIE) return document.createElement(t);
+  else return document.createElementNS("http://www.w3.org/1999/xhtml",t);
 }
 
 function myCreateElementMathML(t) {
-  if (document.createElementNS==null)
-    return document.createElement("mml:"+t);
-  else
-    return document.createElementNS("http://www.w3.org/1998/Math/MathML",t);
+  if (isIE) return document.createElement("mml:"+t);
+  else return document.createElementNS("http://www.w3.org/1998/Math/MathML",t);
 }
 
 function createMmlNode(name,frag) {
@@ -391,13 +396,20 @@ function parseSexpr(str) { //parses str and returns [node,tailstr]
       else if (str.charAt(0)=="(") var i=str.indexOf(")");
       else if (str.charAt(0)=="[") var i=str.indexOf("]");
       else var i = 0;
+      if (i==-1) i = str.length;
       node = createMmlNode(symbol.tag,document.createTextNode(str.slice(1,i)));
       str = removeCharsAndBlanks(str,i+1);
       return [node,str];
+    } else if (symbol == hat || symbol == bar || symbol == ul || symbol == vec) {
+      result = parseSexpr(str);
+      removeBrackets(result[0]);
+      node = createMmlNode(symbol.tag,result[0]);
+      node.appendChild(createMmlNode("mo",document.createTextNode(symbol.output)));
+      return [node,result[1]];
     } else {                        // font change command
       result = parseSexpr(str);
       removeBrackets(result[0]);
-      if (document.createElementNS!=null && symbol.codes!=null) {
+      if (!isIE && symbol.codes!=null) {
         for (var i=0; i<result[0].childNodes.length; i++)
           if (result[0].childNodes[i].nodeName=="mi" || result[0].nodeName=="mi") {
             var st = (result[0].nodeName=="mi"?result[0].firstChild.nodeValue:
@@ -497,7 +509,8 @@ function parseExpr(str) {
       var right = newFrag.childNodes[len-1].lastChild.firstChild.nodeValue;
       if (right==")" || right=="]") {
         var left = newFrag.childNodes[len-1].firstChild.firstChild.nodeValue;
-        if (left=="(" && right==")" || left=="[" && right=="]") {
+        if (left=="(" && right==")" && symbol.output != "}" || 
+            left=="[" && right=="]") {
         var pos = []; // positions of commas
         var matrix = true;
         var m = newFrag.childNodes.length;
@@ -555,7 +568,7 @@ function parseExpr(str) {
 function parseMath(str) {
   var node = myCreateElementMathML("mstyle");
   node.setAttribute("mathcolor",mathcolor);
-  node.setAttribute("displaystyle","true");
+  if (displaystyle) node.setAttribute("displaystyle","true");
   node.appendChild(parseExpr(str)[0]);
   return createMmlNode("math",node);
 }
@@ -565,8 +578,18 @@ function strarr2docFrag(arr) {
   var expr = false;
   for (var i=0; i<arr.length; i++) {
     if (expr) newFrag.appendChild(parseMath(arr[i]));
-    else newFrag.appendChild(myCreateElementXHTML("span").
-      appendChild(document.createTextNode(arr[i])));
+    else {
+      var arri = arr[i].split("\n\n\n");
+      newFrag.appendChild(myCreateElementXHTML("span").
+      appendChild(document.createTextNode(arri[0].
+        replace(/\\dollar/g,"$").replace(/\\lq/g,"`"))));
+      for (var j=1; j<arri.length; j++) {
+        newFrag.appendChild(myCreateElementXHTML("p"));
+        newFrag.appendChild(myCreateElementXHTML("span").
+        appendChild(document.createTextNode(arri[j].
+          replace(/\\dollar/g,"$").replace(/\\lq/g,"`"))));
+      }
+    }
     expr = !expr;
   }
   return newFrag;
@@ -578,8 +601,14 @@ function processNode(n) {
     n.parentNode.nodeName!="textarea" && n.parentNode.nodeName!="TEXTAREA") {
     var str = n.nodeValue;
     if (!(str == null)) {
+      str = str.replace(/\\\$/g,"\\dollar");
+      str = str.replace(/\r\n/g,"\n");
+//      str = str.replace(/([^\n])\n([^\n])/g,"$1 $2");
+      str = str.replace(/\$/g,"`");
+      str = str.replace(/\\`/g,"\\lq");
       var arr = str.split(mathdelimit);
-      if (arr.length > 1) n.parentNode.replaceChild(strarr2docFrag(arr),n);
+      if (arr.length>1 || arr[0].split("\n\n").length>1)
+        n.parentNode.replaceChild(strarr2docFrag(arr),n);
     }
   } else for (var i=0; i<n.childNodes.length; i++)
            processNode(n.childNodes[i]);

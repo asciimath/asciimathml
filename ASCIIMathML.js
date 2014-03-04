@@ -7,7 +7,7 @@ loads, and should work with Firefox/Mozilla/Netscape 7+ and Internet
 Explorer 6+MathPlayer (http://www.dessci.com/en/products/mathplayer/).
 This is a convenient and inexpensive solution for authoring MathML.
 
-Version 1.4.5beta Jan 26, 2005, (c) Peter Jipsen http://www.chapman.edu/~jipsen
+Version 1.4.6 Apr 23, 2005, (c) Peter Jipsen http://www.chapman.edu/~jipsen
 Latest version at http://www.chapman.edu/~jipsen/mathml/ASCIIMathML.js
 If you use it on a webpage, please send the URL to jipsen@chapman.edu
 
@@ -29,12 +29,13 @@ var mathcolor = "red";   // change it to "" (to inherit) or any other color
 var mathfontfamily = "serif"; // change to "" to inherit (works in IE) 
                               // or another family (e.g. "arial")
 var displaystyle = true;   // puts limits above and below large operators
-var separatetokens = false;// if true, nonletters must separate letter tokens
-
+var showasciiformulaonhover = true; // helps students learn ASCIIMath
+var decimalsign = ".";     // change to "," if you like, beware of `(1,2)`!
 var AMdelimiter1 = "`", AMescape1 = "\\\\`"; // can use other characters
 var AMdelimiter2 = "$", AMescape2 = "\\\\\\$", AMdelimiter2regexp = "\\$";
 var doubleblankmathdelimiter = false; // if true,  x+1  is equal to `x+1`
                                       // for IE this works only in <!--   -->
+//var separatetokens;// has been removed (email me if this is a problem
 var isIE = document.createElementNS==null;
 
 if (document.getElementById==null) 
@@ -137,7 +138,7 @@ var AMsymbols = [
 {input:"**", tag:"mo", output:"\u22C6", tex:"star", ttype:CONST},
 {input:"//", tag:"mo", output:"/",      tex:null, ttype:CONST},
 {input:"\\\\", tag:"mo", output:"\\",   tex:"backslash", ttype:CONST},
-{input:"setminus", tag:"mo", output:"\\",   tex:null, ttype:CONST},
+{input:"setminus", tag:"mo", output:"\\", tex:null, ttype:CONST},
 {input:"xx", tag:"mo", output:"\u00D7", tex:"times", ttype:CONST},
 {input:"-:", tag:"mo", output:"\u00F7", tex:"divide", ttype:CONST},
 {input:"@",  tag:"mo", output:"\u2218", tex:"circ", ttype:CONST},
@@ -188,8 +189,8 @@ var AMsymbols = [
 {input:"EE",  tag:"mo", output:"\u2203", tex:"exists", ttype:CONST},
 {input:"_|_", tag:"mo", output:"\u22A5", tex:"bot", ttype:CONST},
 {input:"TT",  tag:"mo", output:"\u22A4", tex:"top", ttype:CONST},
-{input:"|-",  tag:"mo", output:"\u22A2", tex:"vdash", ttype:CONST},
-{input:"|=",  tag:"mo", output:"\u22A8", tex:"models", ttype:CONST},
+{input:"|--",  tag:"mo", output:"\u22A2", tex:"vdash", ttype:CONST},
+{input:"|==",  tag:"mo", output:"\u22A8", tex:"models", ttype:CONST},
 
 //grouping brackets
 {input:"(", tag:"mo", output:"(", tex:null, ttype:LEFTBRACKET},
@@ -229,8 +230,8 @@ var AMsymbols = [
 {input:"ddots", tag:"mo", output:"\u22F1", tex:null, ttype:CONST},
 {input:"diamond", tag:"mo", output:"\u22C4", tex:null, ttype:CONST},
 {input:"square", tag:"mo", output:"\u25A1", tex:null, ttype:CONST},
-{input:"|_", tag:"mo", output:"\u230A",  tex:"lfloor", ttype:CONST},
-{input:"_|", tag:"mo", output:"\u230B",  tex:"rfloor", ttype:CONST},
+{input:"|__", tag:"mo", output:"\u230A",  tex:"lfloor", ttype:CONST},
+{input:"__|", tag:"mo", output:"\u230B",  tex:"rfloor", ttype:CONST},
 {input:"|~", tag:"mo", output:"\u2308",  tex:"lceiling", ttype:CONST},
 {input:"~|", tag:"mo", output:"\u2309",  tex:"rceiling", ttype:CONST},
 {input:"CC",  tag:"mo", output:"\u2102", tex:null, ttype:CONST},
@@ -360,8 +361,6 @@ function AMposition(arr, str, n) {
   return i; // i=arr.length || arr[i]>=str
 }
 
-var AMseparated = true;
-
 function AMgetSymbol(str) {
 //return maximal initial substring of str that appears in names
 //return null if there is none
@@ -383,53 +382,42 @@ function AMgetSymbol(str) {
     }
     more = k<AMnames.length && str.slice(0,AMnames[k].length)>=AMnames[k];
   }
-  if (match!="")
-    if (separatetokens) {
-      i = match.length;
-      if ("a">str.charAt(0) || str.charAt(0)>"z" || 
-        "a">str.charAt(i-1) || str.charAt(i-1)>"z") {
-        AMseparated = true;
-        return AMsymbols[mk];
-      }
-      st = str.charAt(i);
-      AMseparated = AMseparated && ("a">st || st>"z");
-      if (AMseparated) return AMsymbols[mk];
-    } else return AMsymbols[mk]; 
+  AMpreviousSymbol=AMcurrentSymbol;
+  if (match!=""){
+    AMcurrentSymbol=AMsymbols[mk].ttype;
+    return AMsymbols[mk]; 
+  }
 // if str[0] is a digit or - return maxsubstring of digits.digits
+  AMcurrentSymbol=CONST;
   k = 1;
   st = str.slice(0,1);
-  var pos = true;
   var integ = true;
-  if (st == "-") {
-    pos = false;
-    st = str.slice(k,k+1);
-    k++;
-  }
   while ("0"<=st && st<="9" && k<=str.length) {
     st = str.slice(k,k+1);
     k++;
   }
-  if (st == ".") {
-    integ = false;
+  if (st == decimalsign) {
     st = str.slice(k,k+1);
-    k++;
-    while ("0"<=st && st<="9" && k<=str.length) {
-      st = str.slice(k,k+1);
+    if ("0"<=st && st<="9") {
+      integ = false;
       k++;
+      while ("0"<=st && st<="9" && k<=str.length) {
+        st = str.slice(k,k+1);
+        k++;
+      }
     }
   }
-  if ((pos && integ && k>1) || ((pos || integ) && k>2) || k>3) {
+  if ((integ && k>1) || k>2) {
     st = str.slice(0,k-1);
     tagst = "mn";
-    AMseparated = true;
   } else {
     k = 2;
     st = str.slice(0,1); //take 1 character
-    AMseparated = ("A">st || st>"Z") && ("a">st || st>"z");
-    tagst = (AMseparated?"mo":"mi");
-    AMseparated = AMseparated || str.charAt(1)<"a" || str.charAt(1)>"z";
+    tagst = (("A">st || st>"Z") && ("a">st || st>"z")?"mo":"mi");
   }
-  return {input:str.slice(0,k-1), tag:tagst, output:st, ttype:CONST};
+  if (st=="-" && AMpreviousSymbol==INFIX)
+    return {input:st, tag:tagst, output:st, ttype:UNARY, func:true};
+  return {input:st, tag:tagst, output:st, ttype:CONST};
 }
 
 function AMremoveBrackets(node) {
@@ -455,15 +443,14 @@ I ::= S_S | S^S | S_S^S | S          Intermediate expression
 E ::= IE | I/I                       Expression
 Each terminal symbol is translated into a corresponding mathml node.*/
 
-var AMnestingDepth;
+var AMnestingDepth,AMpreviousSymbol,AMcurrentSymbol;
 
 function AMparseSexpr(str) { //parses str and returns [node,tailstr]
-  var symbol, node, result, i, st, rightvert = false,
+  var symbol, node, result, i, st,// rightvert = false,
     newFrag = document.createDocumentFragment();
   str = AMremoveCharsAndBlanks(str,0);
   symbol = AMgetSymbol(str);             //either a token or a bracket or empty
   if (symbol == null || symbol.ttype == RIGHTBRACKET && AMnestingDepth > 0) {
-//alert("rightbracket");
     return [null,str];
   }
   if (symbol.ttype == DEFINITION) {
@@ -474,19 +461,13 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
   case UNDEROVER:
   case CONST:
     str = AMremoveCharsAndBlanks(str,symbol.input.length); 
-    if (symbol.tag=="mn" && symbol.output.charAt(0)=="-") {
-      node = AMcreateMmlNode("mo",document.createTextNode("-"));
-      node = AMcreateMmlNode("mrow",node);
-      node.appendChild(AMcreateMmlNode(symbol.tag,        //its a constant
-                             document.createTextNode(symbol.output.slice(1))));
-      return [node,str];
-    } else
     return [AMcreateMmlNode(symbol.tag,        //its a constant
                              document.createTextNode(symbol.output)),str];
   case LEFTBRACKET:   //read (expr+)
     AMnestingDepth++;
     str = AMremoveCharsAndBlanks(str,symbol.input.length); 
     result = AMparseExpr(str,true);
+    AMnestingDepth--;
     if (typeof symbol.invisible == "boolean" && symbol.invisible) 
       node = AMcreateMmlNode("mrow",result[0]);
     else {
@@ -524,7 +505,8 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
       if (result[0]==null) return [AMcreateMmlNode("mo",
                              document.createTextNode(symbol.input)),str];
       if (typeof symbol.func == "boolean" && symbol.func) { // functions hack
-        if (str.charAt(0)=="^" || str.charAt(0)=="_" || str.charAt(0)=="/") {
+        st = str.charAt(0);
+        if (st=="^" || st=="_" || st=="/" || st=="|") {
           return [AMcreateMmlNode(symbol.tag,
                     document.createTextNode(symbol.output)),str];
         } else {
@@ -593,17 +575,21 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
     newFrag.appendChild(node);
     return [AMcreateMmlNode("mrow",newFrag),str];
   case LEFTRIGHT:
-    if (rightvert) return [null,str]; else rightvert = true;
+//    if (rightvert) return [null,str]; else rightvert = true;
     AMnestingDepth++;
     str = AMremoveCharsAndBlanks(str,symbol.input.length); 
     result = AMparseExpr(str,false);
-    var st = result[0].lastChild.firstChild.nodeValue;
-    if (st == "|") {
+    AMnestingDepth--;
+    var st = "";
+    if (result[0].lastChild!=null)
+      st = result[0].lastChild.firstChild.nodeValue;
+//alert(result[0].lastChild+"***"+st);
+    if (st == "|") { // its an absolute value subterm
       node = AMcreateMmlNode("mo",document.createTextNode(symbol.output));
       node = AMcreateMmlNode("mrow",node);
       node.appendChild(result[0]);
       return [node,result[1]];
-    } else {
+    } else { // the "|" is a \mid
       node = AMcreateMmlNode("mo",document.createTextNode(symbol.output));
       node = AMcreateMmlNode("mrow",node);
       return [node,str];
@@ -677,13 +663,14 @@ function AMparseExpr(str,rightbracket) {
       node = AMcreateMmlNode(symbol.tag,node);
       node.appendChild(result[0]);
       newFrag.appendChild(node);
+      symbol = AMgetSymbol(str);
     } 
     else if (node!=undefined) newFrag.appendChild(node);
   } while ((symbol.ttype != RIGHTBRACKET && 
            (symbol.ttype != LEFTRIGHT || rightbracket)
            || AMnestingDepth == 0) && symbol!=null && symbol.output!="");
   if (symbol.ttype == RIGHTBRACKET || symbol.ttype == LEFTRIGHT) {
-    if (AMnestingDepth > 0) AMnestingDepth--;
+//    if (AMnestingDepth > 0) AMnestingDepth--;
     var len = newFrag.childNodes.length;
     if (len>0 && newFrag.childNodes[len-1].nodeName == "mrow" && len>1 &&
       newFrag.childNodes[len-2].nodeName == "mo" &&
@@ -757,6 +744,7 @@ function AMparseMath(str) {
   AMnestingDepth = 0;
   node.appendChild(AMparseExpr(str.replace(/^\s+/g,""),false)[0]);
   node = AMcreateMmlNode("math",node);
+  if (showasciiformulaonhover) node.setAttribute("title",str);
   if (mathfontfamily != "" && (isIE || mathfontfamily != "serif")) {
     var fnode = AMcreateElementXHTML("font");
     fnode.setAttribute("face",mathfontfamily);
@@ -774,14 +762,11 @@ function AMstrarr2docFrag(arr, linebreaks) {
     else {
       var arri = (linebreaks ? arr[i].split("\n\n") : [arr[i]]);
       newFrag.appendChild(AMcreateElementXHTML("span").
-      appendChild(document.createTextNode(arri[0].
-      replace(/AMescape2/g,AMdelimiter2).replace(/AMescape1/g,AMdelimiter1))));
+      appendChild(document.createTextNode(arri[0])));
       for (var j=1; j<arri.length; j++) {
         newFrag.appendChild(AMcreateElementXHTML("p"));
         newFrag.appendChild(AMcreateElementXHTML("span").
-        appendChild(document.createTextNode(arri[j].
-          replace(/AMescape2/g,AMdelimiter2).
-          replace(/AMescape1/g,AMdelimiter1))));
+        appendChild(document.createTextNode(arri[j])));
       }
     }
     expr = !expr;
@@ -790,8 +775,9 @@ function AMstrarr2docFrag(arr, linebreaks) {
 }
 
 function AMprocessNodeR(n, linebreaks) {
-  var mtch, str, arr;
+  var mtch, str, arr, frg, i;
   if (n.childNodes.length == 0 && (n.nodeType!=8 || linebreaks) &&
+    n.parentNode.nodeName!="form" && n.parentNode.nodeName!="FORM" &&
     n.parentNode.nodeName!="textarea" && n.parentNode.nodeName!="TEXTAREA" &&
     n.parentNode.nodeName!="pre" && n.parentNode.nodeName!="PRE") {
     str = n.nodeValue;
@@ -811,6 +797,9 @@ function AMprocessNodeR(n, linebreaks) {
               function(st){mtch=true;return "AMescape1"});
       str = str.replace(new RegExp(AMdelimiter2regexp, "g"),AMdelimiter1);
       arr = str.split(AMdelimiter1);
+      for (i=0; i<arr.length; i++)
+        arr[i]=arr[i].replace(/AMescape2/g,AMdelimiter2).
+                      replace(/AMescape1/g,AMdelimiter1);
       if (arr.length>1 || mtch) {
         if (checkForMathML) {
           checkForMathML = false;
@@ -819,21 +808,37 @@ function AMprocessNodeR(n, linebreaks) {
           if (AMnoMathML && notifyIfNoMathML) 
             AMbody.insertBefore(nd,AMbody.childNodes[0]);
         }
-        if (!AMnoMathML)
-          n.parentNode.replaceChild(AMstrarr2docFrag(arr,n.nodeType==8),n);
+        if (!AMnoMathML) {
+          frg = AMstrarr2docFrag(arr,n.nodeType==8);
+          var len = frg.childNodes.length;
+          n.parentNode.replaceChild(frg,n);
+          return len-1;
+        } else return 0;
       }
     }
   } else if (n.nodeName!="math") {
-    var len = n.childNodes.length;
-    for (var i=0; i<len; i++)
-      AMprocessNodeR(n.childNodes[i], linebreaks);
+    for (i=0; i<n.childNodes.length; i++)
+      i += AMprocessNodeR(n.childNodes[i], linebreaks);
   }
+  return 0;
 }
 
-function AMprocessNode(n, linebreaks) {
-  AMprocessNodeR(n,linebreaks);
+function AMprocessNode(n, linebreaks, spanclassAM) {
+  var frag,st;
+  if (spanclassAM!=null) {
+    frag = document.getElementsByTagName("span")
+    for (var i=0;i<frag.length;i++)
+      if (frag[i].className == "AM")
+        AMprocessNodeR(frag[i],linebreaks);
+  } else {
+    try {
+      st = n.innerHTML;
+    } catch(err) {}
+    if (st==null || st.indexOf("`")!=-1 || st.indexOf("$")!=-1) 
+      AMprocessNodeR(n,linebreaks);
+  }
   if (isIE) { //needed to match size and font of formula to surrounding text
-    var frag = document.getElementsByTagName('math');
+    frag = document.getElementsByTagName('math');
     for (var i=0;i<frag.length;i++) frag[i].update()
   }
 }
@@ -841,10 +846,8 @@ function AMprocessNode(n, linebreaks) {
 var AMbody;
 var AMnoMathML = false;
 
-function translate() {
+function translate(spanclassAM) {
   AMinitSymbols();
   AMbody = document.getElementsByTagName("body")[0];
-  AMprocessNode(AMbody, false);
+  AMprocessNode(AMbody, false, spanclassAM);
 }
-
-

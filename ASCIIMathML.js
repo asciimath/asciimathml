@@ -9,7 +9,7 @@ Just add the next line to your (X)HTML page with this file in the same folder:
 <script type="text/javascript" src="ASCIIMathML.js"></script>
 This is a convenient and inexpensive solution for authoring MathML.
 
-Version 1.4.7 Dec 15, 2005, (c) Peter Jipsen http://www.chapman.edu/~jipsen
+Version 1.4.8 Sep 6, 2005, (c) Peter Jipsen http://www.chapman.edu/~jipsen
 Latest version at http://www.chapman.edu/~jipsen/mathml/ASCIIMathML.js
 For changes see http://www.chapman.edu/~jipsen/mathml/asciimathchanges.txt
 If you use it on a webpage, please send the URL to jipsen@chapman.edu
@@ -29,6 +29,8 @@ for more details.
 var checkForMathML = true;   // check if browser can display MathML
 var notifyIfNoMathML = true; // display note if no MathML capability
 var alertIfNoMathML = false;  // show alert box if no MathML capability
+var linkIfNoMathML = true;   // link on Math expression(s) if no MathML
+var linkOnAllIfNoMathML = false; // link on all (true) or only on first (false)
 var mathcolor = "red";       // change it to "" (to inherit) or any other color
 var mathfontfamily = "serif"; // change to "" to inherit (works in IE) 
                               // or another family (e.g. "arial")
@@ -179,8 +181,6 @@ var AMsymbols = [
 {input:"-<",  tag:"mo", output:"\u227A", tex:"prec", ttype:CONST},
 {input:"-lt", tag:"mo", output:"\u227A", tex:null, ttype:CONST},
 {input:">-",  tag:"mo", output:"\u227B", tex:"succ", ttype:CONST},
-{input:"-<=", tag:"mo", output:"\u2AAF", tex:"preceq", ttype:CONST},
-{input:">-=", tag:"mo", output:"\u2AB0", tex:"succeq", ttype:CONST},
 {input:"in",  tag:"mo", output:"\u2208", tex:null, ttype:CONST},
 {input:"!in", tag:"mo", output:"\u2209", tex:"notin", ttype:CONST},
 {input:"sub", tag:"mo", output:"\u2282", tex:"subset", ttype:CONST},
@@ -436,10 +436,8 @@ function AMgetSymbol(str) {
     st = str.slice(0,1); //take 1 character
     tagst = (("A">st || st>"Z") && ("a">st || st>"z")?"mo":"mi");
   }
-  if (st=="-" && AMpreviousSymbol==INFIX) {
-    AMcurrentSymbol = INFIX;  //trick "/" into recognizing "-" on second parse
+  if (st=="-" && AMpreviousSymbol==INFIX)
     return {input:st, tag:tagst, output:st, ttype:UNARY, func:true};
-  }
   return {input:st, tag:tagst, output:st, ttype:CONST};
 }
 
@@ -606,6 +604,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
     var st = "";
     if (result[0].lastChild!=null)
       st = result[0].lastChild.firstChild.nodeValue;
+//alert(result[0].lastChild+"***"+st);
     if (st == "|") { // its an absolute value subterm
       node = AMcreateMmlNode("mo",document.createTextNode(symbol.output));
       node = AMcreateMmlNode("mrow",node);
@@ -781,7 +780,18 @@ function AMstrarr2docFrag(arr, linebreaks) {
   var newFrag=document.createDocumentFragment();
   var expr = false;
   for (var i=0; i<arr.length; i++) {
-    if (expr) newFrag.appendChild(AMparseMath(arr[i]));
+    if (expr) {
+      if (AMnoMathML) {
+        newFrag.appendChild(document.createTextNode("`"+arr[i]+"`"));
+        if (linkIfNoMathML) {
+          if (!linkOnAllIfNoMathML) linkIfNoMathML = false;
+          var node = AMcreateElementXHTML("a");
+          node.setAttribute("href","MathMLhelp.html");
+          node.appendChild(document.createTextNode("HELP WITH MathML"));
+          newFrag.appendChild(node);
+        }
+      } else newFrag.appendChild(AMparseMath(arr[i]));
+    }
     else {
       var arri = (linebreaks ? arr[i].split("\n\n") : [arr[i]]);
       newFrag.appendChild(AMcreateElementXHTML("span").
@@ -835,7 +845,7 @@ function AMprocessNodeR(n, linebreaks) {
                 or Firefox/Mozilla/Netscape");
             else AMbody.insertBefore(nd,AMbody.childNodes[0]);
         }
-        if (!AMnoMathML) {
+        if (!AMnoMathML || linkIfNoMathML) {
           frg = AMstrarr2docFrag(arr,n.nodeType==8);
           var len = frg.childNodes.length;
           n.parentNode.replaceChild(frg,n);

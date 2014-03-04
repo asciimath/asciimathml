@@ -2,13 +2,16 @@
 ASCIIMathML.js
 ==============
 This file contains JavaScript functions to convert ASCII math notation
-to Presentation MathML. The conversion is done while the XHTML page 
+to Presentation MathML. The conversion is done while the (X)HTML page 
 loads, and should work with Firefox/Mozilla/Netscape 7+ and Internet 
 Explorer 6+MathPlayer (http://www.dessci.com/en/products/mathplayer/).
+Just add the next line to your (X)HTML page with this file in the same folder:
+<script type="text/javascript" src="ASCIIMathML.js"></script>
 This is a convenient and inexpensive solution for authoring MathML.
 
-Version 1.4.6 Apr 23, 2005, (c) Peter Jipsen http://www.chapman.edu/~jipsen
+Version 1.4.7 Aug 30, 2005, (c) Peter Jipsen http://www.chapman.edu/~jipsen
 Latest version at http://www.chapman.edu/~jipsen/mathml/ASCIIMathML.js
+For changes see http://www.chapman.edu/~jipsen/mathml/asciimathchanges.txt
 If you use it on a webpage, please send the URL to jipsen@chapman.edu
 
 This program is free software; you can redistribute it and/or modify
@@ -23,19 +26,20 @@ General Public License (at http://www.gnu.org/copyleft/gpl.html)
 for more details.
 */
 
-var checkForMathML = true; // check if browser can display MathML
-var notifyIfNoMathML = true; // put note at top of page if no MathML capability
-var mathcolor = "red";   // change it to "" (to inherit) or any other color
+var checkForMathML = true;   // check if browser can display MathML
+var notifyIfNoMathML = true; // display note if no MathML capability
+var alertIfNoMathML = true;  // show alert box if no MathML capability
+var mathcolor = "red";       // change it to "" (to inherit) or any other color
 var mathfontfamily = "serif"; // change to "" to inherit (works in IE) 
                               // or another family (e.g. "arial")
-var displaystyle = true;   // puts limits above and below large operators
+var displaystyle = true;      // puts limits above and below large operators
 var showasciiformulaonhover = true; // helps students learn ASCIIMath
-var decimalsign = ".";     // change to "," if you like, beware of `(1,2)`!
+var decimalsign = ".";        // change to "," if you like, beware of `(1,2)`!
 var AMdelimiter1 = "`", AMescape1 = "\\\\`"; // can use other characters
 var AMdelimiter2 = "$", AMescape2 = "\\\\\\$", AMdelimiter2regexp = "\\$";
 var doubleblankmathdelimiter = false; // if true,  x+1  is equal to `x+1`
                                       // for IE this works only in <!--   -->
-//var separatetokens;// has been removed (email me if this is a problem
+//var separatetokens;// has been removed (email me if this is a problem)
 var isIE = document.createElementNS==null;
 
 if (document.getElementById==null) 
@@ -49,8 +53,10 @@ function AMcreateElementXHTML(t) {
   else return document.createElementNS("http://www.w3.org/1999/xhtml",t);
 }
 
-function AMisMathMLavailable() {
-  var nd = AMcreateElementXHTML("center");
+function AMnoMathMLNote() {
+  var nd = AMcreateElementXHTML("h3");
+  nd.setAttribute("align","center")
+  nd.appendChild(AMcreateElementXHTML("p"));
   nd.appendChild(document.createTextNode("To view the "));
   var an = AMcreateElementXHTML("a");
   an.appendChild(document.createTextNode("ASCIIMathML"));
@@ -62,17 +68,22 @@ function AMisMathMLavailable() {
   an.setAttribute("href","http://www.dessci.com/en/products/mathplayer/download.htm");
   nd.appendChild(an);
   nd.appendChild(document.createTextNode(" or Netscape/Mozilla/Firefox"));
+  nd.appendChild(AMcreateElementXHTML("p"));
+  return nd;
+}
+
+function AMisMathMLavailable() {
   if (navigator.appName.slice(0,8)=="Netscape") 
     if (navigator.appVersion.slice(0,1)>="5") return null;
-    else return nd;
+    else return AMnoMathMLNote();
   else if (navigator.appName.slice(0,9)=="Microsoft")
     try {
         var ActiveX = new ActiveXObject("MathPlayer.Factory.1");
         return null;
     } catch (e) {
-        return nd;
+        return AMnoMathMLNote();
     }
-  else return nd;
+  else return AMnoMathMLNote();
 }
 
 // character lists for Mozilla/Netscape fonts
@@ -121,6 +132,7 @@ var AMsymbols = [
 {input:"pi",     tag:"mi", output:"\u03C0", tex:null, ttype:CONST},
 {input:"Pi",     tag:"mo", output:"\u03A0", tex:null, ttype:CONST},
 {input:"psi",    tag:"mi", output:"\u03C8", tex:null, ttype:CONST},
+{input:"Psi",    tag:"mi", output:"\u03A8", tex:null, ttype:CONST},
 {input:"rho",    tag:"mi", output:"\u03C1", tex:null, ttype:CONST},
 {input:"sigma",  tag:"mi", output:"\u03C3", tex:null, ttype:CONST},
 {input:"Sigma",  tag:"mo", output:"\u03A3", tex:null, ttype:CONST},
@@ -222,6 +234,8 @@ var AMsymbols = [
 {input:"oo",   tag:"mo", output:"\u221E", tex:"infty", ttype:CONST},
 {input:"aleph", tag:"mo", output:"\u2135", tex:null, ttype:CONST},
 {input:"...",  tag:"mo", output:"...",    tex:"ldots", ttype:CONST},
+{input:":.",  tag:"mo", output:"\u2234",  tex:"therefore", ttype:CONST},
+{input:"/_",  tag:"mo", output:"\u2220",  tex:"angle", ttype:CONST},
 {input:"\\ ",  tag:"mo", output:"\u00A0", tex:null, ttype:CONST},
 {input:"quad", tag:"mo", output:"\u00A0\u00A0", tex:null, ttype:CONST},
 {input:"qquad", tag:"mo", output:"\u00A0\u00A0\u00A0\u00A0", tex:null, ttype:CONST},
@@ -322,16 +336,21 @@ function AMinitSymbols() {
 var AMmathml = "http://www.w3.org/1998/Math/MathML";
 
 function AMcreateElementMathML(t) {
-  if (isIE) return document.createElement("mml:"+t);
+  if (isIE) return document.createElement("m:"+t);
   else return document.createElementNS(AMmathml,t);
 }
 
 function AMcreateMmlNode(t,frag) {
 //  var node = AMcreateElementMathML(name);
-  if (isIE) var node = document.createElement("mml:"+t);
+  if (isIE) var node = document.createElement("m:"+t);
   else var node = document.createElementNS(AMmathml,t);
   node.appendChild(frag);
   return node;
+}
+
+function newcommand(oldstr,newstr) {
+  AMsymbols = AMsymbols.concat([{input:oldstr, tag:"mo", output:newstr, 
+                                 tex:null, ttype:DEFINITION}]);
 }
 
 function AMremoveCharsAndBlanks(str,n) {
@@ -502,11 +521,11 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
   case UNARY:
       str = AMremoveCharsAndBlanks(str,symbol.input.length); 
       result = AMparseSexpr(str);
-      if (result[0]==null) return [AMcreateMmlNode("mo",
-                             document.createTextNode(symbol.input)),str];
+      if (result[0]==null) return [AMcreateMmlNode(symbol.tag,
+                             document.createTextNode(symbol.output)),str];
       if (typeof symbol.func == "boolean" && symbol.func) { // functions hack
         st = str.charAt(0);
-        if (st=="^" || st=="_" || st=="/" || st=="|") {
+        if (st=="^" || st=="_" || st=="/" || st=="|" || st==",") {
           return [AMcreateMmlNode(symbol.tag,
                     document.createTextNode(symbol.output)),str];
         } else {
@@ -744,7 +763,8 @@ function AMparseMath(str) {
   AMnestingDepth = 0;
   node.appendChild(AMparseExpr(str.replace(/^\s+/g,""),false)[0]);
   node = AMcreateMmlNode("math",node);
-  if (showasciiformulaonhover) node.setAttribute("title",str);
+  if (showasciiformulaonhover)                      //fixed by djhsu so newline
+    node.setAttribute("title",str.replace(/\s+/g," "));//does not show in Gecko
   if (mathfontfamily != "" && (isIE || mathfontfamily != "serif")) {
     var fnode = AMcreateElementXHTML("font");
     fnode.setAttribute("face",mathfontfamily);
@@ -776,7 +796,8 @@ function AMstrarr2docFrag(arr, linebreaks) {
 
 function AMprocessNodeR(n, linebreaks) {
   var mtch, str, arr, frg, i;
-  if (n.childNodes.length == 0 && (n.nodeType!=8 || linebreaks) &&
+  if (n.childNodes.length == 0) {
+   if ((n.nodeType!=8 || linebreaks) &&
     n.parentNode.nodeName!="form" && n.parentNode.nodeName!="FORM" &&
     n.parentNode.nodeName!="textarea" && n.parentNode.nodeName!="TEXTAREA" &&
     n.parentNode.nodeName!="pre" && n.parentNode.nodeName!="PRE") {
@@ -804,9 +825,12 @@ function AMprocessNodeR(n, linebreaks) {
         if (checkForMathML) {
           checkForMathML = false;
           var nd = AMisMathMLavailable();
-          AMnoMathML = nd != null
+          AMnoMathML = nd != null;
           if (AMnoMathML && notifyIfNoMathML) 
-            AMbody.insertBefore(nd,AMbody.childNodes[0]);
+            if (alertIfNoMathML)
+              alert("To view the ASCIIMathML notation use Internet Explorer 6 +\nMathPlayer (free from www.dessci.com)\n\
+                or Firefox/Mozilla/Netscape");
+            else AMbody.insertBefore(nd,AMbody.childNodes[0]);
         }
         if (!AMnoMathML) {
           frg = AMstrarr2docFrag(arr,n.nodeType==8);
@@ -816,6 +840,7 @@ function AMprocessNodeR(n, linebreaks) {
         } else return 0;
       }
     }
+   } else return 0;
   } else if (n.nodeName!="math") {
     for (i=0; i<n.childNodes.length; i++)
       i += AMprocessNodeR(n.childNodes[i], linebreaks);
@@ -834,7 +859,8 @@ function AMprocessNode(n, linebreaks, spanclassAM) {
     try {
       st = n.innerHTML;
     } catch(err) {}
-    if (st==null || st.indexOf("`")!=-1 || st.indexOf("$")!=-1) 
+    if (st==null || 
+        st.indexOf(AMdelimiter1)!=-1 || st.indexOf(AMdelimiter2)!=-1) 
       AMprocessNodeR(n,linebreaks);
   }
   if (isIE) { //needed to match size and font of formula to surrounding text
@@ -844,10 +870,67 @@ function AMprocessNode(n, linebreaks, spanclassAM) {
 }
 
 var AMbody;
-var AMnoMathML = false;
+var AMnoMathML = false, AMtranslated = false;
 
 function translate(spanclassAM) {
-  AMinitSymbols();
-  AMbody = document.getElementsByTagName("body")[0];
-  AMprocessNode(AMbody, false, spanclassAM);
+  if (!AMtranslated) { // run this only once
+    AMtranslated = true;
+    AMinitSymbols();
+    AMbody = document.getElementsByTagName("body")[0];
+    AMprocessNode(AMbody, false, spanclassAM);
+  }
+}
+
+if (isIE) { // avoid adding MathPlayer info explicitly to each webpage
+  document.write("<object id=\"mathplayer\"\
+  classid=\"clsid:32F66A20-7614-11D4-BD11-00104BD3F987\"></object>");
+  document.write("<?import namespace=\"m\" implementation=\"#mathplayer\"?>");
+}
+
+// GO1.1 Generic onload by Brothercake 
+// http://www.brothercake.com/
+//onload function (replaces the onload="translate()" in the <body> tag)
+function generic()
+{
+  translate();
+};
+//setup onload function
+if(typeof window.addEventListener != 'undefined')
+{
+  //.. gecko, safari, konqueror and standard
+  window.addEventListener('load', generic, false);
+}
+else if(typeof document.addEventListener != 'undefined')
+{
+  //.. opera 7
+  document.addEventListener('load', generic, false);
+}
+else if(typeof window.attachEvent != 'undefined')
+{
+  //.. win/ie
+  window.attachEvent('onload', generic);
+}
+//** remove this condition to degrade older browsers
+else
+{
+  //.. mac/ie5 and anything else that gets this far
+  //if there's an existing onload function
+  if(typeof window.onload == 'function')
+  {
+    //store it
+    var existing = onload;
+    //add new onload handler
+    window.onload = function()
+    {
+      //call existing onload function
+      existing();
+      //call generic onload function
+      generic();
+    };
+  }
+  else
+  {
+    //setup onload function
+    window.onload = generic;
+  }
 }

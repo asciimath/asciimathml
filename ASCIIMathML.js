@@ -405,16 +405,16 @@ var AMsymbols = [
 {input:"text", tag:"mtext", output:"text", tex:null, ttype:TEXT},
 {input:"mbox", tag:"mtext", output:"mbox", tex:null, ttype:TEXT},
 AMquote,
-{input:"bb", tag:"mstyle", atname:"fontweight", atval:"bold", output:"bb", tex:null, ttype:UNARY},
-{input:"mathbf", tag:"mstyle", atname:"fontweight", atval:"bold", output:"mathbf", tex:null, ttype:UNARY},
-{input:"sf", tag:"mstyle", atname:"fontfamily", atval:"sans-serif", output:"sf", tex:null, ttype:UNARY},
-{input:"mathsf", tag:"mstyle", atname:"fontfamily", atval:"sans-serif", output:"mathsf", tex:null, ttype:UNARY},
+{input:"bb", tag:"mstyle", atname:"mathvariant", atval:"bold", output:"bb", tex:null, ttype:UNARY},
+{input:"mathbf", tag:"mstyle", atname:"mathvariant", atval:"bold", output:"mathbf", tex:null, ttype:UNARY},
+{input:"sf", tag:"mstyle", atname:"mathvariant", atval:"sans-serif", output:"sf", tex:null, ttype:UNARY},
+{input:"mathsf", tag:"mstyle", atname:"mathvariant", atval:"sans-serif", output:"mathsf", tex:null, ttype:UNARY},
 {input:"bbb", tag:"mstyle", atname:"mathvariant", atval:"double-struck", output:"bbb", tex:null, ttype:UNARY, codes:AMbbb},
 {input:"mathbb", tag:"mstyle", atname:"mathvariant", atval:"double-struck", output:"mathbb", tex:null, ttype:UNARY, codes:AMbbb},
 {input:"cc",  tag:"mstyle", atname:"mathvariant", atval:"script", output:"cc", tex:null, ttype:UNARY, codes:AMcal},
 {input:"mathcal", tag:"mstyle", atname:"mathvariant", atval:"script", output:"mathcal", tex:null, ttype:UNARY, codes:AMcal},
-{input:"tt",  tag:"mstyle", atname:"fontfamily", atval:"monospace", output:"tt", tex:null, ttype:UNARY},
-{input:"mathtt", tag:"mstyle", atname:"fontfamily", atval:"monospace", output:"mathtt", tex:null, ttype:UNARY},
+{input:"tt",  tag:"mstyle", atname:"mathvariant", atval:"monospace", output:"tt", tex:null, ttype:UNARY},
+{input:"mathtt", tag:"mstyle", atname:"mathvariant", atval:"monospace", output:"mathtt", tex:null, ttype:UNARY},
 {input:"fr",  tag:"mstyle", atname:"mathvariant", atval:"fraktur", output:"fr", tex:null, ttype:UNARY, codes:AMfrk},
 {input:"mathfrak",  tag:"mstyle", atname:"mathvariant", atval:"fraktur", output:"mathfrak", tex:null, ttype:UNARY, codes:AMfrk}
 ];
@@ -636,9 +636,9 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
       if (symbol.input == "sqrt") {           // sqrt
         return [createMmlNode(symbol.tag,result[0]),result[1]];
       } else  if (symbol.input == "abs") {    // abs
-          node = AMcreateMmlNode("mrow", AMcreateMmlNode("mo",document.createTextNode('|')));
+          node = createMmlNode("mrow", createMmlNode("mo",document.createTextNode('|')));
           node.appendChild(result[0]);
-          node.appendChild(AMcreateMmlNode("mo",document.createTextNode('|')));
+          node.appendChild(createMmlNode("mo",document.createTextNode('|')));
           return [node,result[1]];
       } else if (typeof symbol.acc == "boolean" && symbol.acc) {   // accent
         node = createMmlNode(symbol.tag,result[0]);

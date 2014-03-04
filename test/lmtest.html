@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<script type="text/javascript" src="../LaTeXMathML.js"></script>
+	<title> LaTeXMathML examples </title>
+</head>
+<body>
+	<h1> LaTeXMathML examples </h1>
+<hr>
+
+<br/>
+This page is a test of
+<a href="lm.html">
+LaTeXMathML.js</a>.
+
+The input
+<blockquote>
+<font color="blue">
+\$\\$\alpha + \\$\beta = \\$(\alpha + \beta).\$
+</font>
+</blockquote>
+produces <font color="red"> $\$\alpha + \$\beta = \$(\alpha + \beta).$</font>
+
+The input
+<blockquote>
+<font color="blue">
+\$\lim_{x\to\infty} f(x) = k \choose r + \frac ab \sum_{n=1}^\infty a_n +
+<br/>
+\displaystyle{ \left\{ \frac{1}{13} \sum_{n=1}^\infty b_n \right\} }.\$
+</font>
+</blockquote>
+produces <font color="red">$
+\lim_{x\to\infty} f(x) = k \choose r +
+\frac ab \sum_{n=1}^\infty a_n + \displaystyle{ \left\{
+\frac{1}{13} \sum_{n=1}^\infty b_n \right\} }.$</font>
+
+Changing
+<font color="blue"> \displaystyle </font> to
+<br/>
+<font color="blue"> \textstyle </font>
+and
+<font color="blue"> \$...\$ </font> to
+<font color="blue"> &lt;blockquote>\$\displaystyle{ ...
+}\$&lt;/blockquote> </font>
+gives
+<blockquote> <font color="red">$\displaystyle{
+\lim_{x\to\infty} f(x) = k \choose r +
+\frac ab \sum_{n=1}^\infty a_n + \textstyle{ \left\{
+\frac{1}{13} \sum_{n=1}^\infty b_n \right\} }.$</font> </blockquote>
+
+The input
+<blockquote>
+<font color="blue"> &lt;blockquote>\$\begin{eqnarray}
+x & = & \frac{-7 \pm \sqrt{49 - 24}}{6} \\
+<br/>
+& = & -2 \textrm{ or } -\frac13.
+\end{eqnarray}\$&lt;/blockquote> </font>
+</blockquote>
+produces
+<blockquote> <font color="red">$\begin{eqnarray}
+x & = & \frac{-7 \pm \sqrt{49 - 24}}{6} \\
+& = & -\frac13 \textrm{ or } -2.
+\end{eqnarray}$</font> </blockquote>
+(LaTeXMathML tries to reduce the column spacing in eqnarrays,
+but some browsers do not respond, and others over-react.)
+
+The input
+<blockquote>
+<font color="blue"> &lt;blockquote>\$\displaystyle{
+f(x) := \left\{\begin{array}{l l}
+<br/>
+x^2 \sin \frac1x & \textrm{if } x \ne 0, \\
+<br/>
+0 & \textrm{if } x = 0 .
+<br/>
+\end{array}\right.}\$&lt;/blockquote> </font>
+</blockquote>
+produces
+<blockquote> <font color="red"> $\displaystyle{
+f(x) := \left\{\begin{array}{l l}
+x^2 \sin \frac1x & \textrm{if } x \ne 0, \\
+0 & \textrm{if } x = 0 .
+\end{array}\right.
+}$</font> </blockquote>
+
+The input
+<blockquote>
+<font color="blue"> &lt;blockquote>\$\displaystyle{
+A = \left[\begin{array}{c c c}
+<br/>
+1-x & 0 & 0 \\ 0 & 1-x & 0 \\ 0 & 0 & 1-x \end{array}\right].
+<br/>
+\$&lt;/blockquote> </font>
+</blockquote>
+produces
+<blockquote> <font color="red"> $\displaystyle{
+A = \left[\begin{array}{c c c}
+1-x & 0 & 0 \\ 0 & 1-x & 0 \\ 0 & 0 & 1-x \end{array}\right].
+}$</font> </blockquote>
+
+Large summation signs, etc., without limits can sometimes get too big.
+For example, the input
+<blockquote>
+<font color="blue">
+\$\sum a_i + \sum_{i=0}^\infty b_i.\$ </font>
+</blockquote>
+produces
+<font color="red"> $
+\sum a_i + \sum_{i=0}^\infty b_i .
+$</font>
+In some browsers,
+the presence of the second summation sign, with limits, makes
+the first one too big.
+Enclosing the first one in braces, as in
+<font color="blue">{\sum a_i}</font>, produces
+<font color="red"> $
+{\sum a_i} + \sum_{i=0}^\infty b_i ,
+$</font>
+which is arguably better.
+(This is a bug in LaTeXMathML, but one that would be difficult
+to correct.)
+
+<br/> <br/>
+<hr>
+<p>
+<a href="lm.html">
+LaTeXMathML home page</a>
+</p>
+<p>
+     <a href="http://validator.w3.org/check?uri=referer"><img border="0"
+        src="http://www.w3.org/Icons/valid-html401"
+        alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+</p>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<a name="largesigma"></a>
+</body>
+</html>

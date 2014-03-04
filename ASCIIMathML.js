@@ -15,7 +15,7 @@ Just add the next line to your (X)HTML page with this file in the same folder:
 (using the graphics in IE also requires the file "d.svg" in the same folder).
 This is a convenient and inexpensive solution for authoring MathML and SVG.
 
-Version 2.0.1 Sept 27, 2007, (c) Peter Jipsen http://www.chapman.edu/~jipsen
+Version 2.0.4 Oct 9, 2007, (c) Peter Jipsen http://www.chapman.edu/~jipsen
 This version extends ASCIIMathML.js with LaTeXMathML.js and ASCIIsvg.js.
 Latest version at http://www.chapman.edu/~jipsen/mathml/ASCIIMathML.js
 If you use it on a webpage, please send the URL to jipsen@chapman.edu
@@ -836,7 +836,7 @@ function AMautomathrec(str) {
       arr[i] = arr[i].replace(/([{}[\]])/,"`$1`");
     }
   str = arr.join(AMdelimiter1);
-  str = str.replace(/(\([a-zA-Z]{2,}.*?)\)`/g,"$1`)");  //fix parentheses
+  str = str.replace(/((^|\s)\([a-zA-Z]{2,}.*?)\)`/g,"$1`)");  //fix parentheses
   str = str.replace(/`(\((a\s|in\s))(.*?[a-zA-Z]{2,}\))/g,"$1`$3");  //fix parentheses
   str = str.replace(/\sin`/g,"` in");
   str = str.replace(/`(\(\w\)[,.]?(\s|\n|$))/g,"$1`");
@@ -862,7 +862,7 @@ function AMprocessNodeR(n, linebreaks) {
               function(){mtch = true; return "AMescape1"});
       str = str.replace(/\\?end{?a?math}?/i,
               function(){automathrecognize = false; mtch = true; return ""});
-      str = str.replace(/amath|\\begin{a?math}/i,
+      str = str.replace(/amath\b|\\begin{a?math}/i,
               function(){automathrecognize = true; mtch = true; return ""});
       arr = str.split(AMdelimiter1);
       if (automathrecognize)
@@ -910,7 +910,7 @@ function AMprocessNode(n, linebreaks, spanclassAM) {
     try {
       st = n.innerHTML; // look for AMdelimiter on page
     } catch(err) {}
-    if (st==null || /amath|\\begin{a?math}/i.test(st) ||
+    if (st==null || /amath\b|\\begin{a?math}/i.test(st) ||
       st.indexOf(AMdelimiter1+" ")!=-1 || st.slice(-1)==AMdelimiter1 ||
       st.indexOf(AMdelimiter1+"<")!=-1 || st.indexOf(AMdelimiter1+"\n")!=-1) {
       AMprocessNodeR(n,linebreaks);
@@ -2061,7 +2061,7 @@ function LMprocessNodeR(n, linebreaks) {
 var tcnt = 0, dcnt = 0; //theorem and definition counters
 
 function simpleLaTeXformatting(st) {
-  st = st.replace(/\$\$(.*?)\$\$/g,"<p align=\"center\">$\\displaystyle{$1}$</p>");
+  st = st.replace(/\$\$((.|\n)*?)\$\$/g,"<p align=\"center\">$\\displaystyle{$1}$</p>");
   st = st.replace(/\\begin{(theorem|lemma|proposition|corollary)}((.|\n)*?)\\end{\1}/g,function(r,s,t){tcnt++; return "<b>"+s.charAt(0).toUpperCase()+s.slice(1)+" "+tcnt+".</b> <i>"+t.replace(/^\s*<\/?\w+\/?>|\s*<\/?\w+\/?>$/g,"")+"</i>"});
   st = st.replace(/\\begin{(definition|example|remark|problem|exercise|conjecture|solution)}((.|\n)*?)\\end{\1}/g,function(r,s,t){dcnt++; return "<b>"+s.charAt(0).toUpperCase()+s.slice(1)+" "+dcnt+".</b> "+t.replace(/^\s*<\/?\w+\/?>|\s*<\/?\w+\/?>$/g,"")});
   st = st.replace(/\\begin{proof}((.|\n)*?)\\end{proof}/g,function(s,t){return "<i>Proof:</i> "+t.replace(/^\s*<\/?\w+\/?>|\s*<\/?\w+\/?>$/g,"")+" &#x25A1;"});
@@ -2070,7 +2070,7 @@ function simpleLaTeXformatting(st) {
   st = st.replace(/\\cite{(.*?)}/g,"[$1]");
   st = st.replace(/\\chapter{(.*?)}/g,"<h2>$1</h2>");
   st = st.replace(/\\section{(.*?)}(\s*<\/?(br|p)\s?\/?>)?/g,"<h3>$1</h3>");
-  st = st.replace(/\\subsection{(.*?)}/g,"<h4>$1</h4>");
+  st = st.replace(/\\subsection{((.|\n)*?)}/g,"<h4>$1</h4>");
   st = st.replace(/\\begin{itemize}(\s*<\/?(br|p)\s?\/?>)?/g,"<ul>");
   st = st.replace(/\\item\s((.|\n)*?)(?=(\\item|\\end))/g,"<li>$1</li>");
   st = st.replace(/\\end{itemize}(\s*<\/?(br|p)\s?\/?>)?/g,"</ul>");
@@ -2085,45 +2085,41 @@ function simpleLaTeXformatting(st) {
   st = st.replace(/\\bigskip/g,"<p style=\"margin-bottom:0.5in\">&nbsp;</p>");
   st = st.replace(/\\medskip/g,"<p style=\"margin-bottom:0.3in\">&nbsp;</p>");
   st = st.replace(/\\smallskip/g,"<p style=\"margin-bottom:0.15in\">&nbsp;</p>");
-  st = st.replace(/\\begin{center}(.*?)\\end{center}/g,"<p align=\"center\">$1</p>");
+  st = st.replace(/\\begin{center}((.|\n)*?)\\end{center}/g,"<center>$1</center>");
+  return st
+}
+
+function ASCIIandgraphformatting(st) {
+  st = st.replace(/<sup>(.*?)<\/sup>(\s|(\S))/gi,"^{$1} $3");
+//st = st.replace(/<\/?font.*?>/gi,""); // do this only in amath...end
+  st = st.replace(/(Proof:)/g,"<i>$1</i>");
+  st = st.replace(/QED/g,"&nbsp; &nbsp; &#x25A1;");
+  st = st.replace(/(\\?end{?a?math}?)/ig,"<span></span>$1");
+  st = st.replace(/(\bamath\b|\\begin{a?math})/ig,"<span></span>$1");
+  st = st.replace(/([>\n])(Theorem|Lemma|Proposition|Corollary|Definition|Example|Remark|Problem|Exercise|Conjecture|Solution)(:|\W\W?(\w|\.)*?\W?:)/g,"$1<b>$2$3</b>");
   st = st.replace(/<embed\s+class\s?=\s?"ASCIIsvg"/g,"<embed class=\"ASCIIsvg\" src=\""+dsvglocation+"d.svg\" wmode=\"transparent\"");
   st = st.replace(/(?:\\begin{a?graph}|agraph|\(:graph\s)((.|\n)*?)(?:\\end{a?graph}|enda?graph|:\))/g,function(s,t){return "<div><embed class=\"ASCIIsvg\" src=\""+dsvglocation+"d.svg\" wmode=\"transparent\" script=\'"+t.replace(/<\/?(br|p|pre)\s?\/?>/gi,"\n")+"\'/></div>"});
-//  st = st.replace(/\(:graph((.|\n)*?):\)/g,function(s,t){return "<div><embed class=\"ASCIIsvg\" src=\""+dsvglocation+"d.svg\" wmode=\"transparent\" script=\'"+t.replace(/<\/?(br|p|pre)\s?\/?>/gi,"\n")+"\'/></div>"});
   st = st.replace(/insertASCIIMathCalculator/g,"<div class=\"ASCIIMathCalculator\"></div>");
   return st
 }
 
-function LMprocessNode(n, linebreaks, spanclassLM) {
+function LMprocessNode(n) {
   var frag,st;
-  if (spanclassLM!=null) {
-    frag = document.getElementsByTagName("span")
-    for (var i=0;i<frag.length;i++)
-      if (frag[i].className == "LM")
-        LMprocessNodeR(frag[i],linebreaks);
-  } else {
-    try {
-      st = n.innerHTML;
-    } catch(err) {}
-    var am = /amath|agraph/i.test(st);
-    if ((st==null || st.indexOf("\$ ")!=-1 || st.indexOf("\$<")!=-1 || 
-         st.indexOf("\\begin")!=-1 || am || st.slice(-1)=="$" ||
-         st.indexOf("\$\n")!=-1)&& !/edit-content|HTMLArea|wikiedit/.test(st)){
-      if (!avoidinnerHTML && translateLaTeXformatting) 
-        st = simpleLaTeXformatting(st);
-      if (st!=null && am && !avoidinnerHTML) {
-//alert(st)
-        st = st.replace(/<sup>(.*?)<\/sup>(\s|(\S))/gi,"^{$1} $3");
-//        st = st.replace(/<\/?font.*?>/gi,""); // do this only in amath...end
-        st = st.replace(/(Proof:)/g,"<i>$1</i>");
-        st = st.replace(/QED/g,"&#x25A1;");
-        st = st.replace(/(\\?end{?a?math}?)/ig,"<span></span>$1");
-        st = st.replace(/(\bamath|\\begin{a?math})/ig,"<span></span>$1");
-        st = st.replace(/([>\n])(Theorem|Lemma|Proposition|Corollary|Definition|Example|Remark|Problem|Exercise|Conjecture|Solution)(:|\W\W?(\w|\.)*?\W?:)/g,"$1<b>$2$3</b>");
-      }
-      st = st.replace(/%7E/g,"~");
-      if (!avoidinnerHTML) n.innerHTML = st;
-      LMprocessNodeR(n,linebreaks);
+  try {
+    st = n.innerHTML;
+  } catch(err) {}
+  var am = /amath\b|agraph/i.test(st);
+  if ((st==null || st.indexOf("\$ ")!=-1 || st.indexOf("\$<")!=-1 || 
+       st.indexOf("\\begin")!=-1 || am || st.slice(-1)=="$" ||
+       st.indexOf("\$\n")!=-1)&& !/edit-content|HTMLArea|wikiedit|wpTextbox1/.test(st)){
+    if (!avoidinnerHTML && translateLaTeXformatting) 
+      st = simpleLaTeXformatting(st);
+    if (st!=null && am && !avoidinnerHTML) {
+      st = ASCIIandgraphformatting(st);
     }
+    st = st.replace(/%7E/g,"~"); // else PmWiki has url issues
+    if (!avoidinnerHTML) n.innerHTML = st;
+    LMprocessNodeR(n,false);
   }
   if (isIE) { //needed to match size and font of formula to surrounding text
     frag = document.getElementsByTagName('math');
@@ -2134,14 +2130,13 @@ function LMprocessNode(n, linebreaks, spanclassLM) {
 var LMbody;
 var LMnoMathML = false, LMtranslated = false;
 
-function LMtranslate(spanclassLM) {
+function LMtranslate() {
   if (!LMtranslated) { // run this only once
     LMtranslated = true;
     LMinitSymbols();
     LMbody = document.getElementsByTagName("body")[0];
     var processN = document.getElementById(AMdocumentId);
-//alert(processN)
-    LMprocessNode((processN!=null?processN:LMbody), false, spanclassLM);
+    LMprocessNode((processN!=null?processN:LMbody));
   }
 }
 
@@ -2230,7 +2225,7 @@ var xmin, xmax, ymin, ymax, xscl, yscl,
 var strokewidth, strokedasharray, stroke, fill, strokeopacity, fillopacity;
 var fontstyle, fontfamily, fontsize, fontweight, fontstroke, fontfill;
 var marker, endpoints, dynamic = {};
-var picture, svgpicture, doc, width, height, a, b, c, d, i, n, p, t, x, y;
+var picture, svgpicture, doc, width, height;
 var isIE = document.createElementNS==null;
 
 var cpi = "\u03C0", ctheta = "\u03B8";      // character for pi, theta
@@ -2307,6 +2302,13 @@ function getElementsByClass(container, tagName, clsName){
   return list;
 }
 
+function showobj(obj) {
+  var st="", i;
+  for (i in obj) 
+    st += (obj.getAttribute(i)==null?"":" "+i+":"+obj.getAttribute(i));
+  return st;
+}
+
 function findPos(obj) { // top-left corner of obj on HTML page in pixel
   var curleft = curtop = 0;
   if (obj.offsetParent) {
@@ -2315,6 +2317,7 @@ function findPos(obj) { // top-left corner of obj on HTML page in pixel
     while (obj = obj.offsetParent) {
       curleft += obj.offsetLeft
       curtop += obj.offsetTop
+//alert(showobj(obj)+[curleft,curtop])
     }
   }
   return [curleft,curtop];
@@ -2360,12 +2363,13 @@ function setText(st,id) { // add text to an existing node with given id
 
 function getX(evt) { // return mouse x-coord in user coordinate system
   var svgroot = evt.target.parentNode;
-  return (evt.clientX+(isIE?0:window.pageXOffset)-svgroot.getAttribute("left")-svgroot.getAttribute("ox"))/(svgroot.getAttribute("xunitlength")-0);
+  return (evt.clientX+(isIE?0:window.pageXOffset)-svgroot.getAttribute("myleft")-svgroot.getAttribute("ox"))/(svgroot.getAttribute("xunitlength")-0);
 }
 
 function getY(evt) { // return mouse y-coord in user coordinate system
   var svgroot = evt.target.parentNode;
-  return (svgroot.getAttribute("height")-svgroot.getAttribute("oy")-(evt.clientY+(isIE?0:window.pageYOffset)-svgroot.getAttribute("top")))/(svgroot.getAttribute("yunitlength")-0);
+//alert(showobj(svgroot)+svgroot.getAttribute("mytop"))
+  return (svgroot.getAttribute("height")-svgroot.getAttribute("oy")-(evt.clientY+(isIE?0:window.pageYOffset)-svgroot.getAttribute("mytop")))/(svgroot.getAttribute("yunitlength")-0);
 }
 
 function translateandeval(src) { //modify user input to JavaScript syntax
@@ -2500,7 +2504,10 @@ function setdefaults() { //called before each graph is evaluated
 }
 
 function switchTo(id) { // used by dynamic code to select appropriate graph
-  picture = document.getElementById(id);
+  if (id==undefined) return;
+  var name = id;
+  if (typeof name!="string") name = id.target.parentNode.getAttribute("name");
+  picture = document.getElementById(name);
   width = picture.getAttribute("width")-0;
   height = picture.getAttribute("height")-0;
   setdefaults();
@@ -2521,7 +2528,7 @@ function switchTo(id) { // used by dynamic code to select appropriate graph
 }
 
 function updatePicture(obj) {
-  var node, src, id;
+  var node, src, id, top, left;
   if (typeof obj=="object") id = obj.id.slice(0,-6);
   else id = (typeof obj=="string"?obj:"picture"+(obj+1));
   src = document.getElementById(id+"input").value;
@@ -2529,8 +2536,15 @@ function updatePicture(obj) {
   xscl = null; xgrid = null; yscl = null; ygrid = null;
   initialized = false;
   picture = document.getElementById(id);
-//  switchTo(id);
+  if (!isIE) {
+    left = picture.getAttribute("myleft");
+    top = picture.getAttribute("mytop");
+  }
   translateandeval(src)
+  if (!isIE) {
+    picture.setAttribute("myleft",left);
+    picture.setAttribute("mytop",top);
+  }
 }
 
 function changepicturesize(evt,factor) {
@@ -2542,6 +2556,23 @@ function changepicturesize(evt,factor) {
   src = src.replace(/height\s*=\s*\d+/,"height="+(factor*(pic.getAttribute("height")-0)));
   document.getElementById(name+"input").value = src;
 //alert(getKey(evt.keycode))
+  updatePicture(name);
+}
+
+function zoom(evt,factor) {
+  switchTo(evt);
+  var obj = evt.target;
+  var name = obj.parentNode.getAttribute("name");
+  var pic = document.getElementById(name);
+  var src = document.getElementById(name+"input").value;
+  var xlen = (xmax-xmin)/2;
+  var ylen = (ymax-ymin)/2;
+  var xcen = getX(evt), ycen = getY(evt);
+  src = src.replace(/xmin\s*=\s*[-\d.]+/,"xmin="+(xcen-factor*xlen));
+  src = src.replace(/xmax\s*=\s*[-\d.]+/,"xmax="+(xcen+factor*xlen));
+  src = src.replace(/ymin\s*=\s*[-\d.]+/,"ymin="+(ycen-factor*ylen));
+  src = src.replace(/ymax\s*=\s*[-\d.]+/,"ymax="+(ycen+factor*ylen));
+  document.getElementById(name+"input").value = src;
   updatePicture(name);
 }
 
@@ -2559,8 +2590,10 @@ function timer() {
 function mClick(evt) {
   if(sinceFirstClick!=0) {
     if(sinceFirstClick <= 40) {
-      if (evt.shiftKey) changepicturesize(evt,2);
-      else if (evt.altKey) changepicturesize(evt,.5);
+      if (evt.shiftKey) {
+        if (evt.altKey) changepicturesize(evt,2);
+        else zoom(evt,2);
+      } else if (evt.altKey) zoom(evt,.5);//changepicturesize(evt,.5);
       else showHideCode(evt);             // do this on dblclick
       clearTimeout(dblClkTimer);
       dblClkTimer = "";
@@ -2646,20 +2679,19 @@ function initPicture(x_min,x_max,y_min,y_max) { // set up the graph
     svgpicture.setAttribute("height",height);
     svgpicture.setAttribute("name",picture.getAttribute("id"));
     doc = picture.getSVGDocument();
-    var nd = document.getElementById(picture.getAttribute("id")+"mml");
-    if (nd!=null) // clear out MathML layer
-      while (nd.childNodes.length>0) nd.removeChild(nd.lastChild); 
   } else {
     var qnode = document.createElementNS("http://www.w3.org/2000/svg","svg");
     qnode.setAttribute("id",picture.getAttribute("id"));
     qnode.setAttribute("name",picture.getAttribute("id"));
-    qnode.setAttribute("style","display:inline");
+//    qnode.setAttribute("style","display:inline");
     qnode.setAttribute("width",picture.getAttribute("width"));
     qnode.setAttribute("height",picture.getAttribute("height"));
     picturepos = findPos(picture);
-    qnode.setAttribute("left",picturepos[0]);
-    qnode.setAttribute("top",picturepos[1]);
-//      qnode.setAttribute("xmlns:xlink","http://www.w3.org/1999/xlink");
+    if (qnode.getAttribute("myleft")==null) {
+      qnode.setAttribute("myleft",""+picturepos[0]);
+      qnode.setAttribute("mytop",""+picturepos[1]);
+    }
+//  qnode.setAttribute("xmlns:xlink","http://www.w3.org/1999/xlink");
     if (picture.parentNode!=null) {
       picture.parentNode.replaceChild(qnode,picture);
     } else {
@@ -2668,6 +2700,9 @@ function initPicture(x_min,x_max,y_min,y_max) { // set up the graph
     svgpicture = qnode;
     doc = document;
   }
+  var nd = document.getElementById(picture.getAttribute("id")+"mml");
+  if (nd!=null) // clear out MathML layer
+    while (nd.childNodes.length>0) nd.removeChild(nd.lastChild); 
   svgpicture.setAttribute("xunitlength",xunitlength);
   svgpicture.setAttribute("yunitlength",yunitlength);
   svgpicture.setAttribute("xmin",xmin);
@@ -2906,9 +2941,6 @@ function text(p,st,pos,id,fontsty) {
       }
       while (node.childNodes.length>0) node.removeChild(node.lastChild); 
       node.appendChild(document.createTextNode(st));
-//      node.lastChild.nodeValue = st;
-      node.style.left = ""+(p[0]*xunitlength+origin[0])+"px";
-      node.style.top = ""+(height-p[1]*yunitlength-origin[1])+"px";
       if (/`/.test(st)) AMprocessNode(node); else LMprocessNode(node);
       dx = -node.offsetWidth/2;
       dy = -node.offsetHeight/2;
@@ -3323,7 +3355,7 @@ function plot(fun,x_min,x_max,points,id,endpts) {
     if (!(isNaN(gt)||Math.abs(gt)=="Infinity")) pth[pth.length] = [f(t), gt];
   }
   path(pth,name,null,endpts);
-  return p;
+  return pth;
 }
 
 // make polar plot

@@ -3,11 +3,11 @@ ASCIIMathML.js
 ==============
 This file contains JavaScript functions to convert ASCII math notation
 to Presentation MathML. The conversion is done while the XHTML page 
-loads, and should work with Internet Explorer 6 + MathPlayer 
-(http://www.dessci.com/en/products/mathplayer/) and Mozilla/Netscape 7+.
+loads, and should work with Firefox/Mozilla/Netscape 7+ and Internet 
+Explorer 6+MathPlayer (http://www.dessci.com/en/products/mathplayer/).
 This is a convenient and inexpensive solution for authoring MathML.
 
-Version 1.4.2 Nov 12, 2004, (c) Peter Jipsen http://www.chapman.edu/~jipsen
+Version 1.4.3 Dec 23, 2004, (c) Peter Jipsen http://www.chapman.edu/~jipsen
 Latest version at http://www.chapman.edu/~jipsen/mathml/ASCIIMathML.js
 If you use it on a webpage, please send the URL to jipsen@chapman.edu
 
@@ -18,13 +18,14 @@ your option) any later version.
 
 This program is distributed in the hope that it will be useful, 
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 General Public License (at http://www.gnu.org/copyleft/gpl.html) 
 for more details.
 */
 
-var checkForMathML = true; // put note at top of page if no MathML capability
-var mathcolor = "Red";     // change it to Black or any other preferred color
+var checkForMathML = true; // check if browser can display MathML
+var notifyIfNoMathML = true; // put note at top of page if no MathML capability
+var mathcolor = "red";   // change it to Black or any other preferred color
 var displaystyle = true;   // puts limits above and below large operators
 var separatetokens = false;// if true, letter tokens must be separated by nonletters
 var doubleblankmathdelimiter = false; // if true,  x+1  is equal to `x+1`
@@ -259,6 +260,7 @@ var AMsymbols = [
 {input:"darr", tag:"mo", output:"\u2193", tex:"downarrow", ttype:CONST},
 {input:"rarr", tag:"mo", output:"\u2192", tex:"rightarrow", ttype:CONST},
 {input:"->",   tag:"mo", output:"\u2192", tex:"to", ttype:CONST},
+{input:"|->",  tag:"mo", output:"\u21A6", tex:"mapsto", ttype:CONST},
 {input:"larr", tag:"mo", output:"\u2190", tex:"leftarrow", ttype:CONST},
 {input:"harr", tag:"mo", output:"\u2194", tex:"leftrightarrow", ttype:CONST},
 {input:"rArr", tag:"mo", output:"\u21D2", tex:"Rightarrow", ttype:CONST},
@@ -456,6 +458,13 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
   case UNDEROVER:
   case CONST:
     str = AMremoveCharsAndBlanks(str,symbol.input.length); 
+    if (symbol.tag=="mn" && symbol.output.charAt(0)=="-") {
+      node = AMcreateMmlNode("mo",document.createTextNode("-"));
+      node = AMcreateMmlNode("mrow",node);
+      node.appendChild(AMcreateMmlNode(symbol.tag,        //its a constant
+                             document.createTextNode(symbol.output.slice(1))));
+      return [node,str];
+    } else
     return [AMcreateMmlNode(symbol.tag,        //its a constant
                              document.createTextNode(symbol.output)),str];
   case LEFTBRACKET:   //read (expr+)
@@ -577,7 +586,9 @@ function AMparseExpr(str) {
     if (symbol.ttype == INFIX) {
       str = AMremoveCharsAndBlanks(str,symbol.input.length);
       result = AMparseSexpr(str);
-      AMremoveBrackets(result[0]);
+      if (result[0] == null)
+        result[0] = AMcreateMmlNode("mo",document.createTextNode("\u25A1"));
+      else AMremoveBrackets(result[0]);
       str = result[1];
       if (symbol == AMdiv) AMremoveBrackets(node);
       if (symbol == AMsub) {
@@ -728,7 +739,8 @@ function AMprocessNode(n, linebreaks) {
           checkForMathML = false;
           var nd = AMisMathMLavailable();
           AMnoMathML = nd != null
-          if (AMnoMathML) AMbody.insertBefore(nd,AMbody.childNodes[0]);
+          if (AMnoMathML && notifyIfNoMathML) 
+            AMbody.insertBefore(nd,AMbody.childNodes[0]);
         }
         if (!AMnoMathML)
           n.parentNode.replaceChild(AMstrarr2docFrag(arr,n.nodeType==8),n);

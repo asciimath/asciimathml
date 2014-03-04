@@ -15,7 +15,7 @@ Just add the next line to your (X)HTML page with this file in the same folder:
 (using the graphics in IE also requires the file "d.svg" in the same folder).
 This is a convenient and inexpensive solution for authoring MathML and SVG.
 
-Version 2.0 Sept 25, 2007, (c) Peter Jipsen http://www.chapman.edu/~jipsen
+Version 2.0.1 Sept 27, 2007, (c) Peter Jipsen http://www.chapman.edu/~jipsen
 This version extends ASCIIMathML.js with LaTeXMathML.js and ASCIIsvg.js.
 Latest version at http://www.chapman.edu/~jipsen/mathml/ASCIIMathML.js
 If you use it on a webpage, please send the URL to jipsen@chapman.edu
@@ -34,26 +34,25 @@ FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
 (at http://www.gnu.org/licences/lgpl.html) for more details.
 */
 
-var mathcolor = "blue";       // change it to "" (to inherit) or another color
-var mathfontsize = "1em";   // change to e.g. 1.2em for larger math
-var mathfontfamily = "serif"; // change to "" to inherit (works in IE) 
-                              // or another family (e.g. "arial")
+var mathcolor = "blue";        // change it to "" (to inherit) or another color
+var mathfontsize = "1em";      // change to e.g. 1.2em for larger math
+var mathfontfamily = "serif";  // change to "" to inherit (works in IE) 
+                               // or another family (e.g. "arial")
 var automathrecognize = false; // writing "amath" on page makes this true
-var checkForMathML = true;   // check if browser can display MathML
-var notifyIfNoMathML = true; // display note at top if no MathML capability
-var alertIfNoMathML = false; // show alert box if no MathML capability
-var translateOnLoad = true;  // set to false to do call translators from js 
-var translateLaTeX = true;   // false to preserve $..$, $$..$$
+var checkForMathML = true;     // check if browser can display MathML
+var notifyIfNoMathML = true;   // display note at top if no MathML capability
+var alertIfNoMathML = false;   // show alert box if no MathML capability
+var translateOnLoad = true;    // set to false to do call translators from js 
+var translateLaTeX = true;     // false to preserve $..$, $$..$$
 var translateLaTeXformatting = true; // false to preserve \emph,\begin{},\end{}
 var translateASCIIMath = true; // false to preserve `..`
-var translateASCIIsvg = true; // false to preserve (:graph..:), \begin{graph}..
-//var translateOnlyamathtextarea = false; // true to avoid global innerHTML
-var avoidinnerHTML = false;  // set true if assigning to innerHTML gives error
+var translateASCIIsvg = true;  // false to preserve agraph.., \begin{graph}..
+var avoidinnerHTML = false;   // set true if assigning to innerHTML gives error
 var displaystyle = true;      // puts limits above and below large operators
 var showasciiformulaonhover = true; // helps students learn ASCIIMath
 var decimalsign = ".";        // change to "," if you like, beware of `(1,2)`!
 var AMdelimiter1 = "`", AMescape1 = "\\\\`"; // can use other characters
-var AMdocumentId = "wikitext" // pmwiki element containing math (default=body)
+var AMdocumentId = "wikitext" // PmWiki element containing math (default=body)
 var checkforprocessasciimathinmoodle = false; // true for systems like Moodle
 var dsvglocation = ""; // path to d.svg (blank if same as ASCIIMathML.js loc)
 
@@ -841,7 +840,8 @@ function AMautomathrec(str) {
   str = str.replace(/`(\((a\s|in\s))(.*?[a-zA-Z]{2,}\))/g,"$1`$3");  //fix parentheses
   str = str.replace(/\sin`/g,"` in");
   str = str.replace(/`(\(\w\)[,.]?(\s|\n|$))/g,"$1`");
-  str = str.replace(/`([0-9.]+|e.g)`([.:])/gi,"$1$2");
+  str = str.replace(/`([0-9.]+|e.g)`(\\.)/gi,"$1$2");
+  str = str.replace(/`([0-9.]:)`/g,"$1");
   return str;
 }
 
@@ -2120,6 +2120,7 @@ function LMprocessNode(n, linebreaks, spanclassLM) {
         st = st.replace(/(\bamath|\\begin{a?math})/ig,"<span></span>$1");
         st = st.replace(/([>\n])(Theorem|Lemma|Proposition|Corollary|Definition|Example|Remark|Problem|Exercise|Conjecture|Solution)(:|\W\W?(\w|\.)*?\W?:)/g,"$1<b>$2$3</b>");
       }
+      st = st.replace(/%7E/g,"~");
       if (!avoidinnerHTML) n.innerHTML = st;
       LMprocessNodeR(n,linebreaks);
     }

@@ -3,11 +3,13 @@ ASCIIMathML.js
 ==============
 This file contains JavaScript functions to convert ASCII math notation
 to Presentation MathML. The conversion is done while the XHTML page 
-loads, and should work with IE 6+MathPlayer and Mozilla/Netscape 7+.
+loads, and should work with Internet Explorer 6 + MathPlayer 
+(http://www.dessci.com/en/products/mathplayer/) and Mozilla/Netscape 7+.
 This is a convenient and inexpensive solution for authoring MathML.
 
-Version 1.0 Jan 6 2004, (c) Peter Jipsen http://www.chapman.edu/~jipsen
-Contact jipsen@chapman.edu for the latest version of ASCIIMathML.js
+Version 1.1 Jan 9 2004, (c) Peter Jipsen http://www.chapman.edu/~jipsen
+Latest version at http://www.chapman.edu/~jipsen/mathml/ASCIIMathML.js
+If you use it on a webpage, please send the URL to jipsen@chapman.edu
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -40,7 +42,8 @@ symbols = [
 {input:"chi",    tag:"mi", output:"\u03C7"},
 {input:"delta",  tag:"mi", output:"\u03B4"},
 {input:"Delta",  tag:"mo", output:"\u0394"},
-{input:"epsilon", tag:"mi", output:"\u03B5", tex:"varepsilon"},
+{input:"epsilon", tag:"mi", output:"\u03B5"},
+{input:"varepsilon", tag:"mi", output:"\u025B"},
 {input:"eta",    tag:"mi", output:"\u03B7"},
 {input:"gamma",  tag:"mi", output:"\u03B3"},
 {input:"Gamma",  tag:"mo", output:"\u0393"},
@@ -53,7 +56,7 @@ symbols = [
 {input:"omega",  tag:"mi", output:"\u03C9"},
 {input:"Omega",  tag:"mo", output:"\u03A9"},
 {input:"phi",    tag:"mi", output:"\u03C6"},
-{input:"varphi", tag:"mi", output:"\u03C6"},
+{input:"varphi", tag:"mi", output:"\u03D5"},
 {input:"Phi",    tag:"mo", output:"\u03A6"},
 {input:"pi",     tag:"mi", output:"\u03C0"},
 {input:"Pi",     tag:"mo", output:"\u03A0"},
@@ -63,6 +66,7 @@ symbols = [
 {input:"Sigma",  tag:"mo", output:"\u03A3"},
 {input:"tau",    tag:"mi", output:"\u03C4"},
 {input:"theta",  tag:"mi", output:"\u03B8"},
+{input:"vartheta", tag:"mi", output:"\u03D1"},
 {input:"Theta",  tag:"mo", output:"\u0398"},
 {input:"upsilon", tag:"mi", output:"\u03C5"},
 {input:"xi",     tag:"mi", output:"\u03BE"},
@@ -79,12 +83,16 @@ symbols = [
 {input:"@",  tag:"mo", output:"\u2218", tex:"circ"},
 {input:"o+", tag:"mo", output:"\u2295", tex:"oplus"},
 {input:"ox", tag:"mo", output:"\u2297", tex:"otimes"},
-{input:"^^", tag:"mo", output:"\u2227", tex:"wedge"},
-{input:"vv", tag:"mo", output:"\u2228", tex:"vee"},
-{input:"uu", tag:"mo", output:"\u222A", tex:"cup"},
-{input:"union", tag:"mo", output:"\u222A"},
-{input:"nn", tag:"mo", output:"\u2229", tex:"cap"},
-{input:"intersect", tag:"mo", output:"\u2229"},
+{input:"sum", tag:"mo", output:"\u2211", underover:"true"},
+{input:"prod", tag:"mo", output:"\u220F", underover:"true"},
+{input:"^^",  tag:"mo", output:"\u2227", tex:"wedge"},
+{input:"^^^", tag:"mo", output:"\u22C0", tex:"bigwedge", underover:"true"},
+{input:"vv",  tag:"mo", output:"\u2228", tex:"vee"},
+{input:"vvv", tag:"mo", output:"\u22C1", tex:"bigvee", underover:"true"},
+{input:"nn",  tag:"mo", output:"\u2229", tex:"cap"},
+{input:"nnn", tag:"mo", output:"\u22C2", tex:"bigcap", underover:"true"},
+{input:"uu",  tag:"mo", output:"\u222A", tex:"cup"},
+{input:"uuu", tag:"mo", output:"\u22C3", tex:"bigcup", underover:"true"},
 
 //binary relation symbols
 {input:"!=",  tag:"mo", output:"\u2260", tex:"ne"},
@@ -92,17 +100,20 @@ symbols = [
 {input:"<=",  tag:"mo", output:"\u2264", tex:"le"},
 {input:"lt=", tag:"mo", output:"\u2264", tex:"leq"},
 {input:">=",  tag:"mo", output:"\u2265", tex:"ge"},
-{input:"geq",  tag:"mo", output:"\u2265"},
+{input:"geq", tag:"mo", output:"\u2265"},
 {input:"-<",  tag:"mo", output:"\u227A", tex:"prec"},
 {input:"-lt", tag:"mo", output:"\u227A"},
 {input:">-",  tag:"mo", output:"\u227B", tex:"succ"},
 {input:"in",  tag:"mo", output:"\u2208"},
 {input:"!in", tag:"mo", output:"\u2209", tex:"notin"},
-{input:"subset", tag:"mo", output:"\u2286", tex:"subseteq"},
-{input:"supset", tag:"mo", output:"\u2287", tex:"supseteq"},
+{input:"sub", tag:"mo", output:"\u2282", tex:"subset"},
+{input:"sup", tag:"mo", output:"\u2283", tex:"supset"},
+{input:"sube", tag:"mo", output:"\u2286", tex:"subseteq"},
+{input:"supe", tag:"mo", output:"\u2287", tex:"supseteq"},
 {input:"-=",  tag:"mo", output:"\u2261", tex:"equiv"},
 {input:"~=",  tag:"mo", output:"\u2245", tex:"cong"},
 {input:"~~",  tag:"mo", output:"\u2248", tex:"approx"},
+{input:"prop", tag:"mo", output:"\u221D", tex:"propto"},
 
 //logical symbols
 {input:"and", tag:"mtext", output:"and", space:"1ex"},
@@ -115,6 +126,8 @@ symbols = [
 {input:"EE",  tag:"mo", output:"\u2203", tex:"exists"},
 {input:"_|_", tag:"mo", output:"\u22A5", tex:"bot"},
 {input:"TT",  tag:"mo", output:"\u22A4", tex:"top"},
+{input:"|-",  tag:"mo", output:"\u22A2", tex:"vdash"},
+{input:"|=",  tag:"mo", output:"\u22A8", tex:"models"},
 
 //grouping brackets
 {input:"(", tag:"mo", output:"(", leftBracket:true},
@@ -129,9 +142,8 @@ symbols = [
 {input:":}", tag:"mo", output:":}", rightBracket:true, invisible:true},
 
 //miscellaneous symbols
-{input:"sum",  tag:"mo", output:"\u2211", underover:"true"},
-{input:"prod", tag:"mo", output:"\u220F", underover:"true"},
 {input:"int",  tag:"mo", output:"\u222B"},
+{input:"oint", tag:"mo", output:"\u222E"},
 {input:"del",  tag:"mo", output:"\u2202", tex:"partial"},
 {input:"grad", tag:"mo", output:"\u2207", tex:"nabla"},
 {input:"+-",   tag:"mo", output:"\u00B1", tex:"pm"},

@@ -7,7 +7,7 @@ loads, and should work with Internet Explorer 6 + MathPlayer
 (http://www.dessci.com/en/products/mathplayer/) and Mozilla/Netscape 7+.
 This is a convenient and inexpensive solution for authoring MathML.
 
-Version 1.4 July 13, 2004, (c) Peter Jipsen http://www.chapman.edu/~jipsen
+Version 1.4.1 Aug 8, 2004, (c) Peter Jipsen http://www.chapman.edu/~jipsen
 Latest version at http://www.chapman.edu/~jipsen/mathml/ASCIIMathML.js
 If you use it on a webpage, please send the URL to jipsen@chapman.edu
 
@@ -80,8 +80,11 @@ var AMsqrt = {input:"sqrt", tag:"msqrt", output:"sqrt", tex:null, ttype:UNARY},
   AMroot  = {input:"root", tag:"mroot", output:"root", tex:null, ttype:BINARY},
   AMfrac  = {input:"frac", tag:"mfrac", output:"/",    tex:null, ttype:BINARY},
   AMdiv   = {input:"/",    tag:"mfrac", output:"/",    tex:null, ttype:INFIX},
+  AMover  = {input:"stackrel", tag:"mover", output:"", tex:null, ttype:BINARY},
   AMsub   = {input:"_",    tag:"msub",  output:"_",    tex:null, ttype:INFIX},
   AMsup   = {input:"^",    tag:"msup",  output:"^",    tex:null, ttype:INFIX},
+  AMpsub  = {input:"_:",   tag:"msub",  output:"_:",   tex:null, ttype:INFIX},
+  AMpsup  = {input:"^:",   tag:"msup",  output:"^:",   tex:null, ttype:INFIX},
   AMtext  = {input:"text", tag:"mtext", output:"text", tex:null, ttype:UNARY},
   AMmbox  = {input:"mbox", tag:"mtext", output:"mbox", tex:null, ttype:UNARY},
   AMquote = {input:"\"",   tag:"mtext", output:"mbox", tex:null, ttype:UNARY};
@@ -148,6 +151,7 @@ var AMsymbols = [
 
 //binary relation symbols
 {input:"!=",  tag:"mo", output:"\u2260", tex:"ne", ttype:CONST},
+{input:":=",  tag:"mo", output:":=",     tex:null, ttype:CONST},
 {input:"lt",  tag:"mo", output:"<",      tex:null, ttype:CONST},
 {input:"<=",  tag:"mo", output:"\u2264", tex:"le", ttype:CONST},
 {input:"lt=", tag:"mo", output:"\u2264", tex:"leq", ttype:CONST},
@@ -258,7 +262,7 @@ var AMsymbols = [
 {input:"hArr", tag:"mo", output:"\u21D4", tex:"Leftrightarrow", ttype:CONST},
 
 //commands with argument
-AMsqrt, AMroot, AMfrac, AMdiv, AMsub, AMsup,
+AMsqrt, AMroot, AMfrac, AMdiv, AMover, AMsub, AMsup, AMpsub, AMpsup,
 {input:"hat", tag:"mover", output:"\u005E", tex:null, ttype:UNARY, acc:true},
 {input:"bar", tag:"mover", output:"\u00AF", tex:"overline", ttype:UNARY, acc:true},
 {input:"vec", tag:"mover", output:"\u2192", tex:null, ttype:UNARY, acc:true},
@@ -531,7 +535,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
     if (result2[0]==null) return [AMcreateMmlNode("mo",
                            document.createTextNode(symbol.input)),str];
     AMremoveBrackets(result2[0]);
-    if (symbol==AMroot) newFrag.appendChild(result2[0]);
+    if (symbol==AMroot || symbol==AMover) newFrag.appendChild(result2[0]);
     newFrag.appendChild(result[0]);
     if (symbol==AMfrac) newFrag.appendChild(result2[0]);
     return [AMcreateMmlNode(symbol.tag,newFrag),result2[1]];
@@ -557,7 +561,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
 }
 
 function AMparseExpr(str) {
-  var symbol, sym1, sym2, node, result, i, underover, nodeList = [],
+  var symbol, sym1, sym2, node, node1, result, i, underover, nodeList = [],
   newFrag = document.createDocumentFragment();
   do {
     str = AMremoveCharsAndBlanks(str,0);
@@ -583,11 +587,28 @@ function AMparseExpr(str) {
           node = AMcreateMmlNode((underover?"munderover":"msubsup"),node);
           node.appendChild(result[0]);
           node.appendChild(res2[0]);
-          node = AMcreateMmlNode("mrow",node);          
+          node = AMcreateMmlNode("mrow",node); // so sum does not stretch
         } else {
           node = AMcreateMmlNode((underover?"munder":"msub"),node);
           node.appendChild(result[0]);
         }
+      } else if (symbol == AMpsub) {
+        sym2 = AMgetSymbol(str);
+        if (sym2 == AMpsup) {
+          str = AMremoveCharsAndBlanks(str,sym2.input.length);
+          var res2 = AMparseSexpr(str);
+          str = res2[1];
+          node1 = AMcreateMmlNode("mmultiscripts",res2[0]);
+          node1.appendChild(AMcreateElementMathML("mprescripts"));
+          node1.appendChild(node);
+          node1.appendChild(result[0]);
+        } else {
+          node1 = AMcreateMmlNode("mmultiscripts",result[0]);
+          node.appendChild(AMcreateElementMathML("mprescripts"));
+          node.appendChild(node);
+          node.appendChild(AMcreateElementMathML("none"));
+        }
+        node = node1;
       } else {
         node = AMcreateMmlNode(symbol.tag,node);
         node.appendChild(result[0]);
@@ -714,15 +735,13 @@ function AMprocessNode(n, linebreaks) {
       str = str.replace(/\\\$/g,function(st){mtch=true;return "\\dollar"});
       str = str.replace(/\\`/g,function(st){mtch=true;return "\\lq"});
       str = str.replace(/\$/g,"`");
-      str = str.replace(/\[math\]/g,"`");
-      str = str.replace(/\[\/math\]/g,"`");
       arr = str.split("`");
       if (arr.length>1 || mtch) {
         if (checkForMathML) {
           checkForMathML = false;
           var nd = AMisMathMLavailable();
           AMnoMathML = nd != null
-          if (AMnoMathML) body.insertBefore(nd,body.childNodes[0]);
+          if (AMnoMathML) AMbody.insertBefore(nd,AMbody.childNodes[0]);
         }
         if (!AMnoMathML)
           n.parentNode.replaceChild(AMstrarr2docFrag(arr,n.nodeType==8),n);

@@ -7,7 +7,7 @@ loads, and should work with Internet Explorer 6 + MathPlayer
 (http://www.dessci.com/en/products/mathplayer/) and Mozilla/Netscape 7+.
 This is a convenient and inexpensive solution for authoring MathML.
 
-Version 1.4.1 Aug 16, 2004, (c) Peter Jipsen http://www.chapman.edu/~jipsen
+Version 1.4.2 Nov 12, 2004, (c) Peter Jipsen http://www.chapman.edu/~jipsen
 Latest version at http://www.chapman.edu/~jipsen/mathml/ASCIIMathML.js
 If you use it on a webpage, please send the URL to jipsen@chapman.edu
 
@@ -130,6 +130,7 @@ var AMsymbols = [
 {input:"**", tag:"mo", output:"\u22C6", tex:"star", ttype:CONST},
 {input:"//", tag:"mo", output:"/",      tex:null, ttype:CONST},
 {input:"\\\\", tag:"mo", output:"\\",   tex:"backslash", ttype:CONST},
+{input:"setminus", tag:"mo", output:"\\",   tex:null, ttype:CONST},
 {input:"xx", tag:"mo", output:"\u00D7", tex:"times", ttype:CONST},
 {input:"-:", tag:"mo", output:"\u00F7", tex:"divide", ttype:CONST},
 {input:"@",  tag:"mo", output:"\u2218", tex:"circ", ttype:CONST},
@@ -215,6 +216,8 @@ var AMsymbols = [
 {input:"quad", tag:"mo", output:"\u00A0\u00A0", tex:null, ttype:CONST},
 {input:"qquad", tag:"mo", output:"\u00A0\u00A0\u00A0\u00A0", tex:null, ttype:CONST},
 {input:"cdots", tag:"mo", output:"\u22EF", tex:null, ttype:CONST},
+{input:"vdots", tag:"mo", output:"\u22EE", tex:null, ttype:CONST},
+{input:"ddots", tag:"mo", output:"\u22F1", tex:null, ttype:CONST},
 {input:"diamond", tag:"mo", output:"\u22C4", tex:null, ttype:CONST},
 {input:"square", tag:"mo", output:"\u25A1", tex:null, ttype:CONST},
 {input:"|_", tag:"mo", output:"\u230A",  tex:"lfloor", ttype:CONST},
@@ -229,6 +232,7 @@ var AMsymbols = [
 
 //standard functions
 {input:"lim",  tag:"mo", output:"lim", tex:null, ttype:UNDEROVER},
+{input:"Lim",  tag:"mo", output:"Lim", tex:null, ttype:UNDEROVER},
 {input:"sin",  tag:"mo", output:"sin", tex:null, ttype:CONST},
 {input:"cos",  tag:"mo", output:"cos", tex:null, ttype:CONST},
 {input:"tan",  tag:"mo", output:"tan", tex:null, ttype:CONST},
@@ -245,6 +249,8 @@ var AMsymbols = [
 {input:"mod",  tag:"mo", output:"mod", tex:null, ttype:CONST},
 {input:"gcd",  tag:"mo", output:"gcd", tex:null, ttype:CONST},
 {input:"lcm",  tag:"mo", output:"lcm", tex:null, ttype:CONST},
+{input:"lub",  tag:"mo", output:"lub", tex:null, ttype:CONST},
+{input:"glb",  tag:"mo", output:"glb", tex:null, ttype:CONST},
 {input:"min",  tag:"mo", output:"min", tex:null, ttype:UNDEROVER},
 {input:"max",  tag:"mo", output:"max", tex:null, ttype:UNDEROVER},
 
@@ -671,7 +677,7 @@ function AMparseMath(str) {
   node.setAttribute("mathcolor",mathcolor);
   if (displaystyle) node.setAttribute("displaystyle","true");
   AMnestingDepth = 0;
-  node.appendChild(AMparseExpr(str)[0]);
+  node.appendChild(AMparseExpr(str.replace(/^\s+/g,""))[0]);
   return AMcreateMmlNode("math",node);
 }
 

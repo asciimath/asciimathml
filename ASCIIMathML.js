@@ -10,8 +10,8 @@ Just add the next line to your HTML page with this file in the same folder:
 
 <script type="text/javascript" src="ASCIIMathML.js"></script>
 
-Version 2.2 Feb 27, 2014, (c) Peter Jipsen http://www.chapman.edu/~jipsen
-Latest version at http://mathcs.chapman.edu/~jipsen/mathml/ASCIIMathML.js
+Version 2.2 Mar 3, 2014, (c) Peter Jipsen http://www.chapman.edu/~jipsen
+Latest version at http://mathcs.chapman.edu/~jipsen/asciimathml/ASCIIMathML.js
 If you use it on a webpage, please send the URL to jipsen@chapman.edu
 
 This program is free software; you can redistribute it and/or modify
@@ -255,8 +255,9 @@ var AMsymbols = [
 {input:"lt",  tag:"mo", output:"<",      tex:null, ttype:CONST},
 {input:"<=",  tag:"mo", output:"\u2264", tex:"le", ttype:CONST},
 {input:"lt=", tag:"mo", output:"\u2264", tex:"leq", ttype:CONST},
+{input:"gt",  tag:"mo", output:">",      tex:null, ttype:CONST},
 {input:">=",  tag:"mo", output:"\u2265", tex:"ge", ttype:CONST},
-{input:"geq", tag:"mo", output:"\u2265", tex:null, ttype:CONST},
+{input:"gt=", tag:"mo", output:"\u2265", tex:"geq", ttype:CONST},
 {input:"-<",  tag:"mo", output:"\u227A", tex:"prec", ttype:CONST},
 {input:"-lt", tag:"mo", output:"\u227A", tex:null, ttype:CONST},
 {input:">-",  tag:"mo", output:"\u227B", tex:"succ", ttype:CONST},
@@ -319,6 +320,8 @@ var AMsymbols = [
 {input:"...",  tag:"mo", output:"...",    tex:"ldots", ttype:CONST},
 {input:":.",  tag:"mo", output:"\u2234",  tex:"therefore", ttype:CONST},
 {input:"/_",  tag:"mo", output:"\u2220",  tex:"angle", ttype:CONST},
+{input:"'",   tag:"mo", output:"\u2032",  tex:"prime", ttype:CONST},
+{input:"tilde", tag:"mover", output:"~", tex:null, ttype:UNARY, acc:true},
 {input:"\\ ",  tag:"mo", output:"\u00A0", tex:null, ttype:CONST},
 {input:"quad", tag:"mo", output:"\u00A0\u00A0", tex:null, ttype:CONST},
 {input:"qquad", tag:"mo", output:"\u00A0\u00A0\u00A0\u00A0", tex:null, ttype:CONST},
@@ -351,6 +354,14 @@ var AMsymbols = [
 {input:"cot",  tag:"mo", output:"cot", tex:null, ttype:UNARY, func:true},
 {input:"sec",  tag:"mo", output:"sec", tex:null, ttype:UNARY, func:true},
 {input:"csc",  tag:"mo", output:"csc", tex:null, ttype:UNARY, func:true},
+{input:"arcsin",  tag:"mo", output:"arcsin", tex:null, ttype:UNARY, func:true},
+{input:"arccos",  tag:"mo", output:"arccos", tex:null, ttype:UNARY, func:true},
+{input:"arctan",  tag:"mo", output:"arctan", tex:null, ttype:UNARY, func:true},
+{input:"coth",  tag:"mo", output:"coth", tex:null, ttype:UNARY, func:true},
+{input:"sech",  tag:"mo", output:"sech", tex:null, ttype:UNARY, func:true},
+{input:"csch",  tag:"mo", output:"csch", tex:null, ttype:UNARY, func:true},
+{input:"exp",  tag:"mo", output:"exp", tex:null, ttype:UNARY, func:true},
+{input:"abs",   tag:"mo", output:"abs",  tex:null, ttype:UNARY},  //add func:true if not using change to line 541
 {input:"log",  tag:"mo", output:"log", tex:null, ttype:UNARY, func:true},
 {input:"ln",   tag:"mo", output:"ln",  tex:null, ttype:UNARY, func:true},
 {input:"det",  tag:"mo", output:"det", tex:null, ttype:UNARY, func:true},
@@ -610,7 +621,8 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
                              document.createTextNode(symbol.output)),str];
       if (typeof symbol.func == "boolean" && symbol.func) { // functions hack
         st = str.charAt(0);
-        if (st=="^" || st=="_" || st=="/" || st=="|" || st==",") {
+          if (st=="^" || st=="_" || st=="/" || st=="|" || st=="," ||
+             (symbol.input.length==1 && symbol.input.match(/\w/) && st!="(")) {
           return [createMmlNode(symbol.tag,
                     document.createTextNode(symbol.output)),str];
         } else {
@@ -623,6 +635,11 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
       AMremoveBrackets(result[0]);
       if (symbol.input == "sqrt") {           // sqrt
         return [createMmlNode(symbol.tag,result[0]),result[1]];
+      } else  if (symbol.input == "abs") {    // abs
+          node = AMcreateMmlNode("mrow", AMcreateMmlNode("mo",document.createTextNode('|')));
+          node.appendChild(result[0]);
+          node.appendChild(AMcreateMmlNode("mo",document.createTextNode('|')));
+          return [node,result[1]];
       } else if (typeof symbol.acc == "boolean" && symbol.acc) {   // accent
         node = createMmlNode(symbol.tag,result[0]);
         node.appendChild(createMmlNode("mo",document.createTextNode(symbol.output)));

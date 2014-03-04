@@ -7,7 +7,7 @@ loads, and should work with Internet Explorer 6 + MathPlayer
 (http://www.dessci.com/en/products/mathplayer/) and Mozilla/Netscape 7+.
 This is a convenient and inexpensive solution for authoring MathML.
 
-Version 1.2 Jan 22 2004, (c) Peter Jipsen http://www.chapman.edu/~jipsen
+Version 1.2 Feb 8 2004, (c) Peter Jipsen http://www.chapman.edu/~jipsen
 Latest version at http://www.chapman.edu/~jipsen/mathml/ASCIIMathML.js
 If you use it on a webpage, please send the URL to jipsen@chapman.edu
 
@@ -28,7 +28,6 @@ if (document.getElementById==null)
 \nMozilla/Netscape 7+ or Internet Explorer 6+MathPlayer")
 
 mathcolor = "Red"; // change it to Black if you prefer that
-mathdelimit = "`"; // change it to $ if you prefer TeX
 displaystyle = true;
 
 isIE = document.createElementNS==null;
@@ -207,10 +206,12 @@ frac = {input:"frac", tag:"mfrac", output:"/", binary:true},
 div = {input:"/", tag:"mfrac", output:"/", infix:true},
 sub = {input:"_", tag:"msub",  output:"_", infix:true},
 sup = {input:"^", tag:"msup",  output:"^", infix:true},
-hat = {input:"hat", tag:"mover", output:"\u005E", unary:true},
-bar = {input:"bar", tag:"mover", output:"\u00AF", unary:true},
-vec = {input:"vec", tag:"mover", output:"\u2192", unary:true},
-ul = {input:"ul", tag:"munder", output:"\u0332", unary:true},
+hat = {input:"hat", tag:"mover", output:"\u005E", unary:true, acc:true},
+bar = {input:"bar", tag:"mover", output:"\u00AF", unary:true, acc:true},
+vec = {input:"vec", tag:"mover", output:"\u2192", unary:true, acc:true},
+dot = {input:"dot", tag:"mover", output:".", unary:true, acc:true},
+ddot = {input:"ddot", tag:"mover", output:"..", unary:true, acc:true},
+ul = {input:"ul", tag:"munder", output:"\u0332", unary:true, acc:true},
 text = {input:"text", tag:"mtext", output:"text", unary:true},
 mbox = {input:"mbox", tag:"mtext", output:"mbox", unary:true},
 {input:"bb", tag:"mstyle", atname:"fontweight", atval:"bold", output:"bb", unary:true},
@@ -397,10 +398,23 @@ function parseSexpr(str) { //parses str and returns [node,tailstr]
       else if (str.charAt(0)=="[") var i=str.indexOf("]");
       else var i = 0;
       if (i==-1) i = str.length;
-      node = createMmlNode(symbol.tag,document.createTextNode(str.slice(1,i)));
+      var st = str.slice(1,i);
+      var newFrag = document.createDocumentFragment();
+      if (st.charAt(0) == " ") {
+        node = myCreateElementMathML("mspace");
+        node.setAttribute("width","1ex");
+        newFrag.appendChild(node);
+      }
+      newFrag.appendChild(
+        createMmlNode(symbol.tag,document.createTextNode(st)));
+      if (st.charAt(st.length-1) == " ") {
+        node = myCreateElementMathML("mspace");
+        node.setAttribute("width","1ex");
+        newFrag.appendChild(node);
+      }
       str = removeCharsAndBlanks(str,i+1);
-      return [node,str];
-    } else if (symbol == hat || symbol == bar || symbol == ul || symbol == vec) {
+      return [createMmlNode("mrow",newFrag),str];
+    } else if (symbol.acc) {
       result = parseSexpr(str);
       removeBrackets(result[0]);
       node = createMmlNode(symbol.tag,result[0]);
@@ -573,13 +587,13 @@ function parseMath(str) {
   return createMmlNode("math",node);
 }
 
-function strarr2docFrag(arr) {
+function strarr2docFrag(arr, linebreaks) {
   var newFrag=document.createDocumentFragment();
   var expr = false;
   for (var i=0; i<arr.length; i++) {
     if (expr) newFrag.appendChild(parseMath(arr[i]));
     else {
-      var arri = arr[i].split("\n\n\n");
+      var arri = (linebreaks ? arr[i].split("\n\n") : [arr[i]]);
       newFrag.appendChild(myCreateElementXHTML("span").
       appendChild(document.createTextNode(arri[0].
         replace(/\\dollar/g,"$").replace(/\\lq/g,"`"))));
@@ -596,22 +610,24 @@ function strarr2docFrag(arr) {
 }
 
 function processNode(n) {
-  if (n.childNodes.length == 0 && 
-    n.parentNode.nodeName!="pre" && n.parentNode.nodeName!="PRE" &&
-    n.parentNode.nodeName!="textarea" && n.parentNode.nodeName!="TEXTAREA") {
+  if (n.childNodes.length == 0 &&
+    n.parentNode.nodeName!="textarea" && n.parentNode.nodeName!="TEXTAREA" &&
+    n.parentNode.nodeName!="pre" && n.parentNode.nodeName!="PRE") {
     var str = n.nodeValue;
     if (!(str == null)) {
-      str = str.replace(/\\\$/g,"\\dollar");
-      str = str.replace(/\r\n/g,"\n");
-//      str = str.replace(/([^\n])\n([^\n])/g,"$1 $2");
+      str = str.replace(/\r\n\r\n/g,"\n\n");
+      str = str.replace(/\x20+/g," ");
+      str = str.replace(/\s*\r\n/g," ");
+      mtch = false;
+      str = str.replace(/\\\$/g,function(st){mtch=true;return "\\dollar"});
+      str = str.replace(/\\`/g,function(st){mtch=true;return "\\lq"});
       str = str.replace(/\$/g,"`");
-      str = str.replace(/\\`/g,"\\lq");
-      var arr = str.split(mathdelimit);
-      if (arr.length>1 || arr[0].split("\n\n").length>1)
-        n.parentNode.replaceChild(strarr2docFrag(arr),n);
+      var arr = str.split("`");
+      if (arr.length>1 || arr[0].split("\n\n").length>1 || mtch)
+        n.parentNode.replaceChild(strarr2docFrag(arr,n.nodeType==8),n);
     }
-  } else for (var i=0; i<n.childNodes.length; i++)
-           processNode(n.childNodes[i]);
+  } else if (n.nodeName!="math") for (var i=0; i<n.childNodes.length; i++)
+      processNode(n.childNodes[i]);
 }
 
 function translate() {

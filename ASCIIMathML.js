@@ -7,7 +7,7 @@ loads, and should work with Internet Explorer 6 + MathPlayer
 (http://www.dessci.com/en/products/mathplayer/) and Mozilla/Netscape 7+.
 This is a convenient and inexpensive solution for authoring MathML.
 
-Version 1.4 May 30 2004, (c) Peter Jipsen http://www.chapman.edu/~jipsen
+Version 1.4 June 28, 2004, (c) Peter Jipsen http://www.chapman.edu/~jipsen
 Latest version at http://www.chapman.edu/~jipsen/mathml/ASCIIMathML.js
 If you use it on a webpage, please send the URL to jipsen@chapman.edu
 
@@ -23,6 +23,7 @@ General Public License (at http://www.gnu.org/copyleft/gpl.html)
 for more details.
 */
 
+var checkForMathML = true; // put up alert box if no MathML capability
 var mathcolor = "Red"; // change it to Black or any other preferred color
 var displaystyle = true; // puts limits above and below large operators
 var separatetokens = false;//if true, letter tokens must be separated by nonletters
@@ -32,6 +33,32 @@ if (document.getElementById==null)
   alert("This webpage requires a recent browser such as\
 \nMozilla/Netscape 7+ or Internet Explorer 6+MathPlayer")
 
+function isMathMLavailable() {
+  var nd = myCreateElementXHTML("center");
+  nd.appendChild(document.createTextNode("To view the "));
+  var an = myCreateElementXHTML("a");
+  an.appendChild(document.createTextNode("ASCIIMathML"));
+  an.setAttribute("href","http://www.chapman.edu/~jipsen/asciimath.html");
+  nd.appendChild(an);
+  nd.appendChild(document.createTextNode(" notation use Internet Explorer 6+"));  
+  an = myCreateElementXHTML("a");
+  an.appendChild(document.createTextNode("MathPlayer"));
+  an.setAttribute("href","http://www.dessci.com/en/products/mathplayer/download.htm");
+  nd.appendChild(an);
+  nd.appendChild(document.createTextNode(" or Netscape/Mozilla/Firefox"));
+  if (navigator.appName.slice(0,8)=="Netscape") 
+    if (navigator.appVersion.slice(0,1)>="5") return null;
+    else return nd;
+  else if (navigator.appName.slice(0,9)=="Microsoft")
+    try {
+        var ActiveX = new ActiveXObject("MathPlayer.Factory.1");
+        return null;
+    } catch (e) {
+        return nd;
+    }
+  else return nd;
+}
+
 var isIE = document.createElementNS==null;
 
 // character lists for Mozilla/Netscape fonts
@@ -39,8 +66,8 @@ var cal = [0xEF35,0x212C,0xEF36,0xEF37,0x2130,0x2131,0xEF38,0x210B,0x2110,0xEF39
 var frk = [0xEF5D,0xEF5E,0x212D,0xEF5F,0xEF60,0xEF61,0xEF62,0x210C,0x2111,0xEF63,0xEF64,0xEF65,0xEF66,0xEF67,0xEF68,0xEF69,0xEF6A,0x211C,0xEF6B,0xEF6C,0xEF6D,0xEF6E,0xEF6F,0xEF70,0xEF71,0x2128];
 var bbb = [0xEF8C,0xEF8D,0x2102,0xEF8E,0xEF8F,0xEF90,0xEF91,0x210D,0xEF92,0xEF93,0xEF94,0xEF95,0xEF96,0x2115,0xEF97,0x2119,0x211A,0x211D,0xEF98,0xEF99,0xEF9A,0xEF9B,0xEF9C,0xEF9D,0xEF9E,0x2124];
 
-var CONST = 0, VCONST = 1, UNARY = 2, BINARY = 3, INFIX = 4, 
-    LEFTBRACKET = 5, RIGHTBRACKET = 6, SPACE = 7, UNDEROVER = 8; // token types
+var CONST = 0, UNARY = 1, BINARY = 2, INFIX = 3, LEFTBRACKET = 4, 
+    RIGHTBRACKET = 5, SPACE = 6, UNDEROVER = 7, DEFINITION = 8; // token types
 
 var sqrt  = {input:"sqrt", tag:"msqrt", output:"sqrt", tex:null, ttype:UNARY};
 var root  = {input:"root", tag:"mroot", output:"root", tex:null, ttype:BINARY};
@@ -54,41 +81,41 @@ var quote = {input:"\"",   tag:"mtext", output:"mbox", tex:null, ttype:UNARY};
 
 var symbols = [
 //some greek symbols
-{input:"alpha",  tag:"mi", output:"\u03B1", tex:null, ttype:VCONST},
-{input:"beta",   tag:"mi", output:"\u03B2", tex:null, ttype:VCONST},
-{input:"chi",    tag:"mi", output:"\u03C7", tex:null, ttype:VCONST},
-{input:"delta",  tag:"mi", output:"\u03B4", tex:null, ttype:VCONST},
-{input:"Delta",  tag:"mo", output:"\u0394", tex:null, ttype:VCONST},
-{input:"epsi",   tag:"mi", output:"\u03B5", tex:"epsilon", ttype:VCONST},
-{input:"varepsilon", tag:"mi", output:"\u025B", tex:null, ttype:VCONST},
-{input:"eta",    tag:"mi", output:"\u03B7", tex:null, ttype:VCONST},
-{input:"gamma",  tag:"mi", output:"\u03B3", tex:null, ttype:VCONST},
-{input:"Gamma",  tag:"mo", output:"\u0393", tex:null, ttype:VCONST},
-{input:"iota",   tag:"mi", output:"\u03B9", tex:null, ttype:VCONST},
-{input:"kappa",  tag:"mi", output:"\u03BA", tex:null, ttype:VCONST},
-{input:"lambda", tag:"mi", output:"\u03BB", tex:null, ttype:VCONST},
-{input:"Lambda", tag:"mo", output:"\u039B", tex:null, ttype:VCONST},
-{input:"mu",     tag:"mi", output:"\u03BC", tex:null, ttype:VCONST},
-{input:"nu",     tag:"mi", output:"\u03BD", tex:null, ttype:VCONST},
-{input:"omega",  tag:"mi", output:"\u03C9", tex:null, ttype:VCONST},
-{input:"Omega",  tag:"mo", output:"\u03A9", tex:null, ttype:VCONST},
-{input:"phi",    tag:"mi", output:"\u03C6", tex:null, ttype:VCONST},
-{input:"varphi", tag:"mi", output:"\u03D5", tex:null, ttype:VCONST},
-{input:"Phi",    tag:"mo", output:"\u03A6", tex:null, ttype:VCONST},
-{input:"pi",     tag:"mi", output:"\u03C0", tex:null, ttype:VCONST},
-{input:"Pi",     tag:"mo", output:"\u03A0", tex:null, ttype:VCONST},
-{input:"psi",    tag:"mi", output:"\u03C8", tex:null, ttype:VCONST},
-{input:"rho",    tag:"mi", output:"\u03C1", tex:null, ttype:VCONST},
-{input:"sigma",  tag:"mi", output:"\u03C3", tex:null, ttype:VCONST},
-{input:"Sigma",  tag:"mo", output:"\u03A3", tex:null, ttype:VCONST},
-{input:"tau",    tag:"mi", output:"\u03C4", tex:null, ttype:VCONST},
-{input:"theta",  tag:"mi", output:"\u03B8", tex:null, ttype:VCONST},
-{input:"vartheta", tag:"mi", output:"\u03D1", tex:null, ttype:VCONST},
-{input:"Theta",  tag:"mo", output:"\u0398", tex:null, ttype:VCONST},
-{input:"upsilon", tag:"mi", output:"\u03C5", tex:null, ttype:VCONST},
-{input:"xi",     tag:"mi", output:"\u03BE", tex:null, ttype:VCONST},
-{input:"Xi",     tag:"mo", output:"\u039E", tex:null, ttype:VCONST},
-{input:"zeta",   tag:"mi", output:"\u03B6", tex:null, ttype:VCONST},
+{input:"alpha",  tag:"mi", output:"\u03B1", tex:null, ttype:CONST},
+{input:"beta",   tag:"mi", output:"\u03B2", tex:null, ttype:CONST},
+{input:"chi",    tag:"mi", output:"\u03C7", tex:null, ttype:CONST},
+{input:"delta",  tag:"mi", output:"\u03B4", tex:null, ttype:CONST},
+{input:"Delta",  tag:"mo", output:"\u0394", tex:null, ttype:CONST},
+{input:"epsi",   tag:"mi", output:"\u03B5", tex:"epsilon", ttype:CONST},
+{input:"varepsilon", tag:"mi", output:"\u025B", tex:null, ttype:CONST},
+{input:"eta",    tag:"mi", output:"\u03B7", tex:null, ttype:CONST},
+{input:"gamma",  tag:"mi", output:"\u03B3", tex:null, ttype:CONST},
+{input:"Gamma",  tag:"mo", output:"\u0393", tex:null, ttype:CONST},
+{input:"iota",   tag:"mi", output:"\u03B9", tex:null, ttype:CONST},
+{input:"kappa",  tag:"mi", output:"\u03BA", tex:null, ttype:CONST},
+{input:"lambda", tag:"mi", output:"\u03BB", tex:null, ttype:CONST},
+{input:"Lambda", tag:"mo", output:"\u039B", tex:null, ttype:CONST},
+{input:"mu",     tag:"mi", output:"\u03BC", tex:null, ttype:CONST},
+{input:"nu",     tag:"mi", output:"\u03BD", tex:null, ttype:CONST},
+{input:"omega",  tag:"mi", output:"\u03C9", tex:null, ttype:CONST},
+{input:"Omega",  tag:"mo", output:"\u03A9", tex:null, ttype:CONST},
+{input:"phi",    tag:"mi", output:"\u03C6", tex:null, ttype:CONST},
+{input:"varphi", tag:"mi", output:"\u03D5", tex:null, ttype:CONST},
+{input:"Phi",    tag:"mo", output:"\u03A6", tex:null, ttype:CONST},
+{input:"pi",     tag:"mi", output:"\u03C0", tex:null, ttype:CONST},
+{input:"Pi",     tag:"mo", output:"\u03A0", tex:null, ttype:CONST},
+{input:"psi",    tag:"mi", output:"\u03C8", tex:null, ttype:CONST},
+{input:"rho",    tag:"mi", output:"\u03C1", tex:null, ttype:CONST},
+{input:"sigma",  tag:"mi", output:"\u03C3", tex:null, ttype:CONST},
+{input:"Sigma",  tag:"mo", output:"\u03A3", tex:null, ttype:CONST},
+{input:"tau",    tag:"mi", output:"\u03C4", tex:null, ttype:CONST},
+{input:"theta",  tag:"mi", output:"\u03B8", tex:null, ttype:CONST},
+{input:"vartheta", tag:"mi", output:"\u03D1", tex:null, ttype:CONST},
+{input:"Theta",  tag:"mo", output:"\u0398", tex:null, ttype:CONST},
+{input:"upsilon", tag:"mi", output:"\u03C5", tex:null, ttype:CONST},
+{input:"xi",     tag:"mi", output:"\u03BE", tex:null, ttype:CONST},
+{input:"Xi",     tag:"mo", output:"\u039E", tex:null, ttype:CONST},
+{input:"zeta",   tag:"mi", output:"\u03B6", tex:null, ttype:CONST},
 
 //binary operation symbols
 {input:"*",  tag:"mo", output:"\u22C5", tex:"cdot", ttype:CONST},
@@ -156,18 +183,24 @@ var symbols = [
 {input:"}", tag:"mo", output:"}", tex:null, ttype:RIGHTBRACKET},
 {input:"(:", tag:"mo", output:"\u2329", tex:"langle", ttype:LEFTBRACKET},
 {input:":)", tag:"mo", output:"\u232A", tex:"rangle", ttype:RIGHTBRACKET},
+{input:"<<", tag:"mo", output:"\u2329", tex:null, ttype:LEFTBRACKET},
+{input:">>", tag:"mo", output:"\u232A", tex:null, ttype:RIGHTBRACKET},
 {input:"{:", tag:"mo", output:"{:", tex:null, ttype:LEFTBRACKET, invisible:true},
 {input:":}", tag:"mo", output:":}", tex:null, ttype:RIGHTBRACKET, invisible:true},
 
 //miscellaneous symbols
 {input:"int",  tag:"mo", output:"\u222B", tex:null, ttype:CONST},
+{input:"dx",   tag:"mi", output:"{:d x:}", tex:null, ttype:DEFINITION},
+{input:"dy",   tag:"mi", output:"{:d y:}", tex:null, ttype:DEFINITION},
+{input:"dz",   tag:"mi", output:"{:d z:}", tex:null, ttype:DEFINITION},
+{input:"dt",   tag:"mi", output:"{:d t:}", tex:null, ttype:DEFINITION},
 {input:"oint", tag:"mo", output:"\u222E", tex:null, ttype:CONST},
 {input:"del",  tag:"mo", output:"\u2202", tex:"partial", ttype:CONST},
 {input:"grad", tag:"mo", output:"\u2207", tex:"nabla", ttype:CONST},
 {input:"+-",   tag:"mo", output:"\u00B1", tex:"pm", ttype:CONST},
 {input:"O/",   tag:"mo", output:"\u2205", tex:"emptyset", ttype:CONST},
 {input:"oo",   tag:"mo", output:"\u221E", tex:"infty", ttype:CONST},
-{input:"aleph", tag:"mo", output:"\u2135", tex:null, ttype:VCONST},
+{input:"aleph", tag:"mo", output:"\u2135", tex:null, ttype:CONST},
 {input:"...",  tag:"mo", output:"...",    tex:"ldots", ttype:CONST},
 {input:"\\ ",  tag:"mo", output:"\u00A0", tex:null, ttype:CONST},
 {input:"quad", tag:"mo", output:"\u00A0\u00A0", tex:null, ttype:CONST},
@@ -372,8 +405,7 @@ function getSymbol(str) {
     tagst = (separated?"mo":"mi");
     separated = separated || str.charAt(1)<"a" || str.charAt(1)>"z";
   }
-  return {input:str.slice(0,k-1), tag:tagst, output:st, 
-    ttype:(tagst == "mo"?CONST:VCONST)};
+  return {input:str.slice(0,k-1), tag:tagst, output:st, ttype:CONST};
 }
 
 function removeBrackets(node) {
@@ -389,13 +421,12 @@ function removeBrackets(node) {
 }
 
 /*Parsing ASCII math expressions with the following grammar
-V ::= [A-Za-z] | greek letters | numbers
-O ::= other constant symbols
+V ::= [A-Za-z] | greek letters | numbers | other constant symbols
 U ::= sqrt | text | bb | other unary symbols for font commands
 B ::= frac | root                    binary symbols
 L ::= ( | [ | { | (: | {:            left brackets
 R ::= ) | ] | } | :) | :}            right brackets
-S ::= VS | O | LER | US | BSS        simple expression
+S ::= V | LER | US | BSS             simple expression
 E ::= SE | S/S | S_S | S^S | S_S^S   expression
 Each terminal symbol is translated into a corresponding mathml node.*/
 
@@ -405,29 +436,16 @@ function parseSexpr(str) { //parses str and returns [node,tailstr]
   symbol = getSymbol(str);             //either a token or a bracket or empty
   if (symbol == null || symbol.ttype == RIGHTBRACKET)
     return [null,str];
+  if (symbol.ttype == DEFINITION) {
+    str = symbol.output+removeCharsAndBlanks(str,symbol.input.length); 
+    symbol = getSymbol(str);
+  }
   switch (symbol.ttype) {
   case UNDEROVER:
   case CONST:
     str = removeCharsAndBlanks(str,symbol.input.length); 
     return [createMmlNode(symbol.tag,        //its a constant
                              document.createTextNode(symbol.output)),str];
-  case VCONST:
-    var blk = str.charAt(symbol.input.length) == " ";
-    str = removeCharsAndBlanks(str,symbol.input.length); 
-    var sym1 = getSymbol(str);
-    if (blk || sym1.ttype != VCONST)
-      return [createMmlNode(symbol.tag,      //its a single variable/value
-                             document.createTextNode(symbol.output)),str];
-    else newFrag.appendChild(createMmlNode(symbol.tag,
-                             document.createTextNode(symbol.output)));
-    while (!blk && sym1.ttype == VCONST) {
-      newFrag.appendChild(createMmlNode(sym1.tag,
-                             document.createTextNode(sym1.output)));
-      blk = str.charAt(symbol.input.length) == " ";
-      str = removeCharsAndBlanks(str,sym1.input.length); 
-      sym1 = getSymbol(str);
-    } 
-    return [createMmlNode("mrow",newFrag),str];
   case LEFTBRACKET:   //read (expr+)
     str = removeCharsAndBlanks(str,symbol.input.length); 
     result = parseExpr(str);
@@ -640,10 +658,14 @@ function parseExpr(str) {
 }
 
 function parseMath(str) {
-  var node = myCreateElementMathML("mstyle");
+  var result, node = myCreateElementMathML("mstyle");
   node.setAttribute("mathcolor",mathcolor);
   if (displaystyle) node.setAttribute("displaystyle","true");
-  node.appendChild(parseExpr(str)[0]);
+  while (str!="") {
+    result = parseExpr(str);
+    node.appendChild(result[0]);
+    str = result[1];
+  }
   return createMmlNode("math",node);
 }
 
@@ -669,9 +691,9 @@ function strarr2docFrag(arr, linebreaks) {
   return newFrag;
 }
 
-function processNode(n) {
+function processNode(n, linebreaks) {
   var mtch, str, arr;
-  if (n.childNodes.length == 0 && n.nodeType!=8 &&
+  if (n.childNodes.length == 0 && (n.nodeType!=8 || linebreaks) &&
     n.parentNode.nodeName!="textarea" && n.parentNode.nodeName!="TEXTAREA" &&
     n.parentNode.nodeName!="pre" && n.parentNode.nodeName!="PRE") {
     str = n.nodeValue;
@@ -689,15 +711,26 @@ function processNode(n) {
       str = str.replace(/\\`/g,function(st){mtch=true;return "\\lq"});
       str = str.replace(/\$/g,"`");
       arr = str.split("`");
-      if (arr.length>1 || mtch)
-        n.parentNode.replaceChild(strarr2docFrag(arr,n.nodeType==8),n);
+      if (arr.length>1 || mtch) {
+        if (checkForMathML) {
+          checkForMathML = false;
+          var nd = isMathMLavailable();
+          noMathML = nd != null
+          if (noMathML) body.insertBefore(nd,body.childNodes[0]);
+        }
+        if (!noMathML)
+          n.parentNode.replaceChild(strarr2docFrag(arr,n.nodeType==8),n);
+      }
     }
   } else if (n.nodeName!="math") for (var i=0; i<n.childNodes.length; i++)
-      processNode(n.childNodes[i]);
+      processNode(n.childNodes[i], linebreaks);
 }
+
+var body;
+var noMathML = false;
 
 function translate() {
   initSymbols();
-  var body = document.getElementsByTagName("body")[0];
-  processNode(body);
+  body = document.getElementsByTagName("body")[0];
+  processNode(body, false);
 }

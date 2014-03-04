@@ -15,7 +15,7 @@ Just add the next line to your (X)HTML page with this file in the same folder:
 (using the graphics in IE also requires the file "d.svg" in the same folder).
 This is a convenient and inexpensive solution for authoring MathML and SVG.
 
-Version 2.0.4 Oct 9, 2007, (c) Peter Jipsen http://www.chapman.edu/~jipsen
+Version 2.0.7 Oct 16, 2007, (c) Peter Jipsen http://www.chapman.edu/~jipsen
 This version extends ASCIIMathML.js with LaTeXMathML.js and ASCIIsvg.js.
 Latest version at http://www.chapman.edu/~jipsen/mathml/ASCIIMathML.js
 If you use it on a webpage, please send the URL to jipsen@chapman.edu
@@ -111,16 +111,7 @@ var CONST = 0, UNARY = 1, BINARY = 2, INFIX = 3, LEFTBRACKET = 4,
     RIGHTBRACKET = 5, SPACE = 6, UNDEROVER = 7, DEFINITION = 8,
     LEFTRIGHT = 9, TEXT = 10; // token types
 
-var AMsqrt = {input:"sqrt", tag:"msqrt", output:"sqrt", tex:null, ttype:UNARY},
-  AMroot  = {input:"root", tag:"mroot", output:"root", tex:null, ttype:BINARY},
-  AMfrac  = {input:"frac", tag:"mfrac", output:"/",    tex:null, ttype:BINARY},
-  AMdiv   = {input:"/",    tag:"mfrac", output:"/",    tex:null, ttype:INFIX},
-  AMover  = {input:"stackrel", tag:"mover", output:"stackrel", tex:null, ttype:BINARY},
-  AMsub   = {input:"_",    tag:"msub",  output:"_",    tex:null, ttype:INFIX},
-  AMsup   = {input:"^",    tag:"msup",  output:"^",    tex:null, ttype:INFIX},
-  AMtext  = {input:"text", tag:"mtext", output:"text", tex:null, ttype:TEXT},
-  AMmbox  = {input:"mbox", tag:"mtext", output:"mbox", tex:null, ttype:TEXT},
-  AMquote = {input:"\"",   tag:"mtext", output:"mbox", tex:null, ttype:TEXT};
+var AMquote = {input:"\"",   tag:"mtext", output:"mbox", tex:null, ttype:TEXT};
 
 var AMsymbols = [
 //some greek symbols
@@ -310,16 +301,23 @@ var AMsymbols = [
 {input:"rArr", tag:"mo", output:"\u21D2", tex:"Rightarrow", ttype:CONST},
 {input:"lArr", tag:"mo", output:"\u21D0", tex:"Leftarrow", ttype:CONST},
 {input:"hArr", tag:"mo", output:"\u21D4", tex:"Leftrightarrow", ttype:CONST},
-
 //commands with argument
-AMsqrt, AMroot, AMfrac, AMdiv, AMover, AMsub, AMsup,
+{input:"sqrt", tag:"msqrt", output:"sqrt", tex:null, ttype:UNARY},
+{input:"root", tag:"mroot", output:"root", tex:null, ttype:BINARY},
+{input:"frac", tag:"mfrac", output:"/",    tex:null, ttype:BINARY},
+{input:"/",    tag:"mfrac", output:"/",    tex:null, ttype:INFIX},
+{input:"stackrel", tag:"mover", output:"stackrel", tex:null, ttype:BINARY},
+{input:"_",    tag:"msub",  output:"_",    tex:null, ttype:INFIX},
+{input:"^",    tag:"msup",  output:"^",    tex:null, ttype:INFIX},
 {input:"hat", tag:"mover", output:"\u005E", tex:null, ttype:UNARY, acc:true},
 {input:"bar", tag:"mover", output:"\u00AF", tex:"overline", ttype:UNARY, acc:true},
 {input:"vec", tag:"mover", output:"\u2192", tex:null, ttype:UNARY, acc:true},
 {input:"dot", tag:"mover", output:".",      tex:null, ttype:UNARY, acc:true},
 {input:"ddot", tag:"mover", output:"..",    tex:null, ttype:UNARY, acc:true},
 {input:"ul", tag:"munder", output:"\u0332", tex:"underline", ttype:UNARY, acc:true},
-AMtext, AMmbox, AMquote,
+{input:"text", tag:"mtext", output:"text", tex:null, ttype:TEXT},
+{input:"mbox", tag:"mtext", output:"mbox", tex:null, ttype:TEXT},
+AMquote,
 {input:"bb", tag:"mstyle", atname:"fontweight", atval:"bold", output:"bb", tex:null, ttype:UNARY},
 {input:"mathbf", tag:"mstyle", atname:"fontweight", atval:"bold", output:"mathbf", tex:null, ttype:UNARY},
 {input:"sf", tag:"mstyle", atname:"fontfamily", atval:"sans-serif", output:"sf", tex:null, ttype:UNARY},
@@ -630,8 +628,8 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
       node = AMcreateMmlNode("mrow",node);
       node.appendChild(result[0]);
       return [node,result[1]];
-    } else { // the "|" is a \mid
-      node = AMcreateMmlNode("mo",document.createTextNode(symbol.output));
+    } else { // the "|" is a \mid so use unicode 2223 (divides) for spacing
+      node = AMcreateMmlNode("mo",document.createTextNode("\u2223"));
       node = AMcreateMmlNode("mrow",node);
       return [node,str];
     }
@@ -840,8 +838,8 @@ function AMautomathrec(str) {
   str = str.replace(/`(\((a\s|in\s))(.*?[a-zA-Z]{2,}\))/g,"$1`$3");  //fix parentheses
   str = str.replace(/\sin`/g,"` in");
   str = str.replace(/`(\(\w\)[,.]?(\s|\n|$))/g,"$1`");
-  str = str.replace(/`([0-9.]+|e.g)`(\\.)/gi,"$1$2");
-  str = str.replace(/`([0-9.]:)`/g,"$1");
+  str = str.replace(/`([0-9.]+|e.g|i.e)`(\.?)/gi,"$1$2");
+  str = str.replace(/`([0-9.]+:)`/g,"$1");
   return str;
 }
 
@@ -992,10 +990,11 @@ LaTeXMathML.js (ctd)
 Content between $...$ and $$...$$ is converted by this part of the file
 */
 
-var LMcheckForMathML = true;   // check if browser can display MathML
-var LMnotifyIfNoMathML = true; // display note if no MathML capability
+var LMcheckForMathML = true;    // check if browser can display MathML
+var LMnotifyIfNoMathML = true;  // display note if no MathML capability
 var LMalertIfNoMathML = false;  // show alert box if no MathML capability
-var LMmathcolor = "";	     // "" (to inherit) or change to another color
+var LMmathcolor = "";	        // "" (to inherit) or change to another color
+var LMdisplaystyle = true;      // puts limits above and below large operators
 var LMmathfontfamily = "serif"; // change to "" to inherit (works in IE)
                                 // or another family (e.g. "arial")
 var LMshowasciiformulaonhover = true; // helps students learn LaTeX
@@ -1048,17 +1047,6 @@ var LMbbb = [0xEF8C,0xEF8D,0x2102,0xEF8E,0xEF8F,0xEF90,0xEF91,0x210D,0xEF92,0xEF
 //var CONST = 0, UNARY = 1, BINARY = 2, INFIX = 3, LEFTBRACKET = 4,
 //    RIGHTBRACKET = 5, SPACE = 6, UNDEROVER = 7, DEFINITION = 8, TEXT = 10, 
 var BIG = 11, LONG = 12, STRETCHY = 13, MATRIX = 14; // token types
-
-var LMsqrt = {input:"\\sqrt",	tag:"msqrt", output:"sqrt",	ttype:UNARY},
-  LMroot = {input:"\\root",	tag:"mroot", output:"root",	ttype:BINARY},
-  LMfrac = {input:"\\frac",	tag:"mfrac", output:"/",	ttype:BINARY},
-  LMover = {input:"\\stackrel", tag:"mover", output:"stackrel", ttype:BINARY},
-  LMatop = {input:"\\atop",	tag:"mfrac", output:"",		ttype:INFIX},
-  LMchoose = {input:"\\choose", tag:"mfrac", output:"",		ttype:INFIX},
-  LMsub  = {input:"_",		tag:"msub",  output:"_",	ttype:INFIX},
-  LMsup  = {input:"^",		tag:"msup",  output:"^",	ttype:INFIX},
-  LMtext = {input:"\\mathrm",	tag:"mtext", output:"text",	ttype:TEXT},
-  LMmbox = {input:"\\mbox",	tag:"mtext", output:"mbox",	ttype:TEXT};
 
 // Commented out by DRW to prevent 1/2 turning into a 2-line fraction
 // LMdiv   = {input:"/",	 tag:"mfrac", output:"/",    ttype:INFIX},
@@ -1382,13 +1370,23 @@ var LMsymbols = [
 {input:"\\longleftrightarrow",	tag:"mo", output:"\u2194", ttype:LONG},
 {input:"\\Longleftarrow",	tag:"mo", output:"\u21D0", ttype:LONG},
 {input:"\\Longrightarrow",	tag:"mo", output:"\u21D2", ttype:LONG},
+{input:"\\implies",		tag:"mo", output:"\u21D2", ttype:LONG},
 {input:"\\Longleftrightarrow",  tag:"mo", output:"\u21D4", ttype:LONG},
 {input:"\\longmapsto",		tag:"mo", output:"\u21A6", ttype:CONST},
 							// disaster if LONG
 
 //commands with argument
-LMsqrt, LMroot, LMfrac, LMover, LMsub, LMsup, LMtext, LMmbox, LMatop, LMchoose,
-//LMdiv, LMquote,
+
+{input:"\\sqrt",	tag:"msqrt", output:"sqrt",	ttype:UNARY},
+{input:"\\root",	tag:"mroot", output:"root",	ttype:BINARY},
+{input:"\\frac",	tag:"mfrac", output:"/",	ttype:BINARY},
+{input:"\\stackrel",    tag:"mover", output:"stackrel", ttype:BINARY},
+{input:"\\atop",	tag:"mfrac", output:"",		ttype:INFIX},
+{input:"\\choose",      tag:"mfrac", output:"",		ttype:INFIX},
+{input:"_",		tag:"msub",  output:"_",	ttype:INFIX},
+{input:"^",		tag:"msup",  output:"^",	ttype:INFIX},
+{input:"\\mathrm",	tag:"mtext", output:"text",	ttype:TEXT},
+{input:"\\mbox",	tag:"mtext", output:"mbox",	ttype:TEXT},
 
 //diacritical marks
 {input:"\\acute",	tag:"mover",  output:"\u00B4", ttype:UNARY, acc:true},
@@ -1980,6 +1978,7 @@ function LMparseExpr(str,rightbracket,matrix) {
 function LMparseMath(str) {
   var result, node = LMcreateElementMathML("mstyle");
   if (LMmathcolor != "") node.setAttribute("mathcolor",LMmathcolor);
+  if (LMdisplaystyle) node.setAttribute("displaystyle","true");
   if (LMmathfontfamily != "") node.setAttribute("fontfamily",LMmathfontfamily);
   node.appendChild(LMparseExpr(str.replace(/^\s+/g,""),false,false)[0]);
   node = LMcreateMmlNode("math",node);
@@ -2097,9 +2096,10 @@ function ASCIIandgraphformatting(st) {
   st = st.replace(/(\\?end{?a?math}?)/ig,"<span></span>$1");
   st = st.replace(/(\bamath\b|\\begin{a?math})/ig,"<span></span>$1");
   st = st.replace(/([>\n])(Theorem|Lemma|Proposition|Corollary|Definition|Example|Remark|Problem|Exercise|Conjecture|Solution)(:|\W\W?(\w|\.)*?\W?:)/g,"$1<b>$2$3</b>");
-  st = st.replace(/<embed\s+class\s?=\s?"ASCIIsvg"/g,"<embed class=\"ASCIIsvg\" src=\""+dsvglocation+"d.svg\" wmode=\"transparent\"");
-  st = st.replace(/(?:\\begin{a?graph}|agraph|\(:graph\s)((.|\n)*?)(?:\\end{a?graph}|enda?graph|:\))/g,function(s,t){return "<div><embed class=\"ASCIIsvg\" src=\""+dsvglocation+"d.svg\" wmode=\"transparent\" script=\'"+t.replace(/<\/?(br|p|pre)\s?\/?>/gi,"\n")+"\'/></div>"});
+  st = st.replace(/<embed\s+class\s?=\s?"?ASCIIsvg"?/gi,"<embed class=\"ASCIIsvg\" src=\""+dsvglocation+"d.svg\" wmode=\"transparent\"");
+  st = st.replace(/(?:\\begin{a?graph}|\bagraph|\(:graph\s)((.|\n)*?)(?:\\end{a?graph}|enda?graph|:\))/g,function(s,t){return "<div class=\"ASCIIsvg\"><embed class=\"ASCIIsvg\" src=\""+dsvglocation+"d.svg\" wmode=\"transparent\" script=\'"+t.replace(/<\/?(br|p|pre)\s?\/?>/gi,"\n")+"\'/></div>"});
   st = st.replace(/insertASCIIMathCalculator/g,"<div class=\"ASCIIMathCalculator\"></div>");
+//alert(dsvglocation)
   return st
 }
 
@@ -2108,7 +2108,7 @@ function LMprocessNode(n) {
   try {
     st = n.innerHTML;
   } catch(err) {}
-  var am = /amath\b|agraph/i.test(st);
+  var am = /amath\b|graph/i.test(st);
   if ((st==null || st.indexOf("\$ ")!=-1 || st.indexOf("\$<")!=-1 || 
        st.indexOf("\\begin")!=-1 || am || st.slice(-1)=="$" ||
        st.indexOf("\$\n")!=-1)&& !/edit-content|HTMLArea|wikiedit|wpTextbox1/.test(st)){
@@ -2118,6 +2118,7 @@ function LMprocessNode(n) {
       st = ASCIIandgraphformatting(st);
     }
     st = st.replace(/%7E/g,"~"); // else PmWiki has url issues
+//alert(st)
     if (!avoidinnerHTML) n.innerHTML = st;
     LMprocessNodeR(n,false);
   }
@@ -2363,13 +2364,13 @@ function setText(st,id) { // add text to an existing node with given id
 
 function getX(evt) { // return mouse x-coord in user coordinate system
   var svgroot = evt.target.parentNode;
-  return (evt.clientX+(isIE?0:window.pageXOffset)-svgroot.getAttribute("myleft")-svgroot.getAttribute("ox"))/(svgroot.getAttribute("xunitlength")-0);
+  return (evt.clientX+(isIE?0:window.pageXOffset)-svgroot.getAttribute("myleft")-svgroot.getAttribute("ox"))/parseFloat(svgroot.getAttribute("xunitlength"));
 }
 
 function getY(evt) { // return mouse y-coord in user coordinate system
   var svgroot = evt.target.parentNode;
 //alert(showobj(svgroot)+svgroot.getAttribute("mytop"))
-  return (svgroot.getAttribute("height")-svgroot.getAttribute("oy")-(evt.clientY+(isIE?0:window.pageYOffset)-svgroot.getAttribute("mytop")))/(svgroot.getAttribute("yunitlength")-0);
+  return (svgroot.getAttribute("height")-svgroot.getAttribute("oy")-(evt.clientY+(isIE?0:window.pageYOffset)-svgroot.getAttribute("mytop")))/parseFloat(svgroot.getAttribute("yunitlength"));
 }
 
 function translateandeval(src) { //modify user input to JavaScript syntax
@@ -2379,16 +2380,17 @@ function translateandeval(src) { //modify user input to JavaScript syntax
   src = src.replace(/plot\(\x20*([^\"f\[][^\n\r;]+)\)/g,"plot(\"$1\")");
 
   // replace (expr,expr) by [expr,expr] where expr has no (,) in it
-  src = src.replace(/([=(,]\x20*)\(([-a-z0-9./+*]+?),([-a-z0-9./+*]+?)\)/g,"$1[$2,$3]");
-
+  src = src.replace(/([=[(,]\x20*)\(([-a-z0-9./+*]+?),([-a-z0-9./+*]+?)\)/g,"$1[$2,$3]");
+//alert(src)
   // insert * between digit and letter e.g. 2x --> 2*x
-  src = src.replace(/([0-9])([a-zA-Z])/g,"$1*$2");
+  src = src.replace(/([0-9])([a-df-zA-Z]|e^)/g,"$1*$2");
   src = src.replace(/\)([\(0-9a-zA-Z])/g,"\)*$1");
 
   try {
     with (Math) eval(src);          // here the svgpicture object is created
   } catch(err) {
     if (err!="wait") {
+//alert(dsvglocation)
       if (typeof err=="object") 
         errstr = err.name+" "+err.message+" "+err.number+" "+err.description;
       else errstr = err;
@@ -2397,16 +2399,14 @@ function translateandeval(src) { //modify user input to JavaScript syntax
   }
 }
 
+var lastSlot = 0;
+
 function drawPictures() { // main routine; called after webpage has loaded
   var src, id, dsvg, nd, node, ht, index, cols, arr, i, node2;
-  var pictures = document.getElementsByTagName("textarea");
-  for (index = 0; index<pictures.length; index++)
-    if (pictures[index].className=="ASCIIsvg"){
-      pictures[index].style.display="none";  // hide the textarea
-    }
   var ASbody = document.getElementsByTagName("body")[0];
   pictures = getElementsByClass(ASbody,"embed","ASCIIsvg");
   var len = pictures.length;
+  if(len==0) return;
   if (checkIfSVGavailable) {
     nd = isSVGavailable();
     if (nd != null && notifyIfNoSVG && len>0)
@@ -2419,17 +2419,17 @@ use Firefox 2.0 or later");
       }
   }
  if (nd == null) {
-  for (index = 0; index < len; index++) {
+  for (index = lastSlot; index < len+lastSlot; index++) {
    width = null; height = null; 
    xmin = null; xmax = null; ymin = null; ymax = null;
    xscl = null; xgrid = null; yscl = null; ygrid = null;
    initialized = false;
-   picture = pictures[index];  // current picture object
+   picture = pictures[index-lastSlot];  // current picture object
    src = picture.getAttribute("script"); // get the ASCIIsvg code
    if (src==null) src = "";
    // insert "axes()" if not present  ******** experimental
    if (!/axes\b|initPicture/.test(src)) {
-     var i = 0
+     var i = 0;
      while (/((yscl|ymax|ymin|xscl|xmax|xmin|\bwidth|\bheight)\s*=\s*-?\d*(\d\.|\.\d|\d)\d*\s*;?)/.test(src.slice(i))) i++;
      src = (i==0?"axes(); "+src: src.slice(0,i)+src.slice(i).replace(/((scl|max|min|idth|eight)\s*=\s*-?\d*(\d\.|\.\d|\d)\d*\s*;?)/,"$1\naxes();"));
    }
@@ -2437,8 +2437,8 @@ use Firefox 2.0 or later");
    if (isIE) {
      picture.setAttribute("wmode","transparent");
 //alert("*"+picture.getAttribute("src")+dsvglocation);
-//adding d.svg dynamically greates problems in IE...
-     if (picture.getAttribute("src")=="") picture.setAttribute("src",dsvglocation+"d.svg");
+//adding d.svg dynamically creates problems in IE...
+//     if (picture.getAttribute("src")=="") picture.setAttribute("src",dsvglocation+"d.svg");
    }
    if (document.getElementById("picture"+(index+1)+"mml")==null) {
      picture.parentNode.style.position = "relative";
@@ -2473,6 +2473,7 @@ use Firefox 2.0 or later");
       node2.appendChild(document.createTextNode("Update"));
       if (src.indexOf("showcode()")==-1) node2.style.display = "none";
       picture.parentNode.insertBefore(node2,node);
+//      picture.parentNode.insertBefore(document.createTextNode("ASCII"),node);
       picture.parentNode.insertBefore(myCreateElementXHTML("br"),node);
     } else src = document.getElementById("picture"+(index+1)+"input").value;
     id = picture.getAttribute("id");
@@ -2481,8 +2482,9 @@ use Firefox 2.0 or later");
       id = "picture"+(index+1);
       picture.setAttribute("id",id);
     }
-    translateandeval(src)
+    translateandeval(src);
   }
+  lastSlot+=len;
  }
 }
 
@@ -2518,13 +2520,26 @@ function switchTo(id) { // used by dynamic code to select appropriate graph
     svgpicture = picture;
     doc = document;
   }
-  xunitlength = svgpicture.getAttribute("xunitlength")-0;
-  yunitlength = svgpicture.getAttribute("yunitlength")-0;
-  xmin = svgpicture.getAttribute("xmin")-0;
-  xmax = svgpicture.getAttribute("xmax")-0;
-  ymin = svgpicture.getAttribute("ymin")-0;
-  ymax = svgpicture.getAttribute("ymax")-0;
+  xunitlength = parseFloat(svgpicture.getAttribute("xunitlength"));
+  yunitlength = parseFloat(svgpicture.getAttribute("yunitlength"));
+  xmin = parseFloat(svgpicture.getAttribute("xmin"));
+  xmax = parseFloat(svgpicture.getAttribute("xmax"));
+  ymin = parseFloat(svgpicture.getAttribute("ymin"));
+  ymax = parseFloat(svgpicture.getAttribute("ymax"));
   origin = [svgpicture.getAttribute("ox")-0,svgpicture.getAttribute("oy")-0];
+}
+
+function updateCoords () { //update top-left position of pictures
+  if (!isIE) {     // many thanks to Paulo Soares for this fix
+    var pos, pictures = document.getElementsByTagName("svg");
+    var len = pictures.length;
+// svg tags not related to ASCIIsvg should be discarded
+    for (index = 0; index<len; index++) {
+      pos = findPos(pictures[index].parentNode);
+      pictures[index].setAttribute("myleft",""+pos[0]);
+      pictures[index].setAttribute("mytop",""+pos[1]);
+    }
+  }
 }
 
 function updatePicture(obj) {
@@ -2536,15 +2551,8 @@ function updatePicture(obj) {
   xscl = null; xgrid = null; yscl = null; ygrid = null;
   initialized = false;
   picture = document.getElementById(id);
-  if (!isIE) {
-    left = picture.getAttribute("myleft");
-    top = picture.getAttribute("mytop");
-  }
   translateandeval(src)
-  if (!isIE) {
-    picture.setAttribute("myleft",left);
-    picture.setAttribute("mytop",top);
-  }
+  updateCoords();
 }
 
 function changepicturesize(evt,factor) {
@@ -2552,6 +2560,8 @@ function changepicturesize(evt,factor) {
   var name = obj.parentNode.getAttribute("name");
   var pic = document.getElementById(name);
   var src = document.getElementById(name+"input").value;
+  if (!/height/.test(src)) src = "height=0; "+src;
+  if (!/width/.test(src)) src = "width=0; "+src;
   src = src.replace(/width\s*=\s*\d+/,"width="+(factor*(pic.getAttribute("width")-0)));
   src = src.replace(/height\s*=\s*\d+/,"height="+(factor*(pic.getAttribute("height")-0)));
   document.getElementById(name+"input").value = src;
@@ -2568,10 +2578,15 @@ function zoom(evt,factor) {
   var xlen = (xmax-xmin)/2;
   var ylen = (ymax-ymin)/2;
   var xcen = getX(evt), ycen = getY(evt);
-  src = src.replace(/xmin\s*=\s*[-\d.]+/,"xmin="+(xcen-factor*xlen));
-  src = src.replace(/xmax\s*=\s*[-\d.]+/,"xmax="+(xcen+factor*xlen));
-  src = src.replace(/ymin\s*=\s*[-\d.]+/,"ymin="+(ycen-factor*ylen));
-  src = src.replace(/ymax\s*=\s*[-\d.]+/,"ymax="+(ycen+factor*ylen));
+//alert([xlen,xcen,ylen,ycen]);
+  if (!/ymax/.test(src)) src = "ymax=0; "+src;
+  if (!/ymin/.test(src)) src = "ymin=0; "+src;
+  if (!/xmax/.test(src)) src = "xmax=0; "+src;
+  if (!/xmin/.test(src)) src = "xmin=0; "+src;
+  src = src.replace(/xmin\s*=\s*[-\d.e]+/,"xmin="+(xcen-factor*xlen));
+  src = src.replace(/xmax\s*=\s*[-\d.e]+/,"xmax="+(xcen+factor*xlen));
+  src = src.replace(/ymin\s*=\s*[-\d.e]+/,"ymin="+(ycen-factor*ylen));
+  src = src.replace(/ymax\s*=\s*[-\d.e]+/,"ymax="+(ycen+factor*ylen));
   document.getElementById(name+"input").value = src;
   updatePicture(name);
 }
@@ -2592,8 +2607,8 @@ function mClick(evt) {
     if(sinceFirstClick <= 40) {
       if (evt.shiftKey) {
         if (evt.altKey) changepicturesize(evt,2);
-        else zoom(evt,2);
-      } else if (evt.altKey) zoom(evt,.5);//changepicturesize(evt,.5);
+        else zoom(evt,.5);
+      } else if (evt.altKey) zoom(evt,2);//changepicturesize(evt,.5);
       else showHideCode(evt);             // do this on dblclick
       clearTimeout(dblClkTimer);
       dblClkTimer = "";
@@ -2721,8 +2736,13 @@ function initPicture(x_min,x_max,y_min,y_max) { // set up the graph
   svgpicture.setAttribute("onmousemove","displayCoord(evt)");
   svgpicture.setAttribute("onmouseout","removeCoord(evt)");
   svgpicture.setAttribute("onclick","mClick(evt)");
-  node = myCreateElementSVG("text");
+  node = myCreateElementSVG("text"); // used for displayCoord
   node.appendChild(doc.createTextNode(" "));
+  node.setAttribute("id","coords");
+  svgpicture.appendChild(node);
+  node = myCreateElementSVG("text"); // used for text display
+  node.appendChild(doc.createTextNode(" "));
+  node.setAttribute("id","coords");
   svgpicture.appendChild(node);
   border = defaultborder;
  }
@@ -2841,10 +2861,11 @@ function loop(p,d,id) {
                p[1]+Math.sin(1.4)*d[0]+Math.cos(1.4)*d[1]],p);
 }
 
-function arc(start,end,radius,id) { // coordinates in units
+function arc(start,end,radius,id,largearc) { // coordinates in units
   var node, v;
 //alert([fill, stroke, origin, xunitlength, yunitlength, height])
   if (id!=null) node = doc.getElementById(id);
+  if (largearc==null) largearc=0;
   if (radius==null) {
     v=[end[0]-start[0],end[1]-start[1]];
     radius = Math.sqrt(v[0]*v[0]+v[1]*v[1]);
@@ -2856,7 +2877,7 @@ function arc(start,end,radius,id) { // coordinates in units
   }
   node.setAttribute("d","M"+(start[0]*xunitlength+origin[0])+","+
     (height-start[1]*yunitlength-origin[1])+" A"+radius*xunitlength+","+
-     radius*yunitlength+" 0 0,0 "+(end[0]*xunitlength+origin[0])+","+
+     radius*yunitlength+" 0 "+largearc+",0 "+(end[0]*xunitlength+origin[0])+","+
     (height-end[1]*yunitlength-origin[1]));
   node.setAttribute("stroke-width", strokewidth);
   node.setAttribute("stroke", stroke);
@@ -2927,8 +2948,8 @@ function rect(p,q,id,rx,ry) { // opposite corners in units, rounded by radii
 }
 
 function text(p,st,pos,id,fontsty) {
-  var dnode, node, dx = 0, dy = fontsize/3;
-  if (/(`|\$)/.test(st)) {  // layer for ASCIIMathML and LaTeXMathML
+  var dnode, node, dx = 0, dy = fontsize/3, str = st.toString();
+  if (/(`|\$)/.test(str)) {  // layer for ASCIIMathML and LaTeXMathML
     dnode = document.getElementById(svgpicture.getAttribute("name")+"mml");
     if (dnode!=null) {
       if (id!=null) node = document.getElementById(id);
@@ -2940,8 +2961,8 @@ function text(p,st,pos,id,fontsty) {
         dnode.appendChild(node);
       }
       while (node.childNodes.length>0) node.removeChild(node.lastChild); 
-      node.appendChild(document.createTextNode(st));
-      if (/`/.test(st)) AMprocessNode(node); else LMprocessNode(node);
+      node.appendChild(document.createTextNode(str));
+      if (/`/.test(str)) AMprocessNode(node); else LMprocessNode(node);
       dx = -node.offsetWidth/2;
       dy = -node.offsetHeight/2;
       if (pos!=null) {
@@ -2967,16 +2988,14 @@ function text(p,st,pos,id,fontsty) {
     node = myCreateElementSVG("text");
     node.setAttribute("id", id);
     svgpicture.appendChild(node);
-    node.appendChild(doc.createTextNode(st));
+    node.appendChild(doc.createTextNode(str));
   }
   while (node.childNodes.length>1) node.removeChild(node.lastChild); 
-//  node.appendChild(document.createTextNode("\xA0"+st+"\xA0"));
-//alert("here");
-  node.lastChild.nodeValue = "\xA0"+st+"\xA0";
+  node.lastChild.nodeValue = "\xA0"+str+"\xA0";
   node.setAttribute("x",p[0]*xunitlength+origin[0]+dx);
   node.setAttribute("y",height-p[1]*yunitlength-origin[1]+dy);
   node.setAttribute("font-style",(fontsty!=null?fontsty:
-    (st.search(/^[a-zA-Z]$/)!=-1?"italic":fontstyle)));
+    (str.search(/^[a-zA-Z]$/)!=-1?"italic":fontstyle)));
   node.setAttribute("font-family",fontfamily);
   node.setAttribute("font-size",fontsize);
   node.setAttribute("font-weight",fontweight);
@@ -2986,7 +3005,7 @@ function text(p,st,pos,id,fontsty) {
   return p;
 }
 
-function mtext(p,st,pos,fontsty) { // method for updating text on an svg
+function mtext(p,st,pos,fontsty,fontsz) { // method for updating text on an svg
 // "this" is the text object or the svgpicture object
   var textanchor = "middle";
   var dx = 0; var dy = fontsize/3;
@@ -3013,7 +3032,7 @@ function mtext(p,st,pos,fontsty) { // method for updating text on an svg
   node.setAttribute("y",p[1]+dy);
   node.setAttribute("font-style",(fontsty!=null?fontsty:fontstyle));
   node.setAttribute("font-family",fontfamily);
-  node.setAttribute("font-size",fontsize);
+  node.setAttribute("font-size",(fontsz!=null?fontsz:fontsize));
   node.setAttribute("font-weight",fontweight);
   node.setAttribute("text-anchor",textanchor);
   if (fontstroke!="none") node.setAttribute("stroke",fontstroke);
@@ -3394,14 +3413,16 @@ function show_props(obj) {
 
 function displayCoord(evt) {
   if (showcoordinates) {
-//alert(show_props(evt.target.parentNode))
     var svgroot = evt.target.parentNode;
     var nl = svgroot.childNodes;
     for (var i=0; i<nl.length && nl.item(i).nodeName!="text"; i++);
     var cnode = nl.item(i);
     cnode.mtext = mtext;
-    cnode.mtext([svgroot.getAttribute("width")-0,svgroot.getAttribute("height")-0],"("+getX(evt).toFixed(2)+", "+getY(evt).toFixed(2)+")", "aboveleft", "");
-  }
+    cnode.mtext([svgroot.getAttribute("width")-(-7),svgroot.getAttribute("height")-7],"("+getX(evt).toFixed(2)+", "+getY(evt).toFixed(2)+")", "left", "", "11");
+/*    var dnode = nl.item(i+1);
+    dnode.mtext = mtext;
+    dnode.mtext([0,svgroot.getAttribute("height")-6],"Try (shift/alt)-dblclick", "right", "", "8");
+*/  }
 }
 
 function removeCoord(evt) {
@@ -3411,7 +3432,10 @@ function removeCoord(evt) {
     var cnode = nl.item(i);
     cnode.mtext = mtext;
     cnode.mtext([svgroot.getAttribute("width")-0,svgroot.getAttribute("height")-0],"", "aboveleft", "");
-}
+/*    var dnode = nl.item(i+1);
+    dnode.mtext = mtext;
+    dnode.mtext([0,svgroot.getAttribute("height")-0],"", "aboveright", "");
+*/}
 
 function initASCIIMathCalculators(li) {
   var i;

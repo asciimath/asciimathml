@@ -47,7 +47,7 @@ var AMdocumentId = "wikitext" // PmWiki element containing math (default=body)
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-var isIE = document.createElementNS==null;
+var isIE = (navigator.appName.slice(0,9)=="Microsoft");
 var noMathML = false, translated = false;
 
 if (isIE) { // avoid adding MathPlayer info explicitly to each webpage

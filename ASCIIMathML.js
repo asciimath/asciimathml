@@ -864,6 +864,10 @@ function AMparseExpr(str,rightbracket) {
 function parseMath(str,latex) {
   var frag, node;
   AMnestingDepth = 0;
+  //some basic cleanup for dealing with stuff editors like TinyMCE adds
+  str = str.replace(/&nbsp;/g,"");
+  str = str.replace(/&gt;/g,">");
+  str = str.replace(/&lt;/g,"<");
   frag = AMparseExpr(str.replace(/^\s+/g,""),false)[0];
   node = createMmlNode("mstyle",frag);
   node.setAttribute("mathcolor",mathcolor);

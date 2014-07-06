@@ -645,7 +645,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
           node.appendChild(createMmlNode("mo",document.createTextNode('|')));
           return [node,result[1]];
       } else if (symbol.input == "cancel") {   // cancel
-        node = AMcreateMmlNode(symbol.tag,result[0]);
+        node = createMmlNode(symbol.tag,result[0]);
 	node.setAttribute("notation","updiagonalstrike");
 	return [node,result[1]];
       } else if (typeof symbol.acc == "boolean" && symbol.acc) {   // accent
@@ -694,7 +694,7 @@ newst = newst +
         else if (str.charAt(0)=="(") i=str.indexOf(")");
         else if (str.charAt(0)=="[") i=str.indexOf("]");
 	st = str.slice(1,i);
-	node = AMcreateMmlNode(symbol.tag,result2[0]);
+	node = createMmlNode(symbol.tag,result2[0]);
 	node.setAttribute("color",st);
 	return [node,result2[1]];
     }
@@ -840,6 +840,7 @@ function AMparseExpr(str,rightbracket) {
                 pos[i][pos[i].length]=j;
           if (matrix && i>1) matrix = pos[i].length == pos[i-2].length;
         }
+        matrix = matrix && (pos.length>1 || pos[0].length>0);
         if (matrix) {
           var row, frag, n, k, table = document.createDocumentFragment();
           for (i=0; i<m; i=i+2) {

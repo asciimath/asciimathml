@@ -1200,7 +1200,6 @@ as your (X)HTML page.
         }
         //create element to contain the latex & process it
         var span = document.createElement("span");
-        console.log(LatexStr.replace(/\\/g, "\\"));
         span.innerText = "$" + LatexStr.replace(/\\/g, "\\") + "$";
         LMprocessNode(span, false);
 

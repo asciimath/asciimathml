@@ -44,6 +44,7 @@ var showasciiformulaonhover = true; // helps students learn ASCIIMath
 var decimalsign = ".";        // change to "," if you like, beware of `(1,2)`!
 var AMdelimiter1 = "`", AMescape1 = "\\\\`"; // can use other characters
 var AMdocumentId = "wikitext" // PmWiki element containing math (default=body)
+var fixphi = true;  		//false to return to legacy phi/varphi mapping
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
@@ -208,8 +209,8 @@ var AMsymbols = [
 {input:"nu",     tag:"mi", output:"\u03BD", tex:null, ttype:CONST},
 {input:"omega",  tag:"mi", output:"\u03C9", tex:null, ttype:CONST},
 {input:"Omega",  tag:"mo", output:"\u03A9", tex:null, ttype:CONST},
-{input:"phi",    tag:"mi", output:"\u03C6", tex:null, ttype:CONST},
-{input:"varphi", tag:"mi", output:"\u03D5", tex:null, ttype:CONST},
+{input:"phi",    tag:"mi", output:fixphi?"\u03D5":"\u03C6", tex:null, ttype:CONST},
+{input:"varphi", tag:"mi", output:fixphi?"\u03C6":"\u03D5", tex:null, ttype:CONST},
 {input:"Phi",    tag:"mo", output:"\u03A6", tex:null, ttype:CONST},
 {input:"pi",     tag:"mi", output:"\u03C0", tex:null, ttype:CONST},
 {input:"Pi",     tag:"mo", output:"\u03A0", tex:null, ttype:CONST},

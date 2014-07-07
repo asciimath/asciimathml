@@ -202,6 +202,8 @@ var AMsymbols = [
 {input:"kappa",  tag:"mi", output:"\u03BA", tex:null, ttype:CONST},
 {input:"lambda", tag:"mi", output:"\u03BB", tex:null, ttype:CONST},
 {input:"Lambda", tag:"mo", output:"\u039B", tex:null, ttype:CONST},
+{input:"lamda", tag:"mi", output:"\u03BB", tex:null, ttype:CONST},
+{input:"Lamda", tag:"mo", output:"\u039B", tex:null, ttype:CONST},
 {input:"mu",     tag:"mi", output:"\u03BC", tex:null, ttype:CONST},
 {input:"nu",     tag:"mi", output:"\u03BD", tex:null, ttype:CONST},
 {input:"omega",  tag:"mi", output:"\u03C9", tex:null, ttype:CONST},

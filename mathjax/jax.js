@@ -1104,7 +1104,6 @@ function parseMath(str,latex) {
   node = createMmlNode("mstyle",frag);
   if (mathcolor != "") node.setAttribute("mathcolor",mathcolor);
   if (mathfontfamily != "") node.setAttribute("fontfamily",mathfontfamily);
-  if (mathsize != "") node.setAttribute("mathsize",mathfontsize);
   if (displaystyle) node.setAttribute("displaystyle","true");
   node = createMmlNode("math",node);
   if (showasciiformulaonhover)                      //fixed by djhsu so newline
@@ -1284,7 +1283,6 @@ else if(typeof window.attachEvent != 'undefined'){
 showasciiformulaonhover = false;
 mathfontfamily = "";
 mathcolor = "";
-mathsize = "";
 
 //
 //  Remove remapping of mathvariants to plane1 (MathJax handles that)

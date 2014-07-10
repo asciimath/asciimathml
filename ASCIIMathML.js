@@ -35,10 +35,7 @@ var checkForMathML = true;     // check if browser can display MathML
 var notifyIfNoMathML = true;   // display note at top if no MathML capability
 var alertIfNoMathML = false;   // show alert box if no MathML capability
 var translateOnLoad = true;    // set to false to do call translators from js 
-var translateLaTeX = true;     // false to preserve $..$, $$..$$
-var translateLaTeXformatting = true; // false to preserve \emph,\begin{},\end{}
 var translateASCIIMath = true; // false to preserve `..`
-var avoidinnerHTML = false;   // set true if assigning to innerHTML gives error
 var displaystyle = true;      // puts limits above and below large operators
 var showasciiformulaonhover = true; // helps students learn ASCIIMath
 var decimalsign = ".";        // change to "," if you like, beware of `(1,2)`!
@@ -51,7 +48,7 @@ var fixphi = true;  		//false to return to legacy phi/varphi mapping
 var isIE = (navigator.appName.slice(0,9)=="Microsoft");
 var noMathML = false, translated = false;
 
-if (isIE) { // avoid adding MathPlayer info explicitly to each webpage
+if (isIE) { // add MathPlayer info to IE webpages
   document.write("<object id=\"mathplayer\"\
   classid=\"clsid:32F66A20-7614-11D4-BD11-00104BD3F987\"></object>");
   document.write("<?import namespace=\"m\" implementation=\"#mathplayer\"?>");
@@ -163,11 +160,28 @@ function createElementXHTML(t) {
   else return document.createElementNS("http://www.w3.org/1999/xhtml",t);
 }
 
+var AMmathml = "http://www.w3.org/1998/Math/MathML";
+
+function AMcreateElementMathML(t) {
+  if (isIE) return document.createElement("m:"+t);
+  else return document.createElementNS(AMmathml,t);
+}
+
 function createMmlNode(t,frag) {
-  if (isIE) var node = document.createElement("m:"+t);
-  else var node = document.createElementNS("http://www.w3.org/1998/Math/MathML",t);
+  var node;
+  if (isIE) node = document.createElement("m:"+t);
+  else node = document.createElementNS(AMmathml,t);
   if (frag) node.appendChild(frag);
   return node;
+}
+
+function newcommand(oldstr,newstr) {
+  AMsymbols = AMsymbols.concat([{input:oldstr, tag:"mo", output:newstr, 
+                                 tex:null, ttype:DEFINITION}]);
+  // ####  Added from Version 2.0.1 #### //
+  AMsymbols.sort(compareNames);
+  for (i=0; i<AMsymbols.length; i++) AMnames[i] = AMsymbols[i].input;
+  // ####  End of Addition #### //
 }
 
 // character lists for Mozilla/Netscape fonts
@@ -664,12 +678,10 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
                               result[0].childNodes[i].firstChild.nodeValue);
               var newst = [];
               for (var j=0; j<st.length; j++)
-		  if (st.charCodeAt(j)>64 && st.charCodeAt(j)<91) newst
-= newst +
-                    symbol.codes[st.charCodeAt(j)-65];
-                else if (st.charCodeAt(j)>96 && st.charCodeAt(j)<123)
-newst = newst +
-                    symbol.codes[st.charCodeAt(j)-71];
+		  if (st.charCodeAt(j)>64 && st.charCodeAt(j)<91) 
+		  	newst = newst + symbol.codes[st.charCodeAt(j)-65];
+                else if (st.charCodeAt(j)>96 && st.charCodeAt(j)<123) 
+                	newst = newst + symbol.codes[st.charCodeAt(j)-71];
                 else newst = newst + st.charAt(j);
               if (result[0].nodeName=="mi")
                 result[0]=createMmlNode("mo").
@@ -727,7 +739,7 @@ newst = newst +
     str = AMremoveCharsAndBlanks(str,symbol.input.length); 
     result = AMparseExpr(str,false);
     AMnestingDepth--;
-    var st = "";
+    st = "";
     if (result[0].lastChild!=null)
       st = result[0].lastChild.firstChild.nodeValue;
     if (st == "|") { // its an absolute value subterm
@@ -790,7 +802,7 @@ function AMparseIexpr(str) {
 }
 
 function AMparseExpr(str,rightbracket) {
-  var symbol, node, result, i, nodeList = [],
+  var symbol, node, result, i,
   newFrag = document.createDocumentFragment();
   do {
     str = AMremoveCharsAndBlanks(str,0);
@@ -893,9 +905,9 @@ function parseMath(str,latex) {
   str = str.replace(/&lt;/g,"<");
   frag = AMparseExpr(str.replace(/^\s+/g,""),false)[0];
   node = createMmlNode("mstyle",frag);
-  node.setAttribute("mathcolor",mathcolor);
-  node.setAttribute("fontfamily",mathfontfamily);
-  node.setAttribute("mathsize",mathfontsize);
+  if (mathcolor != "") node.setAttribute("mathcolor",mathcolor);
+  if (mathfontfamily != "") node.setAttribute("fontfamily",mathfontfamily);
+  if (mathsize != "") node.setAttribute("mathsize",mathfontsize);
   if (displaystyle) node.setAttribute("displaystyle","true");
   node = createMmlNode("math",node);
   if (showasciiformulaonhover)                      //fixed by djhsu so newline

@@ -289,6 +289,8 @@ AMsqrt, AMroot, AMfrac, AMdiv, AMover, AMsub, AMsup,
 {input:"dot", tag:"mover", output:".",      tex:null, ttype:UNARY, acc:true},
 {input:"ddot", tag:"mover", output:"..",    tex:null, ttype:UNARY, acc:true},
 {input:"ul", tag:"munder", output:"\u0332", tex:"underline", ttype:UNARY, acc:true},
+{input:"ubrace", tag:"munder", output:"\u23DF", tex:"underbrace", ttype:UNARY, acc:true},
+{input:"obrace", tag:"mover", output:"\u23DE", tex:"overbrace", ttype:UNARY, acc:true},
 AMtext, AMmbox, AMquote,
 //{input:"var", tag:"mstyle", atname:"fontstyle", atval:"italic", output:"var", tex:null, ttype:UNARY},
 {input:"color", tag:"mstyle", ttype:BINARY},
@@ -316,9 +318,11 @@ var AMnames = []; //list of input symbols
 function AMinitSymbols() {
   var texsymbols = [], i;
   for (i=0; i<AMsymbols.length; i++)
-    if (AMsymbols[i].tex && !(typeof AMsymbols[i].notexcopy == "boolean" && AMsymbols[i].notexcopy)) 
-      texsymbols[texsymbols.length] = {input:AMsymbols[i].tex, 
-        tag:AMsymbols[i].tag, output:AMsymbols[i].output, ttype:AMsymbols[i].ttype};
+    if (AMsymbols[i].tex && !(typeof AMsymbols[i].notexcopy == "boolean" && AMsymbols[i].notexcopy)) {
+       texsymbols[texsymbols.length] = {input:AMsymbols[i].tex, 
+        tag:AMsymbols[i].tag, output:AMsymbols[i].output, ttype:AMsymbols[i].ttype,
+        acc:(AMsymbols[i].acc||false)};
+    }
   AMsymbols = AMsymbols.concat(texsymbols);
   AMsymbols.sort(compareNames);
   for (i=0; i<AMsymbols.length; i++) AMnames[i] = AMsymbols[i].input;
@@ -557,7 +561,8 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
       } else if (symbol.input == "abs") {           // abs
 	      return ['{\\left|'+result[0]+'\\right|}',result[1]];
       } else if (typeof symbol.acc == "boolean" && symbol.acc) {   // accent
-	      return ['{'+AMTgetTeXsymbol(symbol)+'{'+result[0]+'}}',result[1]];
+	      //return ['{'+AMTgetTeXsymbol(symbol)+'{'+result[0]+'}}',result[1]];
+	      return [AMTgetTeXsymbol(symbol)+'{'+result[0]+'}',result[1]];
       } else {                        // font change command  
 	    return ['{'+AMTgetTeXsymbol(symbol)+'{'+result[0]+'}}',result[1]];
       }
@@ -632,7 +637,6 @@ function AMTparseIexpr(str) {
 //    if (symbol.input == "/") AMTremoveBrackets(node);
     if (symbol.input == "_") {
       sym2 = AMgetSymbol(str);
-      underover = (sym1.ttype == UNDEROVER);
       if (sym2.input == "^") {
         str = AMremoveCharsAndBlanks(str,sym2.input.length);
         var res2 = AMTparseSexpr(str);
@@ -646,7 +650,8 @@ function AMTparseIexpr(str) {
         node += '_{'+result[0]+'}';
       }
     } else { //must be ^
-      node = '{'+node+'}^{'+result[0]+'}';
+      //node = '{'+node+'}^{'+result[0]+'}';
+      node = node+'^{'+result[0]+'}';
     }
   } 
   

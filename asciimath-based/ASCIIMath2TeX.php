@@ -266,6 +266,8 @@ array( 'input'=>'tilde', 'unary'=>TRUE, 'acc'=>TRUE),
 array( 'input'=>'dot', 'unary'=>TRUE, 'acc'=>TRUE),
 array( 'input'=>'ddot', 'unary'=>TRUE, 'acc'=>TRUE),
 array( 'input'=>'ul', 'tex'=>'underline', 'unary'=>TRUE, 'acc'=>TRUE),
+array( 'input'=>'ubrace', 'tex'=>'underbrace', 'unary'=>TRUE, 'acc'=>TRUE),
+array( 'input'=>'obrace', 'tex'=>'overbrace', 'unary'=>TRUE, 'acc'=>TRUE),
 array( 'input'=>'text', 'text'=>TRUE),
 array( 'input'=>'mbox', 'text'=>TRUE),
 array( 'input'=>'"', 'text'=>TRUE),
@@ -564,7 +566,8 @@ function AMTparseSexpr($str) {
 		} else if ($symbol['input']=='abs') {
 			return array('{\\left|'.$result[0].'\\right|}',$result[1]);
 		} else if (isset($symbol['acc'])) {
-			return array('{'.$this->AMTgetTeXsymbol($symbol).'{'.$result[0].'}}',$result[1]);
+			//return array('{'.$this->AMTgetTeXsymbol($symbol).'{'.$result[0].'}}',$result[1]);
+			return array($this->AMTgetTeXsymbol($symbol).'{'.$result[0].'}',$result[1]);
 		} else {
 			return array('{'.$this->AMTgetTeXsymbol($symbol).'{'.$result[0].'}}',$result[1]);
 		}
@@ -657,7 +660,8 @@ function AMTparseIexpr($str) {
 				$node .= '_{'.$result[0].'}';
 			}
 		} else {
-			$node = '{'.$node.'}^{'.$result[0].'}';
+			//$node = '{'.$node.'}^{'.$result[0].'}';
+			$node = $node.'^{'.$result[0].'}';
 		}
 	}
 	

@@ -197,7 +197,7 @@ var AMbbb = [0xEF8C,0xEF8D,0x2102,0xEF8E,0xEF8F,0xEF90,0xEF91,0x210D,0xEF92,0xEF
 var CONST = 0, UNARY = 1, BINARY = 2, INFIX = 3, LEFTBRACKET = 4,
     RIGHTBRACKET = 5, SPACE = 6, UNDEROVER = 7, DEFINITION = 8,
     LEFTRIGHT = 9, TEXT = 10, BIG = 11, LONG = 12, STRETCHY = 13,
-    MATRIX = 14;; // token types
+    MATRIX = 14, UNARYUNDEROVER = 15; // token types
 
 var AMquote = {input:"\"",   tag:"mtext", output:"mbox", tex:null, ttype:TEXT};
 
@@ -422,6 +422,8 @@ var AMsymbols = [
 {input:"dot", tag:"mover", output:".",      tex:null, ttype:UNARY, acc:true},
 {input:"ddot", tag:"mover", output:"..",    tex:null, ttype:UNARY, acc:true},
 {input:"ul", tag:"munder", output:"\u0332", tex:"underline", ttype:UNARY, acc:true},
+{input:"ubrace", tag:"munder", output:"\u23DF", tex:"underbrace", ttype:UNARYUNDEROVER, acc:true},
+{input:"obrace", tag:"mover", output:"\u23DE", tex:"overbrace", ttype:UNARYUNDEROVER, acc:true},
 {input:"text", tag:"mtext", output:"text", tex:null, ttype:TEXT},
 {input:"mbox", tag:"mtext", output:"mbox", tex:null, ttype:TEXT},
 {input:"color", tag:"mstyle", ttype:BINARY},
@@ -451,9 +453,11 @@ var AMnames = []; //list of input symbols
 function initSymbols() {
   var texsymbols = [], i;
   for (i=0; i<AMsymbols.length; i++)
-    if (AMsymbols[i].tex) 
+    if (AMsymbols[i].tex) {
       texsymbols[texsymbols.length] = {input:AMsymbols[i].tex, 
-        tag:AMsymbols[i].tag, output:AMsymbols[i].output, ttype:AMsymbols[i].ttype};
+        tag:AMsymbols[i].tag, output:AMsymbols[i].output, ttype:AMsymbols[i].ttype,
+        acc:(AMsymbols[i].acc||false)};
+    }
   AMsymbols = AMsymbols.concat(texsymbols);
   refreshSymbols();
 }
@@ -636,6 +640,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
       }
       str = AMremoveCharsAndBlanks(str,i+1);
       return [createMmlNode("mrow",newFrag),str];
+  case UNARYUNDEROVER:
   case UNARY:
       str = AMremoveCharsAndBlanks(str,symbol.input.length); 
       result = AMparseSexpr(str);
@@ -711,7 +716,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
         else if (str.charAt(0)=="[") i=str.indexOf("]");
 	st = str.slice(1,i);
 	node = createMmlNode(symbol.tag,result2[0]);
-	node.setAttribute("color",st);
+	node.setAttribute("mathcolor",st);
 	return [node,result2[1]];
     }
     if (symbol.input=="root" || symbol.input=="stackrel") 
@@ -777,9 +782,9 @@ function AMparseIexpr(str) {
     else AMremoveBrackets(result[0]);
     str = result[1];
 //    if (symbol.input == "/") AMremoveBrackets(node);
+    underover = (sym1.ttype == UNDEROVER || sym1.ttype == UNARYUNDEROVER);
     if (symbol.input == "_") {
       sym2 = AMgetSymbol(str);
-      underover = (sym1.ttype == UNDEROVER);
       if (sym2.input == "^") {
         str = AMremoveCharsAndBlanks(str,sym2.input.length);
         var res2 = AMparseSexpr(str);
@@ -793,6 +798,9 @@ function AMparseIexpr(str) {
         node = createMmlNode((underover?"munder":"msub"),node);
         node.appendChild(result[0]);
       }
+    } else if (symbol.input == "^" && underover) {
+    	node = createMmlNode("mover",node);
+        node.appendChild(result[0]);   
     } else {
       node = createMmlNode(symbol.tag,node);
       node.appendChild(result[0]);

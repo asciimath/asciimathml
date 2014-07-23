@@ -381,7 +381,9 @@ var AMsymbols = [
 {input:"sech",  tag:"mo", output:"sech", tex:null, ttype:UNARY, func:true},
 {input:"csch",  tag:"mo", output:"csch", tex:null, ttype:UNARY, func:true},
 {input:"exp",  tag:"mo", output:"exp", tex:null, ttype:UNARY, func:true},
-{input:"abs",   tag:"mo", output:"abs",  tex:null, ttype:UNARY},  //add func:true if not using change to line 541
+{input:"abs",   tag:"mo", output:"abs",  tex:null, ttype:UNARY, rewriteleftright:["|","|"]}, 
+{input:"floor",   tag:"mo", output:"floor",  tex:null, ttype:UNARY, rewriteleftright:["\u230A","\u230B"]}, 
+{input:"ceil",   tag:"mo", output:"ceil",  tex:null, ttype:UNARY, rewriteleftright:["\u2308","\u2309"]}, 
 {input:"log",  tag:"mo", output:"log", tex:null, ttype:UNARY, func:true},
 {input:"ln",   tag:"mo", output:"ln",  tex:null, ttype:UNARY, func:true},
 {input:"det",  tag:"mo", output:"det", tex:null, ttype:UNARY, func:true},
@@ -657,10 +659,10 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
       AMremoveBrackets(result[0]);
       if (symbol.input == "sqrt") {           // sqrt
         return [createMmlNode(symbol.tag,result[0]),result[1]];
-      } else  if (symbol.input == "abs") {    // abs
-          node = createMmlNode("mrow", createMmlNode("mo",document.createTextNode('|')));
+      } else if (typeof symbol.rewriteleftright != "undefined") {    // abs, floor, ceil
+          node = createMmlNode("mrow", createMmlNode("mo",document.createTextNode(symbol.rewriteleftright[0])));
           node.appendChild(result[0]);
-          node.appendChild(createMmlNode("mo",document.createTextNode('|')));
+          node.appendChild(createMmlNode("mo",document.createTextNode(symbol.rewriteleftright[1])));
           return [node,result[1]];
       } else if (symbol.input == "cancel") {   // cancel
         node = createMmlNode(symbol.tag,result[0]);

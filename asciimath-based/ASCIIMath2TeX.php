@@ -216,8 +216,10 @@ array( 'input'=>'Sech', 'output'=>'sech', 'definition'=>TRUE),
 array( 'input'=>'Csch', 'output'=>'csch', 'definition'=>TRUE),
 array( 'input'=>'Log', 'output'=>'log', 'definition'=>TRUE),
 array( 'input'=>'Ln', 'output'=>'ln', 'definition'=>TRUE),
-array( 'input'=>'abs', 'tex'=>'text{abs}', 'notexcopy'=>TRUE, 'unary'=>TRUE), //, 'func'=>TRUE
-array( 'input'=>'Abs', 'tex'=>'text{abs}', 'notexcopy'=>TRUE, 'unary'=>TRUE, 'func'=>TRUE),
+array( 'input'=>'abs', 'tex'=>'text{abs}', 'notexcopy'=>TRUE, 'unary'=>TRUE, 'rewriteleftright'=>array("|","|")), 
+array( 'input'=>'Abs', 'tex'=>'text{abs}', 'notexcopy'=>TRUE, 'unary'=>TRUE, 'rewriteleftright'=>array("|","|")),
+array( 'input'=>'floor', 'notexcopy'=>TRUE, 'unary'=>TRUE, 'rewriteleftright'=>array("\\lfloor","\\rfloor")),
+array( 'input'=>'ceil', 'notexcopy'=>TRUE, 'unary'=>TRUE, 'rewriteleftright'=>array("\\lceil","\\rceil")),
 array( 'input'=>'det', 'unary'=>TRUE, 'func'=>TRUE),
 array( 'input'=>'exp', 'unary'=>TRUE, 'func'=>TRUE),
 array( 'input'=>'dim'),
@@ -561,8 +563,8 @@ function AMTparseSexpr($str) {
 			return array('\\sqrt{'.$result[0].'}',$result[1]);
 		} else if ($symbol['input']=='cancel') {
 			return array('\\cancel{'.$result[0].'}',$result[1]);
-		} else if ($symbol['input']=='abs') {
-			return array('{\\left|'.$result[0].'\\right|}',$result[1]);
+		} else if (isset($symbol['rewriteleftright'])) {
+			return array('{\\left'.$symbol['rewriteleftright'][0].$result[0].'\\right'.$symbol['rewriteleftright'][1].'}',$result[1]);
 		} else if (isset($symbol['acc'])) {
 			return array('{'.$this->AMTgetTeXsymbol($symbol).'{'.$result[0].'}}',$result[1]);
 		} else {

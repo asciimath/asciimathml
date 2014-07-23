@@ -234,8 +234,9 @@ var AMsymbols = [
 {input:"csc",  tag:"mo", output:"csc", tex:null, ttype:UNARY, func:true},
 {input:"log",  tag:"mo", output:"log", tex:null, ttype:UNARY, func:true},
 {input:"ln",   tag:"mo", output:"ln",  tex:null, ttype:UNARY, func:true},
-{input:"abs",   tag:"mo", output:"abs",  tex:"text{abs}", ttype:UNARY, notexcopy:true}, //, func:true
-
+{input:"abs",   tag:"mo", output:"abs",  tex:null, ttype:UNARY, notexcopy:true, rewriteleftright:["|","|"]}, 
+{input:"floor",   tag:"mo", output:"floor",  tex:null, ttype:UNARY, notexcopy:true, rewriteleftright:["\\lfloor","\\rfloor"]}, 
+{input:"ceil",   tag:"mo", output:"ceil",  tex:null, ttype:UNARY, notexcopy:true, rewriteleftright:["\\lceil","\\rceil"]}, 
 {input:"Sin",  tag:"mo", output:"sin", tex:null, ttype:UNARY, func:true},
 {input:"Cos",  tag:"mo", output:"cos", tex:null, ttype:UNARY, func:true},
 {input:"Tan",  tag:"mo", output:"tan", tex:null, ttype:UNARY, func:true},
@@ -250,7 +251,7 @@ var AMsymbols = [
 {input:"Csc",  tag:"mo", output:"csc", tex:null, ttype:UNARY, func:true},
 {input:"Log",  tag:"mo", output:"log", tex:null, ttype:UNARY, func:true},
 {input:"Ln",   tag:"mo", output:"ln",  tex:null, ttype:UNARY, func:true},
-{input:"Abs",   tag:"mo", output:"abs",  tex:"text{abs}", ttype:UNARY, func:true, notexcopy:true},
+{input:"Abs",   tag:"mo", output:"abs",  tex:null, ttype:UNARY, notexcopy:true, rewriteleftright:["|","|"]},
 
 {input:"det",  tag:"mo", output:"det", tex:null, ttype:UNARY, func:true},
 {input:"exp",  tag:"mo", output:"exp", tex:null, ttype:UNARY, func:true},
@@ -554,8 +555,8 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
 	      return ['\\sqrt{'+result[0]+'}',result[1]];
       } else if (symbol.input == "cancel") {           // cancel
 	      return ['\\cancel{'+result[0]+'}',result[1]];
-      } else if (symbol.input == "abs") {           // abs
-	      return ['{\\left|'+result[0]+'\\right|}',result[1]];
+      } else if (typeof symbol.rewriteleftright != "undefined") {  // abs, floor, ceil
+	      return ['{\\left'+symbol.rewriteleftright[0]+result[0]+'\\right'+symbol.rewriteleftright[1]+'}',result[1]];
       } else if (typeof symbol.acc == "boolean" && symbol.acc) {   // accent
 	      return ['{'+AMTgetTeXsymbol(symbol)+'{'+result[0]+'}}',result[1]];
       } else {                        // font change command  

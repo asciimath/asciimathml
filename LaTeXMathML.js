@@ -52,7 +52,8 @@ Or use absolute path names if the file is not in the same folder
 as your (X)HTML page.
 */
 
-(function(){
+(function () {
+var translateOnLoad = true;    //true to autotranslate
 var checkForMathML = true;   // check if browser can display MathML
 var notifyIfNoMathML = true; // display note if no MathML capability
 var alertIfNoMathML = false;  // show alert box if no MathML capability
@@ -1177,6 +1178,19 @@ function translate(spanclassLM) {
   }
 }
 
+function LatexToMathML(LatexStr) {
+    //process Symbols if not processed before
+    if (!LMtranslated) {
+        LMinitSymbols();
+    }
+    //create element to contain the latex & process it
+    var span = document.createElement("span");
+    span.innerText = "$" + LatexStr.replace(/\\/g, "\\") + "$";
+    LMprocessNode(span, false);
+
+    return span.innerHTML;
+}
+
 if (isIE) { // avoid adding MathPlayer info explicitly to each webpage
   document.write("<object id=\"mathplayer\"\
   classid=\"clsid:32F66A20-7614-11D4-BD11-00104BD3F987\"></object>");
@@ -1188,7 +1202,8 @@ if (isIE) { // avoid adding MathPlayer info explicitly to each webpage
 //onload function (replaces the onload="translate()" in the <body> tag)
 function generic()
 {
-  translate();
+    if (translateOnLoad)
+        translate();
 };
 //setup onload function
 if(typeof window.addEventListener != 'undefined')
@@ -1230,5 +1245,8 @@ else
     window.onload = generic;
   }
 }
+
+//expose LatexToMathML function
+window.LatexToMathML = LatexToMathML;
 
 })();

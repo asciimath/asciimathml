@@ -24,6 +24,7 @@ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License 
 (at http://www.gnu.org/licences/lgpl.html) for more details.
 */
+var asciimath = {};
 
 (function(){
 var mathcolor = "blue";        // change it to "" (to inherit) or another color
@@ -1077,4 +1078,9 @@ else if(typeof window.attachEvent != 'undefined'){
   }
 }
 
+//expose some functions to outside
+asciimath.newcommand = newcommand;
+asciimath.AMprocesssNode = AMprocessNode;
+asciimath.parseMath = parseMath;
+asciimath.translate = translate;
 })();

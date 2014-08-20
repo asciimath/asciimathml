@@ -81,6 +81,9 @@
       old.nextSibling = old.parent = null;
       return old;
     },
+    hasChildNodes: function (node) {
+      return (this.childNodes.length>0);	    
+    },
     toString: function () {return "{"+this.childNodes.join("")+"}"}
   });
   
@@ -143,6 +146,9 @@
         this.SetData(i,node); node.nextSibling = old.nextSibling;
         old.nextSibling = old.parent = null;
         return old;
+      },
+      hasChildNodes: function (node) {
+        return (this.childNodes.length>0);	    
       },
       setAttribute: function (name,value) {this[name] = value}
     });
@@ -394,7 +400,7 @@ var AMbbb = [0xEF8C,0xEF8D,0x2102,0xEF8E,0xEF8F,0xEF90,0xEF91,0x210D,0xEF92,0xEF
 var CONST = 0, UNARY = 1, BINARY = 2, INFIX = 3, LEFTBRACKET = 4,
     RIGHTBRACKET = 5, SPACE = 6, UNDEROVER = 7, DEFINITION = 8,
     LEFTRIGHT = 9, TEXT = 10, BIG = 11, LONG = 12, STRETCHY = 13,
-    MATRIX = 14;; // token types
+    MATRIX = 14, UNARYUNDEROVER = 15; // token types
 
 var AMquote = {input:"\"",   tag:"mtext", output:"mbox", tex:null, ttype:TEXT};
 
@@ -578,7 +584,9 @@ var AMsymbols = [
 {input:"sech",  tag:"mo", output:"sech", tex:null, ttype:UNARY, func:true},
 {input:"csch",  tag:"mo", output:"csch", tex:null, ttype:UNARY, func:true},
 {input:"exp",  tag:"mo", output:"exp", tex:null, ttype:UNARY, func:true},
-{input:"abs",   tag:"mo", output:"abs",  tex:null, ttype:UNARY},  //add func:true if not using change to line 541
+{input:"abs",   tag:"mo", output:"abs",  tex:null, ttype:UNARY, rewriteleftright:["|","|"]},
+{input:"floor",   tag:"mo", output:"floor",  tex:null, ttype:UNARY, rewriteleftright:["\u230A","\u230B"]},
+{input:"ceil",   tag:"mo", output:"ceil",  tex:null, ttype:UNARY, rewriteleftright:["\u2308","\u2309"]},
 {input:"log",  tag:"mo", output:"log", tex:null, ttype:UNARY, func:true},
 {input:"ln",   tag:"mo", output:"ln",  tex:null, ttype:UNARY, func:true},
 {input:"det",  tag:"mo", output:"det", tex:null, ttype:UNARY, func:true},
@@ -619,6 +627,8 @@ var AMsymbols = [
 {input:"dot", tag:"mover", output:".",      tex:null, ttype:UNARY, acc:true},
 {input:"ddot", tag:"mover", output:"..",    tex:null, ttype:UNARY, acc:true},
 {input:"ul", tag:"munder", output:"\u0332", tex:"underline", ttype:UNARY, acc:true},
+{input:"ubrace", tag:"munder", output:"\u23DF", tex:"underbrace", ttype:UNARYUNDEROVER, acc:true},
+{input:"obrace", tag:"mover", output:"\u23DE", tex:"overbrace", ttype:UNARYUNDEROVER, acc:true},
 {input:"text", tag:"mtext", output:"text", tex:null, ttype:TEXT},
 {input:"mbox", tag:"mtext", output:"mbox", tex:null, ttype:TEXT},
 {input:"color", tag:"mstyle", ttype:BINARY},
@@ -648,9 +658,11 @@ var AMnames = []; //list of input symbols
 function initSymbols() {
   var texsymbols = [], i;
   for (i=0; i<AMsymbols.length; i++)
-    if (AMsymbols[i].tex) 
+    if (AMsymbols[i].tex) {
       texsymbols[texsymbols.length] = {input:AMsymbols[i].tex, 
-        tag:AMsymbols[i].tag, output:AMsymbols[i].output, ttype:AMsymbols[i].ttype};
+        tag:AMsymbols[i].tag, output:AMsymbols[i].output, ttype:AMsymbols[i].ttype,
+        acc:(AMsymbols[i].acc||false)};
+    }
   AMsymbols = AMsymbols.concat(texsymbols);
   refreshSymbols();
 }
@@ -757,11 +769,12 @@ function AMgetSymbol(str) {
 
 function AMremoveBrackets(node) {
   var st;
-  if (node.nodeName=="mrow" || node.nodeName=="M:MROW") {
+  if (!node.hasChildNodes()) { return; }
+  if (node.firstChild.hasChildNodes() && (node.nodeName=="mrow" || node.nodeName=="M:MROW")) {
     st = node.firstChild.firstChild.nodeValue;
     if (st=="(" || st=="[" || st=="{") node.removeChild(node.firstChild);
   }
-  if (node.nodeName=="mrow" || node.nodeName=="M:MROW") {
+  if (node.lastChild.hasChildNodes() && (node.nodeName=="mrow" || node.nodeName=="M:MROW")) {
     st = node.lastChild.firstChild.nodeValue;
     if (st==")" || st=="]" || st=="}") node.removeChild(node.lastChild);
   }
@@ -833,6 +846,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
       }
       str = AMremoveCharsAndBlanks(str,i+1);
       return [createMmlNode("mrow",newFrag),str];
+  case UNARYUNDEROVER:
   case UNARY:
       str = AMremoveCharsAndBlanks(str,symbol.input.length); 
       result = AMparseSexpr(str);
@@ -854,10 +868,10 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
       AMremoveBrackets(result[0]);
       if (symbol.input == "sqrt") {           // sqrt
         return [createMmlNode(symbol.tag,result[0]),result[1]];
-      } else  if (symbol.input == "abs") {    // abs
-          node = createMmlNode("mrow", createMmlNode("mo",document.createTextNode('|')));
+      } else if (typeof symbol.rewriteleftright != "undefined") {    // abs, floor, ceil
+          node = createMmlNode("mrow", createMmlNode("mo",document.createTextNode(symbol.rewriteleftright[0])));
           node.appendChild(result[0]);
-          node.appendChild(createMmlNode("mo",document.createTextNode('|')));
+          node.appendChild(createMmlNode("mo",document.createTextNode(symbol.rewriteleftright[1])));
           return [node,result[1]];
       } else if (symbol.input == "cancel") {   // cancel
         node = createMmlNode(symbol.tag,result[0]);
@@ -908,7 +922,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
         else if (str.charAt(0)=="[") i=str.indexOf("]");
 	st = str.slice(1,i);
 	node = createMmlNode(symbol.tag,result2[0]);
-	node.setAttribute("color",st);
+	node.setAttribute("mathcolor",st);
 	return [node,result2[1]];
     }
     if (symbol.input=="root" || symbol.input=="stackrel") 
@@ -974,9 +988,9 @@ function AMparseIexpr(str) {
     else AMremoveBrackets(result[0]);
     str = result[1];
 //    if (symbol.input == "/") AMremoveBrackets(node);
+    underover = (sym1.ttype == UNDEROVER || sym1.ttype == UNARYUNDEROVER);
     if (symbol.input == "_") {
       sym2 = AMgetSymbol(str);
-      underover = (sym1.ttype == UNDEROVER);
       if (sym2.input == "^") {
         str = AMremoveCharsAndBlanks(str,sym2.input.length);
         var res2 = AMparseSexpr(str);
@@ -990,9 +1004,21 @@ function AMparseIexpr(str) {
         node = createMmlNode((underover?"munder":"msub"),node);
         node.appendChild(result[0]);
       }
+    } else if (symbol.input == "^" && underover) {
+    	node = createMmlNode("mover",node);
+        node.appendChild(result[0]);   
     } else {
       node = createMmlNode(symbol.tag,node);
       node.appendChild(result[0]);
+    }
+    if (typeof sym1.func != 'undefined' && sym1.func) {
+    	sym2 = AMgetSymbol(str);
+    	if (sym2.ttype != INFIX && sym2.ttype != RIGHTBRACKET) {
+    		result = AMparseIexpr(str);
+    		node = createMmlNode("mrow",node);
+    		node.appendChild(result[0]);
+    		str = result[1];
+    	}
     }
   }
   return [node,str];
@@ -1367,7 +1393,8 @@ ASCIIMATH.Augment({
     TOKEN: {
       CONST:CONST, UNARY:UNARY, BINARY:BINARY, INFIX:INFIX,
       LEFTBRACKET:LEFTBRACKET, RIGHTBRACKET:RIGHTBRACKET, SPACE:SPACE,
-      UNDEROVER:UNDEROVER, DEFINITION:DEFINITION, LEFTRIGHT:LEFTRIGHT, TEXT:TEXT
+      UNDEROVER:UNDEROVER, DEFINITION:DEFINITION, LEFTRIGHT:LEFTRIGHT, TEXT:TEXT,
+      UNARYUNDEROVER:UNARYUNDEROVER
     }
   }
 });

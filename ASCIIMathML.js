@@ -801,6 +801,15 @@ function AMparseIexpr(str) {
       node = createMmlNode(symbol.tag,node);
       node.appendChild(result[0]);
     }
+    if (typeof sym1.func != 'undefined' && sym1.func) {
+    	sym2 = AMgetSymbol(str);
+    	if (sym2.ttype != INFIX && sym2.ttype != RIGHTBRACKET) {
+    		result = AMparseIexpr(str);
+    		node = createMmlNode("mrow",node);
+    		node.appendChild(result[0]);
+    		str = result[1];
+    	}
+    }
   }
   return [node,str];
 }

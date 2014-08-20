@@ -306,10 +306,9 @@ function AMcompareNames($a,$b) {
 
 //original version
 function AMinitSymbols() {
-	
-	$tsymb = array();
 	for ($i=0; $i<count($this->AMsymbols); $i++) {
 		if (isset($this->AMsymbols[$i]['tex']) && !isset($this->AMsymbols[$i]['notexcopy'])) {
+			$tsymb = array();
 			foreach($this->AMsymbols[$i] as $k=>$v) {
 				if ($k!='tex') { $tsymb[$k]=$v;}
 			}
@@ -632,7 +631,7 @@ function AMTparseSexpr($str) {
 
 function AMTparseIexpr($str) {
 	$str = $this->AMremoveCharsAndBlanks($str,0);
-	$syml = $this->AMgetSymbol($str);
+	$sym1 = $this->AMgetSymbol($str);
 	$result = $this->AMTparseSexpr($str);
 	$node = $result[0];
 	$str = $result[1];
@@ -648,7 +647,7 @@ function AMTparseIexpr($str) {
 		$str = $result[1];
 		if ($symbol['input']=='_') {
 			$sym2 = $this->AMgetSymbol($str);
-			$underover = isset($syml['underover']);
+			$underover = isset($sym1['underover']);
 			if ($sym2['input']=='^') {
 				$str = $this->AMremoveCharsAndBlanks($str,strlen($sym2['input']));
 				$res2 = $this->AMTparseSexpr($str);
@@ -664,6 +663,14 @@ function AMTparseIexpr($str) {
 		} else {
 			//$node = '{'.$node.'}^{'.$result[0].'}';
 			$node = $node.'^{'.$result[0].'}';
+		}
+		if (isset($sym1['func']) && $sym1['func']) {
+			$sym2 = $this->AMgetSymbol($str);
+			if (!isset($sym2['infix']) && !isset($sym2['rightbracket'])) {
+				$result = $this->AMTparseIexpr($str);
+				$node = '{'.$node.$result[0].'}';
+				$str = $result[1];
+			}
 		}
 	}
 	

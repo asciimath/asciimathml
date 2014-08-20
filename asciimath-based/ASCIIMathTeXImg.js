@@ -654,6 +654,14 @@ function AMTparseIexpr(str) {
       //node = '{'+node+'}^{'+result[0]+'}';
       node = node+'^{'+result[0]+'}';
     }
+    if (typeof sym1.func != 'undefined' && sym1.func) {
+    	sym2 = AMgetSymbol(str);
+    	if (sym2.ttype != INFIX && sym2.ttype != RIGHTBRACKET) {
+    		result = AMTparseIexpr(str);
+    		node = '{'+node+result[0]+'}';
+    		str = result[1];
+    	}
+    }
   } 
   
   return [node,str];

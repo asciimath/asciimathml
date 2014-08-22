@@ -11,6 +11,9 @@
  *  Originally adapted for MathJax by David Lippman.
  *  Additional work done by Davide P. Cervone.
  *  
+ *  The current development repository for AsciiMathML is
+ *      https://github.com/mathjax/asciimathml
+ *  
  *  A portion of this file is taken from
  *  ASCIIMathML.js Version 2.2 Mar 3, 2014, (c) Peter Jipsen http://www.chapman.edu/~jipsen
  *  and is used by permission of Peter Jipsen, who has agreed to allow us to
@@ -186,15 +189,7 @@
  *   
  *   Some sections are commented out to save space in the
  *   minified version (but that is not strictly necessary).
- *   A few items are commented out and marked with DPVC comments
- *   in order to keep the minifier from complaining about the
- *   coding practices in ASCIIMathML.js
  *   
- *   Two sections are modified to include changes from version 2.0.1 of
- *   ASCIIMathML.js and are marked with comments to that effect.  This
- *   makes this version effectively the same as version 2.0.1, but 
- *   without the overhead of the LaTeX-processing code.
- *
  ******************************************************************/
 
  /*
@@ -1364,6 +1359,7 @@ ASCIIMATH.Augment({
 	 case "createElementMathML": AMcreateElementMathML = def[id]; break;
 	 case "createElementXHTML": createElementXHTML = def[id]; break;
 	 case "initSymbols": initSymbols = def[id]; break;
+	 case "refreshSymbols": refreshSymbols = def[id]; break;
 	 case "compareNames": compareNames = def[id]; break;
 	};
         this[id] = def[id];
@@ -1381,12 +1377,14 @@ ASCIIMATH.Augment({
     createElementMathML: AMcreateElementMathML,
     createElementXHTML:  createElementXHTML,
     initSymbols: initSymbols,
+    refreshSymbols: refreshSymbols,
     compareNames: compareNames,
     
     createDocumentFragment: DOCFRAG,
     document: document,
     
-    define: newcommand,
+    define: define,
+    newcommand: newcommand,
     symbols: AMsymbols,
     names: AMnames,
         

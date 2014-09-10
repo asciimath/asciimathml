@@ -10,19 +10,29 @@ Just add the next line to your HTML page with this file in the same folder:
 
 <script type="text/javascript" src="ASCIIMathML.js"></script>
 
-Version 2.2 Mar 3, 2014, (c) Peter Jipsen http://www.chapman.edu/~jipsen
-Latest version at http://mathcs.chapman.edu/~jipsen/asciimathml/ASCIIMathML.js
+Version 2.2 Mar 3, 2014.
+Latest version at https://github.com/mathjax/asciimathml
 If you use it on a webpage, please send the URL to jipsen@chapman.edu
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License (LGPL) as 
-published by the Free Software Foundation; either version 2.1 of the 
-License, or (at your option) any later version.
+Copyright (c) 2014 Peter Jipsen and other ASCIIMathML.js contributors
 
-This program is distributed in the hope that it will be useful, but WITHOUT 
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
-FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License 
-(at http://www.gnu.org/licences/lgpl.html) for more details.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 */
 var asciimath = {};
 

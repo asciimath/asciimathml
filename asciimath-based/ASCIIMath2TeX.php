@@ -424,28 +424,37 @@ function AMgetSymbol($str) {
 
 function AMTremoveBrackets($node) {
 	if ($node{0}=='{' && $node{strlen($node)-1}=='}') {
-		$st = $node{1};
-		if ($st=='(' || $st=='[') {
-			$node = '{'.substr($node,2);
+		
+		$leftchop = 0;
+		$st = substr($node,1,5);
+		if ($st=='\\left') {
+			$st = $node{6};
+			if ($st=='(' || $st=='[' || $st=='{') {
+				$leftchop = 7;
+			} else {
+				$st = substr($node,6,7);
+				if ($st=='\\lbrace') {
+					$leftchop = 13;
+				}
+			}
+		} else {
+			$st = $node{1};
+			if ($st=='(' || $st=='[') {
+				$leftchop = 2;
+			}
 		}
-		$st = substr($node,1,6);
-		if ($st=='\\left(' || $st=='\\left[' || $st=='\\left{') {
-			$node = '{'.substr($node,7);
+	
+		if ($leftchop>0) {
+			$st = substr($node,-8);
+			if ($st=='\\right)}' || $st=='\\right]}' || $st=='\\right.}') {
+				$node = '{'.substr($node,$leftchop);
+				$node = substr($node,0,strlen($node)-8).'}';
+			} else if ($st=='\\rbrace}') {
+				$node = '{'.substr($node,$leftchop);
+				$node = substr($node,0,strlen($node)-14).'}';
+			}
 		}
-		$st = substr($node,1,12);
-		if ($st=='\\left\\lbrace' || $st=='\\left\\langle') {
-			$node = '{'.substr($node,13);
-		}
-		$st = substr($node,-8);
-		if ($st=='\\right)}' || $st=='\\right]}' || $st=='\\right.}') {
-		//$st = $node{strlen($node)-2};
-		//if ($st==')' || $st==']' || $st=='.') {
-			$node = substr($node,0,strlen($node)-8).'}';
-		}
-		$st = substr($node,strlen($node)-8,7);
-		if ($st=='\\rbrace' || $st=='\\rangle') {
-			$node = substr($node,0,strlen($node)-14).'}';
-		}
+		
 	}
 	return $node;
 }

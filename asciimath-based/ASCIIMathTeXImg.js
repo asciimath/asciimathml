@@ -234,7 +234,8 @@ var AMsymbols = [
 {input:"csc",  tag:"mo", output:"csc", tex:null, ttype:UNARY, func:true},
 {input:"log",  tag:"mo", output:"log", tex:null, ttype:UNARY, func:true},
 {input:"ln",   tag:"mo", output:"ln",  tex:null, ttype:UNARY, func:true},
-{input:"abs",   tag:"mo", output:"abs",  tex:null, ttype:UNARY, notexcopy:true, rewriteleftright:["|","|"]}, 
+{input:"abs",   tag:"mo", output:"abs",  tex:null, ttype:UNARY, notexcopy:true, rewriteleftright:["|","|"]},
+{input:"norm",   tag:"mo", output:"norm",  tex:null, ttype:UNARY, notexcopy:true, rewriteleftright:["\\|","\\|"]},
 {input:"floor",   tag:"mo", output:"floor",  tex:null, ttype:UNARY, notexcopy:true, rewriteleftright:["\\lfloor","\\rfloor"]}, 
 {input:"ceil",   tag:"mo", output:"ceil",  tex:null, ttype:UNARY, notexcopy:true, rewriteleftright:["\\lceil","\\rceil"]}, 
 {input:"Sin",  tag:"mo", output:"sin", tex:null, ttype:UNARY, func:true},
@@ -638,7 +639,7 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
 }
 
 function AMTparseIexpr(str) {
-  var symbol, sym1, sym2, node, result, underover;
+  var symbol, sym1, sym2, node, result;
   str = AMremoveCharsAndBlanks(str,0);
   sym1 = AMgetSymbol(str);
   result = AMTparseSexpr(str);

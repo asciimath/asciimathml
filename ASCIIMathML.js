@@ -934,6 +934,7 @@ function parseMath(str,latex) {
   str = str.replace(/&nbsp;/g,"");
   str = str.replace(/&gt;/g,">");
   str = str.replace(/&lt;/g,"<");
+  str = str.replace(/(Sin|Cos|Tan|Arcsin|Arccos|Arctan|Sinh|Cosh|Tanh|Cot|Sec|Csc|Log|Ln|Abs)/g, function(v) { return v.toLowerCase(); });
   frag = AMparseExpr(str.replace(/^\s+/g,""),false)[0];
   node = createMmlNode("mstyle",frag);
   if (mathcolor != "") node.setAttribute("mathcolor",mathcolor);

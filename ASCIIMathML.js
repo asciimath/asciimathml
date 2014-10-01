@@ -264,7 +264,7 @@ var AMsymbols = [
 {input:"xx", tag:"mo", output:"\u00D7", tex:"times", ttype:CONST},
 {input:"-:", tag:"mo", output:"\u00F7", tex:"div", ttype:CONST},
 {input:"divide",   tag:"mo", output:"-:", tex:null, ttype:DEFINITION},
-{input:"@",  tag:"mo", output:"\u26AC", tex:"circ", ttype:CONST},
+{input:"@",  tag:"mo", output:"\u2218", tex:"circ", ttype:CONST},
 {input:"o+", tag:"mo", output:"\u2295", tex:"oplus", ttype:CONST},
 {input:"ox", tag:"mo", output:"\u2297", tex:"otimes", ttype:CONST},
 {input:"o.", tag:"mo", output:"\u2299", tex:"odot", ttype:CONST},

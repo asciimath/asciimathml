@@ -276,6 +276,8 @@ array( 'input'=>'text', 'text'=>TRUE),
 array( 'input'=>'mbox', 'text'=>TRUE),
 array( 'input'=>'"', 'text'=>TRUE),
 array( 'input'=>'stackrel', 'binary'=>TRUE),
+array( 'input'=>'overset', 'binary'=>TRUE),
+array( 'input'=>'underset', 'binary'=>TRUE),
 
 // Grouping brackets
 array( 'input'=>'(', 'leftbracket'=>TRUE),
@@ -515,12 +517,22 @@ function AMTparseSexpr($str) {
 		$str = $this->AMremoveCharsAndBlanks($str,strlen($symbol['input']));
 		$result = $this->AMTparseExpr($str,true);
 		$this->AMnestingDepth--;
+		$leftchop = 0;
 		if (substr($result[0],0,6)=='\\right') {
-			if (substr($result[0],0,7)=='\\right.') {
-				$result[0] = substr($result[0],7);
+			$st = $result[0]{6};
+			if ($st==")" || $st=="]" || $st=="}") {
+				$leftchop = 6;
+			} else if ($st==".") {
+				$leftchop = 7;
 			} else {
-				$result[0] = substr($result[0],6);
-			}
+				$st = substr($result[0],6,7);
+				if ($st=='\\rbrace') {
+					$leftchop = 13;
+				}
+			}	
+		}
+		if ($leftchop>0) {
+			$result[0] = substr($result[0],$leftchop);
 			if (isset($symbol['invisible'])) {
 				$node = '{' . $result[0] . '}';
 			} else {
@@ -597,17 +609,11 @@ function AMTparseSexpr($str) {
 		$result2[0] = $this->AMTremoveBrackets($result2[0]);
 		if ($symbol['input']=='color') {
 			$result[0] = str_replace(array('}','{'),'',$result[0]);
-			$newFrag = '{\\color{'.$result[0].'}'.$result2[0].'}}';
-		}
-		if ($symbol['input']=='root' || $symbol['input']=='stackrel') {
-			if ($symbol['input']=='root') {
-				$newFrag = '{\\sqrt['.$result[0].']{'.$result2[0].'}}';
-			} else {
-				$newFrag = '{'.$this->AMTgetTeXsymbol($symbol).'{'.$result[0].'}{'.$result2[0].'}}';
-			}
-		}
-		if ($symbol['input']=='frac') {
-			$newFrag = '{\\frac{'.$result[0].'}{'.$result2[0].'}}';
+			$newFrag = '{\\color{'.$result[0].'}'.$result2[0].'}';
+		} else if ($symbol['input']=='root') {
+			$newFrag = '{\\sqrt['.$result[0].']{'.$result2[0].'}}';
+		} else {
+			$newFrag = '{'.$this->AMTgetTeXsymbol($symbol).'{'.$result[0].'}{'.$result2[0].'}}';
 		}
 		return array($newFrag,$result2[1]);
 	} else if (isset($symbol['infix'])) {

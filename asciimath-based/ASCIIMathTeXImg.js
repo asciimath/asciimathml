@@ -113,6 +113,8 @@ var AMsymbols = [
 {input:"nnn", tag:"mo", output:"\u22C2", tex:"bigcap", ttype:UNDEROVER},
 {input:"uu",  tag:"mo", output:"\u222A", tex:"cup", ttype:CONST},
 {input:"uuu", tag:"mo", output:"\u22C3", tex:"bigcup", ttype:UNDEROVER},
+{input:"overset", tag:"mover", output:"stackrel", tex:null, ttype:BINARY},
+{input:"underset", tag:"munder", output:"stackrel", tex:null, ttype:BINARY},
 
 //binary relation symbols
 {input:"!=",  tag:"mo", output:"\u2260", tex:"ne", ttype:CONST},
@@ -525,12 +527,22 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
    
     result = AMTparseExpr(str,true);
     AMnestingDepth--;
+    var leftchop = 0;
     if (result[0].substr(0,6)=="\\right") {
-	    if (result[0].substr(0,7)=="\\right.") {
-		    result[0] = result[0].substr(7);
-	    } else {
-		    result[0] = result[0].substr(6);
-	    }
+    	    st = result[0].charAt(6);
+    	    if (st==")" || st=="]" || st=="}") {
+    	    	    leftchop = 6;
+    	    } else if (st==".") {
+    	    	    leftchop = 7;
+    	    } else {
+    	    	    st = result[0].substr(6,7);
+    	    	    if (st=='\\rbrace') {
+    	    	    	    leftchop = 13;
+    	    	    }
+    	    }
+    }
+    if (leftchop>0) {
+	    result[0] = result[0].substr(leftchop);
 	    if (typeof symbol.invisible == "boolean" && symbol.invisible) 
 		    node = '{'+result[0]+'}';
 	    else {
@@ -598,16 +610,10 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
     result2[0] = AMTremoveBrackets(result2[0]);
     if (symbol.input=="color") {
     	newFrag = '{\\color{'+result[0].replace(/[\{\}]/g,'')+'}'+result2[0]+'}';    
-    }
-    if (symbol.input=="root" || symbol.input=="stackrel") {
-	    if (symbol.input=="root") {
-		    newFrag = '{\\sqrt['+result[0]+']{'+result2[0]+'}}';
-	    } else {
-		    newFrag = '{'+AMTgetTeXsymbol(symbol)+'{'+result[0]+'}{'+result2[0]+'}}';
-	    }
-    }
-    if (symbol.input=="frac") {
-	    newFrag = '{\\frac{'+result[0]+'}{'+result2[0]+'}}';
+    } else  if (symbol.input=="root") {
+	    newFrag = '{\\sqrt['+result[0]+']{'+result2[0]+'}}';
+    } else {
+	    newFrag = '{'+AMTgetTeXsymbol(symbol)+'{'+result[0]+'}{'+result2[0]+'}}';
     }
     return [newFrag,result2[1]];
   case INFIX:

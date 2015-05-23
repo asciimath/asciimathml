@@ -20,17 +20,18 @@ FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
 var noMathRender = false;
 
 (function() {
-var translateOnLoad = true;		//true to autotranslate
-var mathcolor = "";       	// defaults to back, or specify any other color
-var displaystyle = true;      // puts limits above and below large operators
-var showasciiformulaonhover = true; // helps students learn ASCIIMath
-var decimalsign = ".";        // change to "," if you like, beware of `(1,2)`!
-var AMdelimiter1 = "`", AMescape1 = "\\\\`"; // can use other characters
-var AMusedelimiter2 = false; 		//whether to use second delimiter below
-var AMdelimiter2 = "$", AMescape2 = "\\\\\\$", AMdelimiter2regexp = "\\$";
-var AMdocumentId = "wikitext" // PmWiki element containing math (default=body)
-var doubleblankmathdelimiter = false; // if true,  x+1  is equal to `x+1`
-                                      // for IE this works only in <!--   -->
+var config = {
+  translateOnLoad: true,		  //true to autotranslate
+  mathcolor: "",       	      // defaults to back, or specify any other color
+  displaystyle: true,         // puts limits above and below large operators
+  showasciiformulaonhover: true, // helps students learn ASCIIMath
+  decimalsign: ".",           // change to "," if you like, beware of `(1,2)`!
+  AMdelimiter1: "`", AMescape1: "\\\\`", // can use other characters
+  AMusedelimiter2: false, 	  //whether to use second delimiter below
+  AMdelimiter2: "$", AMescape2: "\\\\\\$", AMdelimiter2regexp: "\\$",
+  AMdocumentId: "wikitext",   // PmWiki element containing math (default=body)
+  doubleblankmathdelimiter: false // if true,  x+1  is equal to `x+1`
+};                                // for IE this works only in <!--   -->
 
 var CONST = 0, UNARY = 1, BINARY = 2, INFIX = 3, LEFTBRACKET = 4, 
     RIGHTBRACKET = 5, SPACE = 6, UNDEROVER = 7, DEFINITION = 8,
@@ -399,7 +400,7 @@ function AMgetSymbol(str) {
     st = str.slice(k,k+1);
     k++;
   }
-  if (st == decimalsign) {
+  if (st == config.decimalsign) {
     st = str.slice(k,k+1);
     if ("0"<=st && st<="9") {
       integ = false;
@@ -831,10 +832,10 @@ function AMparseMath(str) {
   if (typeof mathbg != "undefined" && mathbg=='dark') {
 	  texstring = "\\reverse " + texstring;
   }
-  if (mathcolor!="") {
-	  texstring = "\\"+mathcolor + texstring;
+  if (config.mathcolor!="") {
+	  texstring = "\\"+config.mathcolor + texstring;
   }
-  if (displaystyle) {
+  if (config.displaystyle) {
 	  texstring = "\\displaystyle" + texstring;
   } else {
 	  texstring = "\\textstyle" + texstring;
@@ -849,7 +850,7 @@ function AMparseMath(str) {
   }
   node.src = AMTcgiloc + '?' + texstring;
   node.style.verticalAlign = "middle";
-  if (showasciiformulaonhover)                      //fixed by djhsu so newline
+  if (config.showasciiformulaonhover)                      //fixed by djhsu so newline
     node.setAttribute("title",str.replace(/\s+/g," "));//does not show in Gecko
  
   var snode = document.createElement("span");
@@ -891,27 +892,27 @@ function AMprocessNodeR(n, linebreaks) {
     str = n.nodeValue;
     if (!(str == null)) {
       str = str.replace(/\r\n\r\n/g,"\n\n");
-      if (doubleblankmathdelimiter) {
-        str = str.replace(/\x20\x20\./g," "+AMdelimiter1+".");
-        str = str.replace(/\x20\x20,/g," "+AMdelimiter1+",");
-        str = str.replace(/\x20\x20/g," "+AMdelimiter1+" ");
+      if (config.doubleblankmathdelimiter) {
+        str = str.replace(/\x20\x20\./g," "+config.AMdelimiter1+".");
+        str = str.replace(/\x20\x20,/g," "+config.AMdelimiter1+",");
+        str = str.replace(/\x20\x20/g," "+config.AMdelimiter1+" ");
       }
       str = str.replace(/\x20+/g," ");
       str = str.replace(/\s*\r\n/g," ");
        mtch = false;
-      if (AMusedelimiter2) {
-      str = str.replace(new RegExp(AMescape2, "g"),
+      if (config.AMusedelimiter2) {
+      str = str.replace(new RegExp(config.AMescape2, "g"),
               function(st){mtch=true;return "AMescape2"});
       }
-      str = str.replace(new RegExp(AMescape1, "g"),
+      str = str.replace(new RegExp(config.AMescape1, "g"),
               function(st){mtch=true;return "AMescape1"});
-     if (AMusedelimiter2)  str = str.replace(new RegExp(AMdelimiter2regexp, "g"),AMdelimiter1);
-      arr = str.split(AMdelimiter1);
+     if (config.AMusedelimiter2)  str = str.replace(new RegExp(config.AMdelimiter2regexp, "g"),config.AMdelimiter1);
+      arr = str.split(config.AMdelimiter1);
       for (i=0; i<arr.length; i++)
-      	if (AMusedelimiter2) {	     
-		arr[i]=arr[i].replace(/AMescape2/g,AMdelimiter2).replace(/AMescape1/g,AMdelimiter1);
+      	if (config.AMusedelimiter2) {	     
+		arr[i]=arr[i].replace(/AMescape2/g,config.AMdelimiter2).replace(/AMescape1/g,config.AMdelimiter1);
 	} else {
-		arr[i]=arr[i].replace(/AMescape1/g,AMdelimiter1);
+		arr[i]=arr[i].replace(/AMescape1/g,config.AMdelimiter1);
 	}
       if (arr.length>1 || mtch) {
         
@@ -932,8 +933,8 @@ function AMprocessNodeR(n, linebreaks) {
 
 function AMprocessNode(n, linebreaks, spanclassAM) {
   var frag,st;
-  if (spanclassAM!=null) {;
-    frag = document.getElementsByTagName("span")
+  if (spanclassAM!=null) {
+    frag = document.getElementsByTagName("span");
     for (var i=0;i<frag.length;i++)
       if (frag[i].className == "AM")
         AMprocessNodeR(frag[i],linebreaks);
@@ -942,7 +943,7 @@ function AMprocessNode(n, linebreaks, spanclassAM) {
       st = n.innerHTML;
     } catch(err) {}
     if (st==null || 
-        st.indexOf(AMdelimiter1)!=-1)// || st.indexOf(AMdelimiter2)!=-1) 
+        st.indexOf(config.AMdelimiter1)!=-1)// || st.indexOf(config.AMdelimiter2)!=-1) 
       AMprocessNodeR(n,linebreaks);
   }
 }
@@ -951,7 +952,7 @@ function translate(spanclassAM) {
   if (!AMtranslated) { // run this only once
     AMtranslated = true;
     var body = document.getElementsByTagName("body")[0];
-    var processN = document.getElementById(AMdocumentId);
+    var processN = document.getElementById(config.AMdocumentId);
     AMprocessNode((processN!=null?processN:body), false, spanclassAM);
   }
 }
@@ -963,16 +964,18 @@ var AMnoMathML = true;
 AMinitSymbols();
 
 window.translate = translate;
+window.AMTconfig = config;
 window.AMprocessNode = AMprocessNode;
 window.AMparseMath = AMparseMath;
 window.AMTparseMath = AMparseMath;
 window.AMTparseAMtoTeX = AMTparseAMtoTeX;
 
 function generic(){
-  if (translateOnLoad) {
+  if (config.translateOnLoad) {
       translate();
   }
-};
+}
+
 //setup onload function
 if(typeof window.addEventListener != 'undefined'){
   //.. gecko, safari, konqueror and standard
@@ -1002,6 +1005,4 @@ else if(typeof window.attachEvent != 'undefined'){
     window.onload = generic;
   }
 }
-
-
 })();

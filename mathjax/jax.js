@@ -24,7 +24,7 @@
  *  
  *  ---------------------------------------------------------------------
  *  
- *  Copyright (c) 2012-2014 The MathJax Consortium
+ *  Copyright (c) 2012-2015 The MathJax Consortium
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -192,7 +192,7 @@
  *   
  ******************************************************************/
 
- /*
+/*
 ASCIIMathML.js
 ==============
 This file contains JavaScript functions to convert ASCII math notation
@@ -204,24 +204,35 @@ Just add the next line to your HTML page with this file in the same folder:
 
 <script type="text/javascript" src="ASCIIMathML.js"></script>
 
-Version 2.2 Mar 3, 2014, (c) Peter Jipsen http://www.chapman.edu/~jipsen
-Latest version at http://mathcs.chapman.edu/~jipsen/asciimathml/ASCIIMathML.js
+Version 2.2 Mar 3, 2014.
+Latest version at https://github.com/mathjax/asciimathml
 If you use it on a webpage, please send the URL to jipsen@chapman.edu
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License (LGPL) as 
-published by the Free Software Foundation; either version 2.1 of the 
-License, or (at your option) any later version.
+Copyright (c) 2014 Peter Jipsen and other ASCIIMathML.js contributors
 
-This program is distributed in the hope that it will be useful, but WITHOUT 
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
-FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License 
-(at http://www.gnu.org/licences/lgpl.html) for more details.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 */
+//var asciimath = {};
 
-
+//(function(){
 var mathcolor = "blue";        // change it to "" (to inherit) or another color
-var mathfontsize = "1em";      // change to e.g. 1.2em for larger math
+//var mathfontsize = "1em";      // change to e.g. 1.2em for larger math
 var mathfontfamily = "serif";  // change to "" to inherit (works in IE) 
                                // or another family (e.g. "arial")
 //var automathrecognize = false; // writing "amath" on page makes this true
@@ -229,10 +240,7 @@ var mathfontfamily = "serif";  // change to "" to inherit (works in IE)
 //var notifyIfNoMathML = true;   // display note at top if no MathML capability
 //var alertIfNoMathML = false;   // show alert box if no MathML capability
 //var translateOnLoad = true;    // set to false to do call translators from js 
-//var translateLaTeX = true;     // false to preserve $..$, $$..$$
-//var translateLaTeXformatting = true; // false to preserve \emph,\begin{},\end{}
 //var translateASCIIMath = true; // false to preserve `..`
-//var avoidinnerHTML = false;   // set true if assigning to innerHTML gives error
 var displaystyle = true;      // puts limits above and below large operators
 var showasciiformulaonhover = true; // helps students learn ASCIIMath
 var decimalsign = ".";        // change to "," if you like, beware of `(1,2)`!
@@ -243,10 +251,10 @@ var fixphi = true;  		//false to return to legacy phi/varphi mapping
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 var isIE = (navigator.appName.slice(0,9)=="Microsoft");
+/*
 var noMathML = false, translated = false;
 
-/*
-if (isIE) { // avoid adding MathPlayer info explicitly to each webpage
+if (isIE) { // add MathPlayer info to IE webpages
   document.write("<object id=\"mathplayer\"\
   classid=\"clsid:32F66A20-7614-11D4-BD11-00104BD3F987\"></object>");
   document.write("<?import namespace=\"m\" implementation=\"#mathplayer\"?>");
@@ -394,8 +402,8 @@ var AMbbb = [0xEF8C,0xEF8D,0x2102,0xEF8E,0xEF8F,0xEF90,0xEF91,0x210D,0xEF92,0xEF
 
 var CONST = 0, UNARY = 1, BINARY = 2, INFIX = 3, LEFTBRACKET = 4,
     RIGHTBRACKET = 5, SPACE = 6, UNDEROVER = 7, DEFINITION = 8,
-    LEFTRIGHT = 9, TEXT = 10, BIG = 11, LONG = 12, STRETCHY = 13,
-    MATRIX = 14, UNARYUNDEROVER = 15; // token types
+    LEFTRIGHT = 9, TEXT = 10, /*BIG = 11, LONG = 12, STRETCHY = 13,
+    MATRIX = 14,*/ UNARYUNDEROVER = 15; // token types
 
 var AMquote = {input:"\"",   tag:"mtext", output:"mbox", tex:null, ttype:TEXT};
 
@@ -541,6 +549,7 @@ var AMsymbols = [
 {input:"'",   tag:"mo", output:"\u2032",  tex:"prime", ttype:CONST},
 {input:"tilde", tag:"mover", output:"~", tex:null, ttype:UNARY, acc:true},
 {input:"\\ ",  tag:"mo", output:"\u00A0", tex:null, ttype:CONST},
+{input:"frown",  tag:"mo", output:"\u2322", tex:null, ttype:CONST},
 {input:"quad", tag:"mo", output:"\u00A0\u00A0", tex:null, ttype:CONST},
 {input:"qquad", tag:"mo", output:"\u00A0\u00A0\u00A0\u00A0", tex:null, ttype:CONST},
 {input:"cdots", tag:"mo", output:"\u22EF", tex:null, ttype:CONST},
@@ -1193,7 +1202,10 @@ function processNodeR(n, linebreaks,latex) {
   if (n.childNodes.length == 0) {
    if ((n.nodeType!=8 || linebreaks) &&
     n.parentNode.nodeName!="form" && n.parentNode.nodeName!="FORM" &&
-    n.parentNode.nodeName!="textarea" && n.parentNode.nodeName!="TEXTAREA") {
+    n.parentNode.nodeName!="textarea" && n.parentNode.nodeName!="TEXTAREA"
+      //&&
+      //n.parentNode.nodeName!="pre" && n.parentNode.nodeName!="PRE"
+    ) {
     str = n.nodeValue;
     if (!(str == null)) {
       str = str.replace(/\r\n\r\n/g,"\n\n");
@@ -1296,6 +1308,14 @@ else if(typeof window.attachEvent != 'undefined'){
     window.onload = generic;
   }
 }
+
+//expose some functions to outside
+asciimath.newcommand = newcommand;
+asciimath.AMprocesssNode = AMprocessNode;
+asciimath.parseMath = parseMath;
+asciimath.translate = translate;
+})();
+
 */
 
 /******************************************************************
@@ -1319,11 +1339,6 @@ mathcolor = "";
     if (AMsymbols[i].func) {AMsymbols[i].tag = "mi"}
   }
 })();
-
-//
-//  Add some missing symbols
-//
-//AMsymbols.push()
 
 //
 //  Access to AsciiMath functions and values
@@ -1403,12 +1418,8 @@ ASCIIMATH.Augment({
 
 //
 //  Make minimizer think these have been used
-var junk = [
-  window, navigator //,
-//  checkForMathML, notifyIfNoMathML, alertIfNoMathML, AMdelimiter1, AMescape1,
-//  AMdelimiter2, AMescape2, AMdelimiter2regexp, doubleblankmathdelimiter
-];
-junk = null;
+//
+var junk = [window, navigator]; junk = null;
   
 })(MathJax.InputJax.AsciiMath);
 
@@ -1428,7 +1439,8 @@ junk = null;
     Translate: function (script) {
       var mml, math = MathJax.HTML.getScript(script);
       var data = {math:math, script:script};
-      this.prefilterHooks.Execute(data); math = data.math;
+      var callback = this.prefilterHooks.Execute(data); if (callback) return callback;
+      math = data.math;
       try {
         mml = this.AM.parseMath(math);
       } catch(err) {
@@ -1436,7 +1448,7 @@ junk = null;
         mml = this.formatError(err,math);
       }
       data.math = MML(mml); this.postfilterHooks.Execute(data);
-      return data.math;
+      return this.postfilterHooks.Execute(data) || data.math;
     },
     formatError: function (err,math,script) {
       var message = err.message.replace(/\n.*/,"");

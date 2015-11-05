@@ -754,10 +754,18 @@ function AMTparseExpr(str,rightbracket) {
 					if (newFrag.charAt(i)==',' && mxanynestingd==1) {
 						subpos[lastsubposstart].push(i);
 					}
+					if (mxanynestingd<0) {  //happens at the end of the row
+						if (lastsubposstart == i+1) { //if at end of row, skip to next row
+							i++;
+						} else { //misformed something - abandon treating as a matrix
+							matrix = false;
+						}
+					}
 				}
+
 				pos.push(len);
 				var lastmxsubcnt = -1;
-				if (mxnestingd==0 && pos.length>0) {
+				if (mxnestingd==0 && pos.length>0 && matrix) {
 					for (i=0;i<pos.length-1;i++) {
 						if (i>0) mxout += '\\\\';
 						if (i==0) {
@@ -792,6 +800,7 @@ function AMTparseExpr(str,rightbracket) {
 					}
 				}
 				mxout += '}';
+
 				if (matrix) { newFrag = mxout;}
 			}
 		}

@@ -159,13 +159,13 @@ var AMsymbols = [
 {input:"|==",  tag:"mo", output:"\u22A8", tex:"models", ttype:CONST}, //mimetex doesn't support
 
 //grouping brackets
-{input:"(", tag:"mo", output:"(", tex:null, ttype:LEFTBRACKET},
-{input:")", tag:"mo", output:")", tex:null, ttype:RIGHTBRACKET},
-{input:"[", tag:"mo", output:"[", tex:null, ttype:LEFTBRACKET},
-{input:"]", tag:"mo", output:"]", tex:null, ttype:RIGHTBRACKET},
+{input:"(", tag:"mo", output:"(", tex:null, ttype:LEFTBRACKET, val:true},
+{input:")", tag:"mo", output:")", tex:null, ttype:RIGHTBRACKET, val:true},
+{input:"[", tag:"mo", output:"[", tex:null, ttype:LEFTBRACKET, val:true},
+{input:"]", tag:"mo", output:"]", tex:null, ttype:RIGHTBRACKET, val:true},
 {input:"{", tag:"mo", output:"{", tex:"lbrace", ttype:LEFTBRACKET},
 {input:"}", tag:"mo", output:"}", tex:"rbrace", ttype:RIGHTBRACKET},
-{input:"|", tag:"mo", output:"|", tex:null, ttype:LEFTRIGHT},
+{input:"|", tag:"mo", output:"|", tex:null, ttype:LEFTRIGHT, val:true},
 //{input:"||", tag:"mo", output:"||", tex:null, ttype:LEFTRIGHT},
 {input:"(:", tag:"mo", output:"\u2329", tex:"langle", ttype:LEFTBRACKET},
 {input:":)", tag:"mo", output:"\u232A", tex:"rangle", ttype:RIGHTBRACKET},
@@ -494,13 +494,6 @@ function AMTgetTeXsymbol(symb) {
 		return (pre+symb.tex);
 	}
 }
-function AMTgetTeXbracket(symb) {
-	if (symb.tex==null) {
-		return (symb.input);
-	} else {
-		return ('\\'+symb.tex);
-	}
-}
 
 function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
   var symbol, node, result, i, st,// rightvert = false,
@@ -547,13 +540,13 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
 	    if (typeof symbol.invisible == "boolean" && symbol.invisible) 
 		    node = '{'+result[0]+'}';
 	    else {
-		    node = '{'+AMTgetTeXbracket(symbol) + result[0]+'}';
+		    node = '{'+AMTgetTeXsymbol(symbol) + result[0]+'}';
 	    }    
     } else {
 	    if (typeof symbol.invisible == "boolean" && symbol.invisible) 
 		    node = '{\\left.'+result[0]+'}';
 	    else {
-		    node = '{\\left'+AMTgetTeXbracket(symbol) + result[0]+'}';
+		    node = '{\\left'+AMTgetTeXsymbol(symbol) + result[0]+'}';
 	    }
     }
     return [node,result[1]];
@@ -808,7 +801,7 @@ function AMTparseExpr(str,rightbracket) {
     
     str = AMremoveCharsAndBlanks(str,symbol.input.length);
     if (typeof symbol.invisible != "boolean" || !symbol.invisible) {
-      node = '\\right'+AMTgetTeXbracket(symbol); //AMcreateMmlNode("mo",document.createTextNode(symbol.output));
+      node = '\\right'+AMTgetTeXsymbol(symbol); //AMcreateMmlNode("mo",document.createTextNode(symbol.output));
       newFrag += node;
       addedright = true;
     } else {

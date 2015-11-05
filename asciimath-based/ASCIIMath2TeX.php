@@ -281,13 +281,13 @@ array( 'input'=>'overset', 'binary'=>TRUE),
 array( 'input'=>'underset', 'binary'=>TRUE),
 
 // Grouping brackets
-array( 'input'=>'(', 'leftbracket'=>TRUE),
-array( 'input'=>')', 'rightbracket'=>TRUE),
-array( 'input'=>'[', 'leftbracket'=>TRUE),
-array( 'input'=>']', 'rightbracket'=>TRUE),
+array( 'input'=>'(', 'leftbracket'=>TRUE, 'val'=>TRUE),
+array( 'input'=>')', 'rightbracket'=>TRUE, 'val'=>TRUE),
+array( 'input'=>'[', 'leftbracket'=>TRUE, 'val'=>TRUE),
+array( 'input'=>']', 'rightbracket'=>TRUE, 'val'=>TRUE),
 array( 'input'=>'{', 'tex'=>'lbrace', 'leftbracket'=>TRUE),
 array( 'input'=>'}', 'tex'=>'rbrace', 'rightbracket'=>TRUE),
-array( 'input'=>'|', 'leftright'=>TRUE),
+array( 'input'=>'|', 'leftright'=>TRUE, 'val'=>TRUE),
 array( 'input'=>'(:', 'tex'=>'langle', 'leftbracket'=>TRUE),
 array( 'input'=>':)', 'tex'=>'rangle', 'rightbracket'=>TRUE),
 array( 'input'=>'{:', 'leftbracket'=>TRUE, 'invisible'=>TRUE),
@@ -318,7 +318,6 @@ function AMinitSymbols() {
 				if ($k!='tex') { $tsymb[$k]=$v;}
 			}
 			$tsymb['input']= $this->AMsymbols[$i]['tex'];
-			$tsymb['istex'] = true;
 			array_push($this->AMsymbols, $tsymb);
 		}
 	}
@@ -487,17 +486,6 @@ function AMTgetTeXsymbol($symb) {
 		return ($pre.$symb['input']);
 	}
 }
-function AMTgetTeXbracket($symb) {
-	if (isset($symb['tex'])) {
-		return ('\\'.$symb['tex']);
-	} else {
-		if (isset($symb['istex']) && $symb['istex']) {
-			return '\\'.$symb['input'];
-		} else {
-			return $symb['input'];
-		}
-	}
-}
 
 function AMTparseSexpr($str) { 
 	
@@ -537,13 +525,13 @@ function AMTparseSexpr($str) {
 			if (isset($symbol['invisible'])) {
 				$node = '{' . $result[0] . '}';
 			} else {
-				$node = '{' . $this->AMTgetTeXbracket($symbol) . $result[0] . '}';
+				$node = '{' . $this->AMTgetTeXsymbol($symbol) . $result[0] . '}';
 			}
 		} else {
 			if (isset($symbol['invisible'])) {
 				$node = '{\\left.' . $result[0] . '}';
 			} else {
-				$node = '{\\left' . $this->AMTgetTeXbracket($symbol) . $result[0] . '}';
+				$node = '{\\left' . $this->AMTgetTeXsymbol($symbol) . $result[0] . '}';
 			}
 		}
 		return array($node, $result[1]);
@@ -810,7 +798,7 @@ function AMTparseExpr($str,$rightbracket) {
 		}
 		$str = $this->AMremoveCharsAndBlanks($str,strlen($symbol['input']));
 		if (!isset($symbol['invisible'])) {
-			$node = '\\right'.$this->AMTgetTeXbracket($symbol);
+			$node = '\\right'.$this->AMTgetTeXsymbol($symbol);
 			$newFrag .= $node;
 			$addedright = true;
 		} else {

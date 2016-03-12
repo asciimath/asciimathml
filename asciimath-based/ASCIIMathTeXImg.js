@@ -192,6 +192,7 @@ var AMsymbols = [
 {input:"aleph", tag:"mo", output:"\u2135", tex:null, ttype:CONST},
 {input:"...",  tag:"mo", output:"...",    tex:"ldots", ttype:CONST},
 {input:":.",  tag:"mo", output:"\u2234",  tex:"therefore", ttype:CONST},
+{input:":'",  tag:"mo", output:"\u2235",  tex:"because", ttype:CONST},
 {input:"/_",  tag:"mo", output:"\u2220",  tex:"angle", ttype:CONST},
 {input:"/_\\",  tag:"mo", output:"\u25B3",  tex:"triangle", ttype:CONST},
 {input:"\\ ",  tag:"mo", output:"\u00A0", tex:null, ttype:CONST, val:true},

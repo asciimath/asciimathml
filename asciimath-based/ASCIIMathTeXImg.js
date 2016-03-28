@@ -16,8 +16,12 @@ FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
 (at http://www.gnu.org/licences/lgpl.html) for more details.
 */
 
-function AMTinit(config) {
-config = config || {
+//var AMTcgiloc = '';			//set to the URL of your LaTex renderer
+var noMathRender = false;
+
+(function() {
+var config = {
+  translateOnLoad: true,		  //true to autotranslate
   mathcolor: "",       	      // defaults to back, or specify any other color
   displaystyle: true,         // puts limits above and below large operators
   showasciiformulaonhover: true, // helps students learn ASCIIMath
@@ -27,7 +31,7 @@ config = config || {
   AMdelimiter2: "$", AMescape2: "\\\\\\$", AMdelimiter2regexp: "\\$",
   AMdocumentId: "wikitext",   // PmWiki element containing math (default=body)
   doubleblankmathdelimiter: false // if true,  x+1  is equal to `x+1`
-};
+};                                // for IE this works only in <!--   -->
 
 var CONST = 0, UNARY = 1, BINARY = 2, INFIX = 3, LEFTBRACKET = 4, 
     RIGHTBRACKET = 5, SPACE = 6, UNDEROVER = 7, DEFINITION = 8,
@@ -828,10 +832,189 @@ function AMTparseAMtoTeX(str) {
   return AMTparseExpr(str.replace(/^\s+/g,""),false)[0];
 }
 
+function AMparseMath(str) {
+ //DLMOD to remove &nbsp;, which editor adds on multiple spaces
+  str = str.replace(/(&nbsp;|\u00a0|&#160;)/g,"");
+  str = str.replace(/&gt;/g,">");
+  str = str.replace(/&lt;/g,"<");
+  if (str.match(/\S/)==null) {
+	  return document.createTextNode(" ");
+  }
+  var texstring = AMTparseAMtoTeX(str);
+  if (typeof mathbg != "undefined" && mathbg=='dark') {
+	  texstring = "\\reverse " + texstring;
+  }
+  if (config.mathcolor!="") {
+	  texstring = "\\"+config.mathcolor + texstring;
+  }
+  if (config.displaystyle) {
+	  texstring = "\\displaystyle" + texstring;
+  } else {
+	  texstring = "\\textstyle" + texstring;
+  }
+  texstring = texstring.replace('$','\\$');
+  
+  var node = document.createElement("img");
+  if (typeof encodeURIComponent == "function") {
+	  texstring = encodeURIComponent(texstring);
+  } else {
+	  texstring = escape(texstring);
+  }
+  node.src = AMTcgiloc + '?' + texstring;
+  node.style.verticalAlign = "middle";
+  if (config.showasciiformulaonhover)                      //fixed by djhsu so newline
+    node.setAttribute("title",str.replace(/\s+/g," "));//does not show in Gecko
+ 
+  var snode = document.createElement("span");
+  snode.appendChild(node); //chg
+  return snode;
+}
+//alias to align with wFallback function
+function AMTparseMath(str) {
+	return AMparseMath(str);
+}
+
+function AMstrarr2docFrag(arr, linebreaks) {
+  var newFrag=document.createDocumentFragment();
+  var expr = false;
+  for (var i=0; i<arr.length; i++) {
+    if (expr) newFrag.appendChild(AMparseMath(arr[i]));
+    else {
+      var arri = (linebreaks ? arr[i].split("\n\n") : [arr[i]]);
+      newFrag.appendChild(document.createElement("span").
+      appendChild(document.createTextNode(arri[0])));
+      for (var j=1; j<arri.length; j++) {
+        newFrag.appendChild(document.createElement("p"));
+        newFrag.appendChild(document.createElement("span").
+        appendChild(document.createTextNode(arri[j])));
+      }
+    }
+    expr = !expr;
+  }
+  return newFrag;
+}
+
+function AMprocessNodeR(n, linebreaks) {
+  var mtch, str, arr, frg, i;
+  if (n.childNodes.length == 0) {
+   if ((n.nodeType!=8 || linebreaks) &&
+    n.parentNode.nodeName!="form" && n.parentNode.nodeName!="FORM" &&
+    n.parentNode.nodeName!="textarea" && n.parentNode.nodeName!="TEXTAREA" &&
+    n.parentNode.nodeName!="pre" && n.parentNode.nodeName!="PRE") {
+    str = n.nodeValue;
+    if (!(str == null)) {
+      str = str.replace(/\r\n\r\n/g,"\n\n");
+      if (config.doubleblankmathdelimiter) {
+        str = str.replace(/\x20\x20\./g," "+config.AMdelimiter1+".");
+        str = str.replace(/\x20\x20,/g," "+config.AMdelimiter1+",");
+        str = str.replace(/\x20\x20/g," "+config.AMdelimiter1+" ");
+      }
+      str = str.replace(/\x20+/g," ");
+      str = str.replace(/\s*\r\n/g," ");
+       mtch = false;
+      if (config.AMusedelimiter2) {
+      str = str.replace(new RegExp(config.AMescape2, "g"),
+              function(st){mtch=true;return "AMescape2"});
+      }
+      str = str.replace(new RegExp(config.AMescape1, "g"),
+              function(st){mtch=true;return "AMescape1"});
+     if (config.AMusedelimiter2)  str = str.replace(new RegExp(config.AMdelimiter2regexp, "g"),config.AMdelimiter1);
+      arr = str.split(config.AMdelimiter1);
+      for (i=0; i<arr.length; i++)
+      	if (config.AMusedelimiter2) {	     
+		arr[i]=arr[i].replace(/AMescape2/g,config.AMdelimiter2).replace(/AMescape1/g,config.AMdelimiter1);
+	} else {
+		arr[i]=arr[i].replace(/AMescape1/g,config.AMdelimiter1);
+	}
+      if (arr.length>1 || mtch) {
+        
+      frg = AMstrarr2docFrag(arr,n.nodeType==8);
+      var len = frg.childNodes.length;
+      n.parentNode.replaceChild(frg,n);
+      return len-1;
+        
+      }
+    }
+   } else return 0;
+  } else if (n.nodeName!="math") { //should this change to img?
+    for (i=0; i<n.childNodes.length; i++)
+      i += AMprocessNodeR(n.childNodes[i], linebreaks);
+  }
+  return 0;
+}
+
+function AMprocessNode(n, linebreaks, spanclassAM) {
+  var frag,st;
+  if (spanclassAM!=null) {
+    frag = document.getElementsByTagName("span");
+    for (var i=0;i<frag.length;i++)
+      if (frag[i].className == "AM")
+        AMprocessNodeR(frag[i],linebreaks);
+  } else {
+    try {
+      st = n.innerHTML;
+    } catch(err) {}
+    if (st==null || 
+        st.indexOf(config.AMdelimiter1)!=-1)// || st.indexOf(config.AMdelimiter2)!=-1) 
+      AMprocessNodeR(n,linebreaks);
+  }
+}
+
+function translate(spanclassAM) {
+  if (!AMtranslated) { // run this only once
+    AMtranslated = true;
+    var body = document.getElementsByTagName("body")[0];
+    var processN = document.getElementById(config.AMdocumentId);
+    AMprocessNode((processN!=null?processN:body), false, spanclassAM);
+  }
+}
+
+var AMbody;
+var AMtranslated = false;
+var AMnoMathML = true;
+
 AMinitSymbols();
 
-return {
-    parseAMtoTeX: AMTparseAMtoTeX,
-};
+window.translate = translate;
+window.AMTconfig = config;
+window.AMprocessNode = AMprocessNode;
+window.AMparseMath = AMparseMath;
+window.AMTparseMath = AMparseMath;
+window.AMTparseAMtoTeX = AMTparseAMtoTeX;
 
-};
+function generic(){
+  if (config.translateOnLoad) {
+      translate();
+  }
+}
+
+//setup onload function
+if(typeof window.addEventListener != 'undefined'){
+  //.. gecko, safari, konqueror and standard
+  window.addEventListener('load', generic, false);
+}
+else if(typeof document.addEventListener != 'undefined'){
+  //.. opera 7
+  document.addEventListener('load', generic, false);
+}
+else if(typeof window.attachEvent != 'undefined'){
+  //.. win/ie
+  window.attachEvent('onload', generic);
+}else{
+  //.. mac/ie5 and anything else that gets this far
+  //if there's an existing onload function
+  if(typeof window.onload == 'function'){
+    //store it
+    var existing = onload;
+    //add new onload handler
+    window.onload = function(){
+      //call existing onload function
+      existing();
+      //call generic onload function
+      generic();
+    };
+  }else{
+    window.onload = generic;
+  }
+}
+})();

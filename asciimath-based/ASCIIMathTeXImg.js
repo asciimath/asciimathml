@@ -334,21 +334,32 @@ function compareNames(s1,s2) {
 var AMnames = []; //list of input symbols
 
 function AMinitSymbols() {
-  var texsymbols = [], i;
-  for (i=0; i<AMsymbols.length; i++)
+  var i;
+  var symlen = AMsymbols.length;
+  for (i=0; i<symlen; i++) {
     if (AMsymbols[i].tex && !(typeof AMsymbols[i].notexcopy == "boolean" && AMsymbols[i].notexcopy)) {
-       texsymbols[texsymbols.length] = {input:AMsymbols[i].tex, 
+       AMsymbols.push({input:AMsymbols[i].tex, 
         tag:AMsymbols[i].tag, output:AMsymbols[i].output, ttype:AMsymbols[i].ttype,
-        acc:(AMsymbols[i].acc||false)};
+        acc:(AMsymbols[i].acc||false)});
     }
-  AMsymbols = AMsymbols.concat(texsymbols);
+  }
+  refreshSymbols();
+}
+
+function refreshSymbols(){
+  var i;
   AMsymbols.sort(compareNames);
   for (i=0; i<AMsymbols.length; i++) AMnames[i] = AMsymbols[i].input;
 }
 
 function newcommand(oldstr,newstr) {
-  AMsymbols = AMsymbols.concat([{input:oldstr, tag:"mo", output:newstr, 
-                                 tex:null, ttype:DEFINITION}]);
+  AMsymbols.push({input:oldstr, tag:"mo", output:newstr, tex:null, ttype:DEFINITION});
+  refreshSymbols();
+}
+
+function newsymbol(symbolobj) {
+  AMsymbols.push(symbolobj);
+  refreshSymbols();
 }
 
 function AMremoveCharsAndBlanks(str,n) {

@@ -871,7 +871,7 @@ function AMparseExpr(str,rightbracket) {
       isnegIoverI = false;
       if (node.nodeName=='mrow' && node.firstChild.firstChild.nodeValue=="-") {
         isnegIoverI = true;
-        node = node.childNodes[1];
+        node.removeChild(node.firstChild);
       }
       AMremoveBrackets(node);
       node = createMmlNode(symbol.tag,node);
@@ -879,15 +879,17 @@ function AMparseExpr(str,rightbracket) {
       if (isnegIoverI) {
       	mrow = createMmlNode("mrow", createMmlNode("mo",document.createTextNode("-")));
       	mrow.appendChild(node);
+      	console.log(mrow.outerHTML);
         newFrag.appendChild(mrow);
       } else {
       	newFrag.appendChild(node);
       }
       symbol = AMgetSymbol(str);
     }
+    else if (node!=undefined) newFrag.appendChild(node);
+    
     if (symbol.input == "-" && node.nodeName!='mo') {
       str = AMremoveCharsAndBlanks(str,symbol.input.length);
-      newFrag.appendChild(node);
       newFrag.appendChild(createMmlNode(symbol.tag,document.createTextNode("-")));
       result = AMparseExpr(str,rightbracket);
       if (result[0] !== null) {
@@ -897,7 +899,7 @@ function AMparseExpr(str,rightbracket) {
       symbol = result[2];
       return [newFrag,str,symbol];
     }
-    else if (node!=undefined) newFrag.appendChild(node);
+    
   } while ((symbol.ttype != RIGHTBRACKET &&
            (symbol.ttype != LEFTRIGHT || rightbracket)
            || AMnestingDepth == 0) && symbol!=null && symbol.output!="");

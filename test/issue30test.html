@@ -11,32 +11,56 @@ p,table { font-family: Times; }
 table   { border-collapse:collapse; }
 td, th  { border:1px solid black; padding:5px; text-align:center; }
 img     { border: 0; } 
+mrow > mo:first-child.neg { color: #0a0;}
 </style>
+<script type="text/javascript">
+window.addEventListener('load', function() {
+var mos = document.getElementsByTagName("mo");
+for (i=0;i<mos.length;i++) {
+	if (mos[i].textContent=="-") {
+		mos[i].className = "neg";
+	}
+}
+});
+</script>
 </head>
 <body>
+`-3`<br/>
+`4-5` <br/>
+`4--3` <br/>
+`4*-4` <br/>
+`-3/2` <br/>
+`(-3)/2` <br/>
+`4-3/2` <br/>
+`3/2-4` <br/>
+`4/5-3/2` <br/>
+`-4/5-3/2` <br/>
+`(-3^2,4)` <br/>
+`(-3/2,4)` <br/>
+`(4,-3/2)` <br/>
+`-3/2,4` <br/>
+`3/2,-4` <br/>
+`5^-2` <br/>
+`5^-(x+4)+2-5` <br/>
+`5^-sqrt(4)` <br/>
+`4_-5` <br/>
+`5/-4` <br/>
+`5/-(x+1)` <br/>
+`int_-2^-1 x^2` <br/>
+`int -x^2 dx` <br/>
+`(-oo,oo)`<br/>
+`-hata - hatb`<br/>
+`-"cow"-"fish"`<br/>
 `-(x+4)/(x+4)-(x+3)/2` <br/>
 `(x+4)/(x-4)-(x+3)/2` <br/>
 `(x+4)/(x-4/(x-2))-(x+3)/2` <br/>
 `2/3-3` <br/>
 `2/3-3/4` <br/>
 `(x+4)/(x-4)-(x+3)/2` <br/>
-`(-3^2,4)` <br/>
-`(-3/2,4)` <br/>
-`(4,-3/2)` <br/>
-`-3/2,4` <br/>
-`3/2,-4` <br/>
-`4-5` <br/>
-`5^-2` <br/>
-`5^-(x+4)+2-5` <br/>
-`5/-4` <br/>
-`4_-5` <br/>
-`4--3` <br/>
-`int_-2^-1 x^2` <br/>
-`5/-(x+1)` <br/>
-`5^-sqrt(4)` <br/>
-`4-2/3` <br/>
 `5 gt -3` <br/>
 `-sqrt(5) - sqrt(4) - vec a - sin(-4) - sin-4-5 and -4 in -5`<br/>
+`[(-2,4,3-2),(3-5,-2,-2-5/4)]`<br/>
+
 
 
 

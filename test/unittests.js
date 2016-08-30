@@ -451,7 +451,7 @@ function runTests() {
 	$("#maketest").on('click', function() {
 		var txt = $("#newtest").val();
 		var out = $(asciimath.parseMath(txt)).find("mstyle").html().replace(/\\/g,"\\\\").replace(/"/g,'\\"');;
-		var outstr = '{input: "'+txt.replace(/\\/g,"\\\\")+'", output:"'+out+'"},\n';
+		var outstr = '{input: "'+txt.replace(/\\/g,"\\\\").replace(/"/g,'\\"')+'", output:"'+out+'"},\n';
 		$("#newtestout").text($("#newtestout").text()+outstr);		
 	})
 	var res,tr,td;

@@ -769,7 +769,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
     st = "";
     if (result[0].lastChild!=null)
       st = result[0].lastChild.firstChild.nodeValue;
-    if (st == "|") { // its an absolute value subterm
+    if (st == "|" && str.charAt(0)!==",") { // its an absolute value subterm
       node = createMmlNode("mo",document.createTextNode(symbol.output));
       node = createMmlNode("mrow",node);
       node.appendChild(result[0]);
@@ -911,7 +911,7 @@ function AMparseExpr(str,rightbracket) {
             for (j=1; j<n-1; j++) {
               if (typeof pos[i][k] != "undefined" && j==pos[i][k]){
                 node.removeChild(node.firstChild); //remove ,
-                if (node.firstChild.nodeName=="mrow" &&
+                if (node.firstChild.nodeName=="mrow" && node.firstChild.childNodes.length==1 &&
          	  node.firstChild.firstChild.firstChild.nodeValue=="\u2223") {
          	    //is columnline marker - skip it
          	    if (i==0) { columnlines.push("solid"); }

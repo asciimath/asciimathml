@@ -652,7 +652,7 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
     var st = "";
     st = result[0].charAt(result[0].length -1);
 //alert(result[0].lastChild+"***"+st);
-    if (st == "|") { // its an absolute value subterm
+    if (st == "|" && str.charAt(0)!==",") { // its an absolute value subterm
 	    node = '{\\left|'+result[0]+'}';
       return [node,result[1]];
     } else { // the "|" is a \mid
@@ -750,7 +750,7 @@ function AMTparseExpr(str,rightbracket) {
 		if (right==')' || right==']') {
 			var left = newFrag.charAt(6);
 			if ((left=='(' && right==')' && symbol.output != '}') || (left=='[' && right==']')) {
-				var mxout = '\\matrix{';
+				var mxout = '';
 				var pos = new Array(); //position of commas
 				pos.push(0);
 				var matrix = true;
@@ -759,6 +759,7 @@ function AMTparseExpr(str,rightbracket) {
 				subpos[0] = [0];
 				var lastsubposstart = 0;
 				var mxanynestingd = 0;
+				var columnaligns = '';
 				for (i=1; i<len-1; i++) {
 					if (newFrag.charAt(i)==left) mxnestingd++;
 					if (newFrag.charAt(i)==right) {
@@ -811,6 +812,16 @@ function AMTparseExpr(str,rightbracket) {
 								subarr.push(newFrag.substring(subpos[pos[i]][subpos[pos[i]].length-1]+1,pos[i+1]-8));
 							}
 						}
+						for (j=subarr.length-1;j>=0;j--) {
+							if (subarr[j]=="{\\mid}") {
+								if (i==0) {
+									columnaligns = "|"+columnaligns;
+								}
+								subarr.splice(j,1);
+							} else if (i==0) {
+								columnaligns = "c"+columnaligns;
+							}
+						}
 						if (lastmxsubcnt>0 && subarr.length!=lastmxsubcnt) {
 							matrix = false;
 						} else if (lastmxsubcnt==-1) {
@@ -819,7 +830,11 @@ function AMTparseExpr(str,rightbracket) {
 						mxout += subarr.join('&');
 					}
 				}
-				mxout += '}';
+				if (columnaligns.indexOf("|")==-1) {
+					mxout = "\\matrix{"+mxout+"}";
+				} else {
+					mxout = "\\begin{array}{"+columnaligns+"} "+mxout+"\\end{array}";
+				}
 
 				if (matrix) { newFrag = mxout;}
 			}
@@ -865,6 +880,7 @@ function AMparseMath(str) {
 	  return document.createTextNode(" ");
   }
   var texstring = AMTparseAMtoTeX(str);
+  console.log(texstring);
   if (typeof mathbg != "undefined" && mathbg=='dark') {
 	  texstring = "\\reverse " + texstring;
   }

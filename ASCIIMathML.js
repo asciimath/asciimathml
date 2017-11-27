@@ -788,7 +788,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
     st = "";
     if (result[0].lastChild!=null)
       st = result[0].lastChild.firstChild.nodeValue;
-    if (st == "|") { // its an absolute value subterm
+    if (st == "|" && str.charAt(0)!==",") { // its an absolute value subterm
       node = createMmlNode("mo",document.createTextNode(symbol.output));
       node = createMmlNode("mrow",node);
       node.appendChild(result[0]);
@@ -917,6 +917,7 @@ function AMparseExpr(str,rightbracket) {
           if (matrix && i>1) matrix = pos[i].length == pos[i-2].length;
         }
         matrix = matrix && (pos.length>1 || pos[0].length>0);
+        var columnlines = [];
         if (matrix) {
           var row, frag, n, k, table = document.createDocumentFragment();
           for (i=0; i<m; i=i+2) {
@@ -929,11 +930,21 @@ function AMparseExpr(str,rightbracket) {
             for (j=1; j<n-1; j++) {
               if (typeof pos[i][k] != "undefined" && j==pos[i][k]){
                 node.removeChild(node.firstChild); //remove ,
+                if (node.firstChild.nodeName=="mrow" && node.firstChild.childNodes.length==1 &&
+         	  node.firstChild.firstChild.firstChild.nodeValue=="\u2223") {
+         	    //is columnline marker - skip it
+         	    if (i==0) { columnlines.push("solid"); }
+         	    node.removeChild(node.firstChild); //remove mrow
+         	    node.removeChild(node.firstChild); //remove ,
+         	    j+=2;
+         	    k++;
+            	} else if (i==0) { columnlines.push("none"); }
                 row.appendChild(createMmlNode("mtd",frag));
                 k++;
               } else frag.appendChild(node.firstChild);
             }
             row.appendChild(createMmlNode("mtd",frag));
+            if (i==0) { columnlines.push("none"); }
             if (newFrag.childNodes.length>2) {
               newFrag.removeChild(newFrag.firstChild); //remove <mrow>)</mrow>
               newFrag.removeChild(newFrag.firstChild); //remove <mo>,</mo>
@@ -941,6 +952,7 @@ function AMparseExpr(str,rightbracket) {
             table.appendChild(createMmlNode("mtr",row));
           }
           node = createMmlNode("mtable",table);
+          node.setAttribute("columnlines", columnlines.join(" "));
           if (typeof symbol.invisible == "boolean" && symbol.invisible) node.setAttribute("columnalign","left");
           newFrag.replaceChild(node,newFrag.firstChild);
         }

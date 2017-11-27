@@ -316,7 +316,8 @@ var unittests = [
 {input: "tilde x", output:"<mover><mi>x</mi><mo>~</mo></mover>"},
 {input: "hat x", output:"<mover><mi>x</mi><mo>^</mo></mover>"},
 {input: "bar x", output:"<mover><mi>x</mi><mo>¯</mo></mover>"},
-{input: "vec x", output:"<mover><mi>x</mi><mo>→</mo></mover>"},
+{input: "vec x", output:"<mover><mi>x</mi><mo stretchy=\"false\">→</mo></mover>"},
+{input: "vec(xy)", output:"<mover><mrow><mi>x</mi><mi>y</mi></mrow><mo>→</mo></mover>"},
 {input: "dot x", output:"<mover><mi>x</mi><mo>.</mo></mover>"},
 {input: "ddot x", output:"<mover><mi>x</mi><mo>..</mo></mover>"},
 {input: "ul x", output:"<munder><mi>x</mi><mo>̲</mo></munder>"},
@@ -406,8 +407,7 @@ var unittests = [
 {input: "3^2/4^2", output:"<mfrac><msup><mn>3</mn><mn>2</mn></msup><msup><mn>4</mn><mn>2</mn></msup></mfrac>"},
 {input: "3_2/4_2", output:"<mfrac><msub><mn>3</mn><mn>2</mn></msub><msub><mn>4</mn><mn>2</mn></msub></mfrac>"},
 {input: "3_2^3/4_2", output:"<mfrac><mrow><msubsup><mn>3</mn><mn>2</mn><mn>3</mn></msubsup></mrow><msub><mn>4</mn><mn>2</mn></msub></mfrac>"},
-{input: "vecx/hat3+vecx^2+(vec x)^2 + vec(x^2)", output:"<mfrac><mover><mi>x</mi><mo>→</mo></mover><mover><mn>3</mn><mo>^</mo></mover></mfrac><mo>+</mo><msup><mover><mi>x</mi><mo>→</mo></mover><mn>2</mn></msup><mo>+</mo><msup><mrow><mo>(</mo><mover><mi>x</mi><mo>→</mo></mover><mo>)</mo></mrow><mn>2</mn></msup><mo>+</mo><mover><mrow><msup><mi>x</mi><mn>2</mn></msup></mrow><mo>→</mo></mover>"},
-
+{input: "vecx/hat3+vecx^2+(vec x)^2 + vec(x^2)", output:"<mfrac><mover><mi>x</mi><mo stretchy=\"false\">→</mo></mover><mover><mn>3</mn><mo>^</mo></mover></mfrac><mo>+</mo><msup><mover><mi>x</mi><mo stretchy=\"false\">→</mo></mover><mn>2</mn></msup><mo>+</mo><msup><mrow><mo>(</mo><mover><mi>x</mi><mo stretchy=\"false\">→</mo></mover><mo>)</mo></mrow><mn>2</mn></msup><mo>+</mo><mover><mrow><msup><mi>x</mi><mn>2</mn></msup></mrow><mo>→</mo></mover>"},
 //negative handling
 {input: "-3-4", output:"<mo>-</mo><mn>3</mn><mo>-</mo><mn>4</mn>"},
 {input: "(-3,-4)", output:"<mrow><mo>(</mo><mo>-</mo><mn>3</mn><mo>,</mo><mo>-</mo><mn>4</mn><mo>)</mo></mrow>"},

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ASCIIMathML test suite</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script type="text/javascript">
+var AMTcgiloc = 'http://www.imathas.com/cgi-bin/mimetex.cgi';
+</script>
+<script type="text/javascript" src="../asciimath-based/ASCIIMathTeXImg.js"></script>
+</head>
+<body>
+`[(1,2,3,|,4),(5,6,7, |,8)]` <br/>
+`[(1,2,3, | ,4,5),(5,6,7, | ,8,9)]` <br/>
+`[(1,|,2,3,4),(5,|,6,7,8)]` <br/>
+`[(1,|,3,|,4),(5,|,7,|,8)]` <br/>
+Absolute value in matrix:<br/>
+`[(2,|x|,5),(3,|y|,4)]` <br/>
+`[(1,|,2,|x|,5),(3,|,4,|y|,7)]` <br/>
+These are for testing weird/bad input:<br/>
+`[(1,2,3,|,4),(5,6,7,8,9)]` <br/>
+`[(1,2,3,|,4),(5,6,7,8)]` <br/>
+`[(1,2,3,4,5),(5,6,7,|,9)]` <br/>
+`[(1,2,3,4),(5,6,7,|,9)]` <br/>
+`[(1,2,3,|),(5,6,7,|)]` <br/>
+These are testing other uses of |:<br/>
+`|x/2+3|,|x-4/5|`<br/>
+`int_2^4 2x dx = x^2|_2^4`<br/>
+
+</body>
+</html>

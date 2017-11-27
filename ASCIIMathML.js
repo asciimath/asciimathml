@@ -323,10 +323,10 @@ var AMsymbols = [
 {input:"|==",  tag:"mo", output:"\u22A8", tex:"models", ttype:CONST},
 
 //grouping brackets
-{input:"(", tag:"mo", output:"(", tex:null, ttype:LEFTBRACKET},
-{input:")", tag:"mo", output:")", tex:null, ttype:RIGHTBRACKET},
-{input:"[", tag:"mo", output:"[", tex:null, ttype:LEFTBRACKET},
-{input:"]", tag:"mo", output:"]", tex:null, ttype:RIGHTBRACKET},
+{input:"(", tag:"mo", output:"(", tex:"left(", ttype:LEFTBRACKET},
+{input:")", tag:"mo", output:")", tex:"right)", ttype:RIGHTBRACKET},
+{input:"[", tag:"mo", output:"[", tex:"left[", ttype:LEFTBRACKET},
+{input:"]", tag:"mo", output:"]", tex:"right]", ttype:RIGHTBRACKET},
 {input:"{", tag:"mo", output:"{", tex:null, ttype:LEFTBRACKET},
 {input:"}", tag:"mo", output:"}", tex:null, ttype:RIGHTBRACKET},
 {input:"|", tag:"mo", output:"|", tex:null, ttype:LEFTRIGHT},

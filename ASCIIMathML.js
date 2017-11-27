@@ -420,7 +420,7 @@ var AMsymbols = [
 {input:"Arccos",  tag:"mo", output:"Arccos", tex:null, ttype:UNARY, func:true},
 {input:"Arctan",  tag:"mo", output:"Arctan", tex:null, ttype:UNARY, func:true},
 {input:"Sinh", tag:"mo", output:"Sinh", tex:null, ttype:UNARY, func:true},
-{input:"Sosh", tag:"mo", output:"Cosh", tex:null, ttype:UNARY, func:true},
+{input:"Cosh", tag:"mo", output:"Cosh", tex:null, ttype:UNARY, func:true},
 {input:"Tanh", tag:"mo", output:"Tanh", tex:null, ttype:UNARY, func:true},
 {input:"Cot",  tag:"mo", output:"Cot", tex:null, ttype:UNARY, func:true},
 {input:"Sec",  tag:"mo", output:"Sec", tex:null, ttype:UNARY, func:true},

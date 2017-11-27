@@ -177,6 +177,9 @@ var AMsymbols = [
 {input:"{", tag:"mo", output:"{", tex:"lbrace", ttype:LEFTBRACKET},
 {input:"}", tag:"mo", output:"}", tex:"rbrace", ttype:RIGHTBRACKET},
 {input:"|", tag:"mo", output:"|", tex:null, ttype:LEFTRIGHT, val:true},
+{input:"|:", tag:"mo", output:"|", tex:"|", ttype:LEFTBRACKET, notexcopy:true, val:true},
+{input:":|", tag:"mo", output:"|", tex:"|", ttype:RIGHTBRACKET, notexcopy:true, val:true},
+{input:":|:", tag:"mo", output:"|", tex:"|", ttype:CONST, notexcopy:true, val:true},
 //{input:"||", tag:"mo", output:"||", tex:null, ttype:LEFTRIGHT},
 {input:"(:", tag:"mo", output:"\u2329", tex:"langle", ttype:LEFTBRACKET},
 {input:":)", tag:"mo", output:"\u232A", tex:"rangle", ttype:RIGHTBRACKET},
@@ -413,6 +416,7 @@ function AMgetSymbol(str) {
   }
   AMpreviousSymbol=AMcurrentSymbol;
   if (match!=""){
+  	  console.log(AMsymbols[mk]);
     AMcurrentSymbol=AMsymbols[mk].ttype;
     return AMsymbols[mk]; 
   }

@@ -170,10 +170,10 @@ var AMsymbols = [
 {input:"|==",  tag:"mo", output:"\u22A8", tex:"models", ttype:CONST}, //mimetex doesn't support
 
 //grouping brackets
-{input:"(", tag:"mo", output:"(", tex:null, ttype:LEFTBRACKET, val:true},
-{input:")", tag:"mo", output:")", tex:null, ttype:RIGHTBRACKET, val:true},
-{input:"[", tag:"mo", output:"[", tex:null, ttype:LEFTBRACKET, val:true},
-{input:"]", tag:"mo", output:"]", tex:null, ttype:RIGHTBRACKET, val:true},
+{input:"(", tag:"mo", output:"(", tex:"left(", ttype:LEFTBRACKET, val:true},
+{input:")", tag:"mo", output:")", tex:"right)", ttype:RIGHTBRACKET, val:true},
+{input:"[", tag:"mo", output:"[", tex:"left[", ttype:LEFTBRACKET, val:true},
+{input:"]", tag:"mo", output:"]", tex:"right]", ttype:RIGHTBRACKET, val:true},
 {input:"{", tag:"mo", output:"{", tex:"lbrace", ttype:LEFTBRACKET},
 {input:"}", tag:"mo", output:"}", tex:"rbrace", ttype:RIGHTBRACKET},
 {input:"|", tag:"mo", output:"|", tex:null, ttype:LEFTRIGHT, val:true},

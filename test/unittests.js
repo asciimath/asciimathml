@@ -358,10 +358,11 @@ var unittests = [
 {input: "(:2,3:)", output:"<mrow><mo>〈</mo><mn>2</mn><mo>,</mo><mn>3</mn><mo>〉</mo></mrow>"},
 
 //matrices and arrays
-{input: "[(2,3),(4,5)]", output:"<mrow><mo>[</mo><mtable><mtr><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd></mtr><mtr><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
-{input: "[(2,3,4,5)]", output:"<mrow><mo>[</mo><mtable><mtr><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
-{input: "((1),(2))", output:"<mrow><mo>(</mo><mtable><mtr><mtd><mn>1</mn></mtd></mtr><mtr><mtd><mn>2</mn></mtd></mtr></mtable><mo>)</mo></mrow>"},
-{input: "{(1,if,x ge 3),(2,if,x gt 3):}", output:"<mrow><mo>{</mo><mtable columnalign=\"left\"><mtr><mtd><mn>1</mn></mtd><mtd><mrow><mspace width=\"1ex\"></mspace><mo>if</mo><mspace width=\"1ex\"></mspace></mrow></mtd><mtd><mi>x</mi><mo>≥</mo><mn>3</mn></mtd></mtr><mtr><mtd><mn>2</mn></mtd><mtd><mrow><mspace width=\"1ex\"></mspace><mo>if</mo><mspace width=\"1ex\"></mspace></mrow></mtd><mtd><mi>x</mi><mo>&gt;</mo><mn>3</mn></mtd></mtr></mtable></mrow>"},
+{input: "[(2,3),(4,5)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none\"><mtr><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd></mtr><mtr><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "[(2,3,4,5)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none none none\"><mtr><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "((1),(2))", output:"<mrow><mo>(</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1</mn></mtd></mtr><mtr><mtd><mn>2</mn></mtd></mtr></mtable><mo>)</mo></mrow>"},
+{input: "{(1,if,x ge 3),(2,if,x gt 3):}", output:"<mrow><mo>{</mo><mtable columnlines=\"none none none\" columnalign=\"left\"><mtr><mtd><mn>1</mn></mtd><mtd><mrow><mspace width=\"1ex\"></mspace><mo>if</mo><mspace width=\"1ex\"></mspace></mrow></mtd><mtd><mi>x</mi><mo>≥</mo><mn>3</mn></mtd></mtr><mtr><mtd><mn>2</mn></mtd><mtd><mrow><mspace width=\"1ex\"></mspace><mo>if</mo><mspace width=\"1ex\"></mspace></mrow></mtd><mtd><mi>x</mi><mo>&gt;</mo><mn>3</mn></mtd></mtr></mtable></mrow>"},
+{input: "[(1,2,|,3),(4,5,|,6)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none solid none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd></mtr><mtr><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd><mtd><mn>6</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
 
 //from the existing demos
 {input: "int_2^3 3dx", output:"<mrow><msubsup><mo>∫</mo><mn>2</mn><mn>3</mn></msubsup></mrow><mn>3</mn><mrow><mi>d</mi><mi>x</mi></mrow>"},
@@ -429,6 +430,10 @@ var unittests = [
 {input: "[2,3rangle", output:"<mrow><mo>[</mo><mn>2</mn><mo>,</mo><mn>3</mn><mo>〉</mo></mrow>"},
 {input: "2,3)", output:"<mn>2</mn><mo>,</mo><mn>3</mn><mo>)</mo>"},
 {input: "(2,3", output:"<mrow><mo>(</mo><mn>2</mn><mo>,</mo><mn>3</mn></mrow>"},
+
+//overparen
+{input: "overparen(AB)", output:"<mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⏜</mo></mover>"},
+{input: "overarc(AB)", output:"<mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⏜</mo></mover>"},
 
 //bad/incomplete input
 {input: "3/", output:"<mfrac><mn>3</mn><mo></mo></mfrac>"},

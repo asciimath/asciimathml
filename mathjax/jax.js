@@ -656,6 +656,7 @@ var AMsymbols = [
 {input:"vec", tag:"mover", output:"\u2192", tex:null, ttype:UNARY, acc:true},
 {input:"dot", tag:"mover", output:".",      tex:null, ttype:UNARY, acc:true},
 {input:"ddot", tag:"mover", output:"..",    tex:null, ttype:UNARY, acc:true},
+{input:"overarc", tag:"mover", output:"\u23DC", tex:"overparen", ttype:UNARY, acc:true},
 {input:"ul", tag:"munder", output:"\u0332", tex:"underline", ttype:UNARY, acc:true},
 {input:"ubrace", tag:"munder", output:"\u23DF", tex:"underbrace", ttype:UNARYUNDEROVER, acc:true},
 {input:"obrace", tag:"mover", output:"\u23DE", tex:"overbrace", ttype:UNARYUNDEROVER, acc:true},

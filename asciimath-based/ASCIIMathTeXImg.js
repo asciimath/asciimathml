@@ -148,7 +148,7 @@ var AMsymbols = [
 {input:"sube", tag:"mo", output:"\u2286", tex:"subseteq", ttype:CONST},
 {input:"supe", tag:"mo", output:"\u2287", tex:"supseteq", ttype:CONST},
 {input:"-=",  tag:"mo", output:"\u2261", tex:"equiv", ttype:CONST},
-{input:"~=",  tag:"mo", output:"\u2245", tex:"stackrel{\\sim}{=}", ttype:CONST}, //back hack b/c mimetex doesn't support /cong
+{input:"~=",  tag:"mo", output:"\u2245", tex:"stackrel{\\sim}{=}", notexcopy: true, ttype:CONST}, //back hack b/c mimetex doesn't support /cong
 {input:"cong",   tag:"mo", output:"~=", tex:null, ttype:DEFINITION},
 {input:"~~",  tag:"mo", output:"\u2248", tex:"approx", ttype:CONST},
 {input:"prop", tag:"mo", output:"\u221D", tex:"propto", ttype:CONST},
@@ -170,10 +170,14 @@ var AMsymbols = [
 {input:"|==",  tag:"mo", output:"\u22A8", tex:"models", ttype:CONST}, //mimetex doesn't support
 
 //grouping brackets
-{input:"(", tag:"mo", output:"(", tex:"left(", ttype:LEFTBRACKET, val:true},
-{input:")", tag:"mo", output:")", tex:"right)", ttype:RIGHTBRACKET, val:true},
-{input:"[", tag:"mo", output:"[", tex:"left[", ttype:LEFTBRACKET, val:true},
-{input:"]", tag:"mo", output:"]", tex:"right]", ttype:RIGHTBRACKET, val:true},
+{input:"(", tag:"mo", output:"(", tex:null, ttype:LEFTBRACKET, val:true},
+{input:")", tag:"mo", output:")", tex:null, ttype:RIGHTBRACKET, val:true},
+{input:"[", tag:"mo", output:"[", tex:null, ttype:LEFTBRACKET, val:true},
+{input:"]", tag:"mo", output:"]", tex:null, ttype:RIGHTBRACKET, val:true},
+{input:"left(", tag:"mo", output:"(", tex:"(", notexcopy: true, ttype:LEFTBRACKET, val:true},
+{input:"right)", tag:"mo", output:")", tex:")", notexcopy: true, ttype:RIGHTBRACKET, val:true},
+{input:"left[", tag:"mo", output:"[", tex:"[", notexcopy: true, ttype:LEFTBRACKET, val:true},
+{input:"right]", tag:"mo", output:"]", tex:"]", notexcopy: true, ttype:RIGHTBRACKET, val:true},
 {input:"{", tag:"mo", output:"{", tex:"lbrace", ttype:LEFTBRACKET},
 {input:"}", tag:"mo", output:"}", tex:"rbrace", ttype:RIGHTBRACKET},
 {input:"|", tag:"mo", output:"|", tex:null, ttype:LEFTRIGHT, val:true},
@@ -310,6 +314,8 @@ AMsqrt, AMroot, AMfrac, AMdiv, AMover, AMsub, AMsup,
 {input:"tilde", tag:"mover", output:"~", tex:null, ttype:UNARY, acc:true},
 {input:"dot", tag:"mover", output:".",      tex:null, ttype:UNARY, acc:true},
 {input:"ddot", tag:"mover", output:"..",    tex:null, ttype:UNARY, acc:true},
+{input:"overarc", tag:"mover", output:"\u23DC", tex:"stackrel{\\frown}", notexcopy: true, ttype:UNARY, acc:true},
+{input:"overparen", tag:"mover", output:"\u23DC", tex:"stackrel{\\frown}", notexcopy: true, ttype:UNARY, acc:true},
 {input:"ul", tag:"munder", output:"\u0332", tex:"underline", ttype:UNARY, acc:true},
 {input:"ubrace", tag:"munder", output:"\u23DF", tex:"underbrace", ttype:UNARY, acc:true},
 {input:"obrace", tag:"mover", output:"\u23DE", tex:"overbrace", ttype:UNARY, acc:true},

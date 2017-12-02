@@ -987,7 +987,15 @@ function parseMath(str,latex) {
   frag = AMparseExpr(str.replace(/^\s+/g,""),false)[0];
   node = createMmlNode("mstyle",frag);
   if (mathcolor != "") node.setAttribute("mathcolor",mathcolor);
-  if (mathfontfamily != "") node.setAttribute("fontfamily",mathfontfamily);
+  if (mathfontsize != "") {
+	  node.setAttribute("fontsize", mathfontsize);
+	  node.setAttribute("mathsize", mathfontsize);
+  }
+  if (mathfontfamily != "") {
+	  node.setAttribute("fontfamily", mathfontfamily);
+	  node.setAttribute("mathvariant", mathfontfamily);
+  }
+
   if (displaystyle) node.setAttribute("displaystyle","true");
   node = createMmlNode("math",node);
   if (showasciiformulaonhover)                      //fixed by djhsu so newline

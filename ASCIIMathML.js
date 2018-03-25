@@ -775,11 +775,9 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
     	node = createMmlNode(symbol.tag,result2[0]);
 
       // Set the correct attribute
-    	node.setAttribute(
-        symbol.input === "color" ? "mathcolor"
-        : symbol.input === "class" ? "class"
-        : "id"
-      ,st);
+      if (symbol.input === "color") node.setAttribute("mathcolor", st)
+      else if (symbol.input === "class") node.setAttribute("class", st)
+      else if (symbol.input === "id") node.setAttribute("id", st)
     	return [node,result2[1]];
     }
     if (symbol.input=="root" || symbol.output=="stackrel")

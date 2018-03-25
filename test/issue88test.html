@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>ASCIIMathML test suite</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script type="text/javascript" src="../ASCIIMathML.js"></script>
+<style type="text/css">
+#menu, #title, #subtitle, #author, .display { text-align: center; }
+body    { font-family: Arial; margin:10%; }
+p,table { font-family: Times; }
+table   { border-collapse:collapse; }
+td, th  { border:1px solid black; padding:5px; text-align:center; }
+img     { border: 0; }
+.red {
+  color: #D91E18;
+  background-color: #F1A9A0;
+  border-radius: 5px;
+  border: 30px !important;
+  transition: all 0.5s ease;
+}
+.red:hover { transform: scale(2); }
+#velocity {
+  background-color: #19B5FE;
+  border-radius: 3px;
+  animation: rotator 5s infinite;
+}
+@keyframes rotator {
+    0% {transform: scale(2)}
+    50% {transform: scale(1)}
+    100% {transform: scale(2)}
+}
+</style>
+</head>
+<body>
+
+<h1> Testing Classes and Id's </h1>
+
+<p>
+  This file tests that you can add classes and id's to asciimath expressions
+  when they are output to mathml. This should allow us to modify parts of the
+  expression using only css. Try mousing over the red text :D
+</p>
+
+`id(velocity)(vec v (t)) = (d vec R(t)) / dt = lim_{Delta t->0} class(red)(vec R(t + Delta t )- vec R(t)) / (Delta t)` <br/>
+
+</body>
+</html>

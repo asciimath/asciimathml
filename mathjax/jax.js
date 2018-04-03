@@ -662,6 +662,8 @@ var AMsymbols = [
 {input:"text", tag:"mtext", output:"text", tex:null, ttype:TEXT},
 {input:"mbox", tag:"mtext", output:"mbox", tex:null, ttype:TEXT},
 {input:"color", tag:"mstyle", ttype:BINARY},
+{input:"id", tag:"mrow", ttype:BINARY},
+{input:"class", tag:"mrow", ttype:BINARY},
 {input:"cancel", tag:"menclose", output:"cancel", tex:null, ttype:UNARY},
 AMquote,
 {input:"bb", tag:"mstyle", atname:"mathvariant", atval:"bold", output:"bb", tex:null, ttype:UNARY},
@@ -910,11 +912,11 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
       } else if (typeof symbol.acc == "boolean" && symbol.acc) {   // accent
         node = createMmlNode(symbol.tag,result[0]);
         var accnode = createMmlNode("mo",document.createTextNode(symbol.output));
-        if (symbol.input=="vec" && ( 
-		(result[0].nodeName=="mrow" && result[0].childNodes.length==1 
-			&& result[0].firstChild.firstChild.nodeValue !== null 
+        if (symbol.input=="vec" && (
+		(result[0].nodeName=="mrow" && result[0].childNodes.length==1
+			&& result[0].firstChild.firstChild.nodeValue !== null
 			&& result[0].firstChild.firstChild.nodeValue.length==1) ||
-		(result[0].firstChild.nodeValue !== null 
+		(result[0].firstChild.nodeValue !== null
 			&& result[0].firstChild.nodeValue.length==1) )) {
 			accnode.setAttribute("stretchy",false);
         }
@@ -955,14 +957,22 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
     if (result2[0]==null) return [createMmlNode("mo",
                            document.createTextNode(symbol.input)),str];
     AMremoveBrackets(result2[0]);
-    if (symbol.input=="color") {
-	if (str.charAt(0)=="{") i=str.indexOf("}");
-        else if (str.charAt(0)=="(") i=str.indexOf(")");
-        else if (str.charAt(0)=="[") i=str.indexOf("]");
-	st = str.slice(1,i);
-	node = createMmlNode(symbol.tag,result2[0]);
-	node.setAttribute("mathcolor",st);
-	return [node,result2[1]];
+    if (['color', 'class', 'id'].indexOf(symbol.input) >= 0) {
+
+      // Get the second argument
+    	if (str.charAt(0)=="{") i=str.indexOf("}");
+      else if (str.charAt(0)=="(") i=str.indexOf(")");
+      else if (str.charAt(0)=="[") i=str.indexOf("]");
+    	st = str.slice(1,i);
+
+      // Make a mathml node
+    	node = createMmlNode(symbol.tag,result2[0]);
+
+      // Set the correct attribute
+      if (symbol.input === "color") node.setAttribute("mathcolor", st)
+      else if (symbol.input === "class") node.setAttribute("class", st)
+      else if (symbol.input === "id") node.setAttribute("id", st)
+    	return [node,result2[1]];
     }
     if (symbol.input=="root" || symbol.output=="stackrel")
       newFrag.appendChild(result2[0]);
@@ -992,7 +1002,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
     st = "";
     if (result[0].lastChild!=null)
       st = result[0].lastChild.firstChild.nodeValue;
-    if (st == "|") { // its an absolute value subterm
+    if (st == "|" && str.charAt(0)!==",") { // its an absolute value subterm
       node = createMmlNode("mo",document.createTextNode(symbol.output));
       node = createMmlNode("mrow",node);
       node.appendChild(result[0]);
@@ -1121,6 +1131,7 @@ function AMparseExpr(str,rightbracket) {
           if (matrix && i>1) matrix = pos[i].length == pos[i-2].length;
         }
         matrix = matrix && (pos.length>1 || pos[0].length>0);
+        var columnlines = [];
         if (matrix) {
           var row, frag, n, k, table = document.createDocumentFragment();
           for (i=0; i<m; i=i+2) {
@@ -1133,11 +1144,21 @@ function AMparseExpr(str,rightbracket) {
             for (j=1; j<n-1; j++) {
               if (typeof pos[i][k] != "undefined" && j==pos[i][k]){
                 node.removeChild(node.firstChild); //remove ,
+                if (node.firstChild.nodeName=="mrow" && node.firstChild.childNodes.length==1 &&
+         	  node.firstChild.firstChild.firstChild.nodeValue=="\u2223") {
+         	    //is columnline marker - skip it
+         	    if (i==0) { columnlines.push("solid"); }
+         	    node.removeChild(node.firstChild); //remove mrow
+         	    node.removeChild(node.firstChild); //remove ,
+         	    j+=2;
+         	    k++;
+            	} else if (i==0) { columnlines.push("none"); }
                 row.appendChild(createMmlNode("mtd",frag));
                 k++;
               } else frag.appendChild(node.firstChild);
             }
             row.appendChild(createMmlNode("mtd",frag));
+            if (i==0) { columnlines.push("none"); }
             if (newFrag.childNodes.length>2) {
               newFrag.removeChild(newFrag.firstChild); //remove <mrow>)</mrow>
               newFrag.removeChild(newFrag.firstChild); //remove <mo>,</mo>
@@ -1145,6 +1166,7 @@ function AMparseExpr(str,rightbracket) {
             table.appendChild(createMmlNode("mtr",row));
           }
           node = createMmlNode("mtable",table);
+          node.setAttribute("columnlines", columnlines.join(" "));
           if (typeof symbol.invisible == "boolean" && symbol.invisible) node.setAttribute("columnalign","left");
           newFrag.replaceChild(node,newFrag.firstChild);
         }

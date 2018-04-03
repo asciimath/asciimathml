@@ -116,7 +116,8 @@ function checkMathML(){
   else if (navigator.appName.slice(0,5)=="Opera")
     if (navigator.appVersion.slice(0,3)>="9.5") noMathML = null;
   else noMathML = true;
-//noMathML = true; //uncomment to check
+
+  //noMathML = true; //uncomment to check
   if (noMathML && notifyIfNoMathML) {
     var msg = "To view the ASCIIMathML notation use Internet Explorer + MathPlayer or Mozilla Firefox 2.0 or later.";
     if (alertIfNoMathML)
@@ -467,6 +468,8 @@ var AMsymbols = [
 {input:"text", tag:"mtext", output:"text", tex:null, ttype:TEXT},
 {input:"mbox", tag:"mtext", output:"mbox", tex:null, ttype:TEXT},
 {input:"color", tag:"mstyle", ttype:BINARY},
+{input:"id", tag:"mrow", ttype:BINARY},
+{input:"class", tag:"mrow", ttype:BINARY},
 {input:"cancel", tag:"menclose", output:"cancel", tex:null, ttype:UNARY},
 AMquote,
 {input:"bb", tag:"mstyle", atname:"mathvariant", atval:"bold", output:"bb", tex:null, ttype:UNARY},
@@ -715,11 +718,11 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
       } else if (typeof symbol.acc == "boolean" && symbol.acc) {   // accent
         node = createMmlNode(symbol.tag,result[0]);
         var accnode = createMmlNode("mo",document.createTextNode(symbol.output));
-        if (symbol.input=="vec" && ( 
-		(result[0].nodeName=="mrow" && result[0].childNodes.length==1 
-			&& result[0].firstChild.firstChild.nodeValue !== null 
+        if (symbol.input=="vec" && (
+		(result[0].nodeName=="mrow" && result[0].childNodes.length==1
+			&& result[0].firstChild.firstChild.nodeValue !== null
 			&& result[0].firstChild.firstChild.nodeValue.length==1) ||
-		(result[0].firstChild.nodeValue !== null 
+		(result[0].firstChild.nodeValue !== null
 			&& result[0].firstChild.nodeValue.length==1) )) {
 			accnode.setAttribute("stretchy",false);
         }
@@ -760,14 +763,22 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
     if (result2[0]==null) return [createMmlNode("mo",
                            document.createTextNode(symbol.input)),str];
     AMremoveBrackets(result2[0]);
-    if (symbol.input=="color") {
-	if (str.charAt(0)=="{") i=str.indexOf("}");
-        else if (str.charAt(0)=="(") i=str.indexOf(")");
-        else if (str.charAt(0)=="[") i=str.indexOf("]");
-	st = str.slice(1,i);
-	node = createMmlNode(symbol.tag,result2[0]);
-	node.setAttribute("mathcolor",st);
-	return [node,result2[1]];
+    if (['color', 'class', 'id'].indexOf(symbol.input) >= 0) {
+
+      // Get the second argument
+    	if (str.charAt(0)=="{") i=str.indexOf("}");
+      else if (str.charAt(0)=="(") i=str.indexOf(")");
+      else if (str.charAt(0)=="[") i=str.indexOf("]");
+    	st = str.slice(1,i);
+
+      // Make a mathml node
+    	node = createMmlNode(symbol.tag,result2[0]);
+
+      // Set the correct attribute
+      if (symbol.input === "color") node.setAttribute("mathcolor", st)
+      else if (symbol.input === "class") node.setAttribute("class", st)
+      else if (symbol.input === "id") node.setAttribute("id", st)
+    	return [node,result2[1]];
     }
     if (symbol.input=="root" || symbol.output=="stackrel")
       newFrag.appendChild(result2[0]);

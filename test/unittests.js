@@ -315,6 +315,7 @@ var unittests = [
 {input: "underset(k)(=)", output:"<munder><mrow><mo>=</mo></mrow><mrow><mi>k</mi></mrow></munder>"},
 {input: "tilde x", output:"<mover><mi>x</mi><mo>~</mo></mover>"},
 {input: "hat x", output:"<mover><mi>x</mi><mo>^</mo></mover>"},
+{input: "hat(xy)", output:"<mover><mrow><mi>x</mi><mi>y</mi></mrow><mo>^</mo></mover>"},
 {input: "bar x", output:"<mover><mi>x</mi><mo>¯</mo></mover>"},
 {input: "vec x", output:"<mover><mi>x</mi><mo stretchy=\"false\">→</mo></mover>"},
 {input: "vec(xy)", output:"<mover><mrow><mi>x</mi><mi>y</mi></mrow><mo>→</mo></mover>"},
@@ -358,10 +359,10 @@ var unittests = [
 {input: "(:2,3:)", output:"<mrow><mo>〈</mo><mn>2</mn><mo>,</mo><mn>3</mn><mo>〉</mo></mrow>"},
 
 //matrices and arrays
-{input: "[(2,3),(4,5)]", output:"<mrow><mo>[</mo><mtable><mtr><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd></mtr><mtr><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
-{input: "[(2,3,4,5)]", output:"<mrow><mo>[</mo><mtable><mtr><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
-{input: "((1),(2))", output:"<mrow><mo>(</mo><mtable><mtr><mtd><mn>1</mn></mtd></mtr><mtr><mtd><mn>2</mn></mtd></mtr></mtable><mo>)</mo></mrow>"},
-{input: "{(1,if,x ge 3),(2,if,x gt 3):}", output:"<mrow><mo>{</mo><mtable columnalign=\"left\"><mtr><mtd><mn>1</mn></mtd><mtd><mrow><mspace width=\"1ex\"></mspace><mo>if</mo><mspace width=\"1ex\"></mspace></mrow></mtd><mtd><mi>x</mi><mo>≥</mo><mn>3</mn></mtd></mtr><mtr><mtd><mn>2</mn></mtd><mtd><mrow><mspace width=\"1ex\"></mspace><mo>if</mo><mspace width=\"1ex\"></mspace></mrow></mtd><mtd><mi>x</mi><mo>&gt;</mo><mn>3</mn></mtd></mtr></mtable></mrow>"},
+{input: "[(2,3),(4,5)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none\"><mtr><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd></mtr><mtr><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "[(2,3,4,5)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none none none\"><mtr><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "((1),(2))", output:"<mrow><mo>(</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1</mn></mtd></mtr><mtr><mtd><mn>2</mn></mtd></mtr></mtable><mo>)</mo></mrow>"},
+{input: "{(1,if,x ge 3),(2,if,x gt 3):}", output:"<mrow><mo>{</mo><mtable columnlines=\"none none none\" columnalign=\"left\"><mtr><mtd><mn>1</mn></mtd><mtd><mrow><mspace width=\"1ex\"></mspace><mo>if</mo><mspace width=\"1ex\"></mspace></mrow></mtd><mtd><mi>x</mi><mo>≥</mo><mn>3</mn></mtd></mtr><mtr><mtd><mn>2</mn></mtd><mtd><mrow><mspace width=\"1ex\"></mspace><mo>if</mo><mspace width=\"1ex\"></mspace></mrow></mtd><mtd><mi>x</mi><mo>&gt;</mo><mn>3</mn></mtd></mtr></mtable></mrow>"},
 
 //from the existing demos
 {input: "int_2^3 3dx", output:"<mrow><msubsup><mo>∫</mo><mn>2</mn><mn>3</mn></msubsup></mrow><mn>3</mn><mrow><mi>d</mi><mi>x</mi></mrow>"},
@@ -429,6 +430,30 @@ var unittests = [
 {input: "[2,3rangle", output:"<mrow><mo>[</mo><mn>2</mn><mo>,</mo><mn>3</mn><mo>〉</mo></mrow>"},
 {input: "2,3)", output:"<mn>2</mn><mo>,</mo><mn>3</mn><mo>)</mo>"},
 {input: "(2,3", output:"<mrow><mo>(</mo><mn>2</mn><mo>,</mo><mn>3</mn></mrow>"},
+
+//issue42
+{input: "[(1,2,3,|,4),(5,6,7, |,8)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none solid none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr><mtr><mtd><mn>5</mn></mtd><mtd><mn>6</mn></mtd><mtd><mn>7</mn></mtd><mtd><mn>8</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "[(1,2,3, | ,4,5),(5,6,7, | ,8,9)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none solid none none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd></mtr><mtr><mtd><mn>5</mn></mtd><mtd><mn>6</mn></mtd><mtd><mn>7</mn></mtd><mtd><mn>8</mn></mtd><mtd><mn>9</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "[(1,|,2,3,4),(5,|,6,7,8)]", output:"<mrow><mo>[</mo><mtable columnlines=\"solid none none none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr><mtr><mtd><mn>5</mn></mtd><mtd><mn>6</mn></mtd><mtd><mn>7</mn></mtd><mtd><mn>8</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "[(1,|,3,|,4),(5,|,7,|,8)]", output:"<mrow><mo>[</mo><mtable columnlines=\"solid solid none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr><mtr><mtd><mn>5</mn></mtd><mtd><mn>7</mn></mtd><mtd><mn>8</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "[(2,|x|,5),(3,|y|,4)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none none\"><mtr><mtd><mn>2</mn></mtd><mtd><mrow><mo>|</mo><mi>x</mi><mo>|</mo></mrow></mtd><mtd><mn>5</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mrow><mo>|</mo><mi>y</mi><mo>|</mo></mrow></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "[(1,|,2,|x|,5),(3,|,4,|y|,7)]", output:"<mrow><mo>[</mo><mtable columnlines=\"solid none none none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd><mrow><mo>|</mo><mi>x</mi><mo>|</mo></mrow></mtd><mtd><mn>5</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd><mtd><mrow><mo>|</mo><mi>y</mi><mo>|</mo></mrow></mtd><mtd><mn>7</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "[(1,2,3,|,4),(5,6,7,8,9)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none solid none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr><mtr><mtd><mn>5</mn></mtd><mtd><mn>6</mn></mtd><mtd><mn>7</mn></mtd><mtd><mn>8</mn></mtd><mtd><mn>9</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "[(1,2,3,|,4),(5,6,7,8)]", output:"<mrow><mo>[</mo><mrow><mo>(</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mn>3</mn><mo>,</mo><mrow><mo>∣</mo></mrow><mo>,</mo><mn>4</mn><mo>)</mo></mrow><mo>,</mo><mrow><mo>(</mo><mn>5</mn><mo>,</mo><mn>6</mn><mo>,</mo><mn>7</mn><mo>,</mo><mn>8</mn><mo>)</mo></mrow><mo>]</mo></mrow>"},
+{input: "[(1,2,3,4,5),(5,6,7,|,9)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none none none none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd></mtr><mtr><mtd><mn>5</mn></mtd><mtd><mn>6</mn></mtd><mtd><mn>7</mn></mtd><mtd><mn>9</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "[(1,2,3,4),(5,6,7,|,9)]", output:"<mrow><mo>[</mo><mrow><mo>(</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mn>3</mn><mo>,</mo><mn>4</mn><mo>)</mo></mrow><mo>,</mo><mrow><mo>(</mo><mn>5</mn><mo>,</mo><mn>6</mn><mo>,</mo><mn>7</mn><mo>,</mo><mrow><mo>∣</mo></mrow><mo>,</mo><mn>9</mn><mo>)</mo></mrow><mo>]</mo></mrow>"},
+{input: "[(1,2,3,|),(5,6,7,|)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none solid none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd><mtd></mtd></mtr><mtr><mtd><mn>5</mn></mtd><mtd><mn>6</mn></mtd><mtd><mn>7</mn></mtd><mtd></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "|x/2+3|,|x-4/5|", output:"<mrow><mo>|</mo><mfrac><mi>x</mi><mn>2</mn></mfrac><mo>+</mo><mn>3</mn><mo>|</mo></mrow><mo>,</mo><mrow><mo>|</mo><mi>x</mi><mo>-</mo><mfrac><mn>4</mn><mn>5</mn></mfrac><mo>|</mo></mrow>"},
+{input: "int_2^4 2x dx = x^2|_2^4", output:"<mrow><msubsup><mo>∫</mo><mn>2</mn><mn>4</mn></msubsup></mrow><mn>2</mn><mi>x</mi><mrow><mi>d</mi><mi>x</mi></mrow><mo>=</mo><msup><mi>x</mi><mn>2</mn></msup><mrow><msubsup><mrow><mo>∣</mo></mrow><mn>2</mn><mn>4</mn></msubsup></mrow>"},
+
+//issue74
+{input: "3+sin(x)/5-2Sin(x)", output:"<mn>3</mn><mo>+</mo><mfrac><mrow><mo>sin</mo><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow><mn>5</mn></mfrac><mo>-</mo><mn>2</mn><mrow><mo>Sin</mo><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow>"},
+{input: "5+sin(x)+Sin(x)+\"test Since\"", output:"<mn>5</mn><mo>+</mo><mrow><mo>sin</mo><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow><mo>+</mo><mrow><mo>Sin</mo><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow><mo>+</mo><mrow><mtext>test Since</mtext></mrow>"},
+{input: "Log(x)/3 +log(x)/3", output:"<mfrac><mrow><mo>Log</mo><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow><mn>3</mn></mfrac><mo>+</mo><mfrac><mrow><mo>log</mo><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow><mn>3</mn></mfrac>"},
+{input: "Abs(3) + abs(3)", output:"<mrow><mo>|</mo><mrow><mn>3</mn></mrow><mo>|</mo></mrow><mo>+</mo><mrow><mo>|</mo><mrow><mn>3</mn></mrow><mo>|</mo></mrow>"},
+
+//issue86
+{input: "3 + id(hi)(x^2)+class(red)(4)", output:"<mn>3</mn><mo>+</mo><mrow id=\"hi\"><mrow><msup><mi>x</mi><mn>2</mn></msup></mrow></mrow><mo>+</mo><mrow class=\"red\"><mrow><mn>4</mn></mrow></mrow>"},
 
 //bad/incomplete input
 {input: "3/", output:"<mfrac><mn>3</mn><mo></mo></mfrac>"},

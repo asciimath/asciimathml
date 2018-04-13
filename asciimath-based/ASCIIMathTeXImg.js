@@ -837,7 +837,7 @@ function AMTparseExpr(str,rightbracket) {
 					}
 				}
 				if (columnaligns.indexOf("|")==-1) {
-					mxout = "\\matrix{"+mxout+"}";
+					mxout = "\\begin{matrix}"+mxout+"\\end{matrix}";
 				} else {
 					mxout = "\\begin{array}{"+columnaligns+"} "+mxout+"\\end{array}";
 				}

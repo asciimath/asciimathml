@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ASCIIMathML test suite</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script type="text/javascript" src="../ASCIIMathML.js"></script>
+<style type="text/css">
+#menu, #title, #subtitle, #author, .display { text-align: center; }
+body    { font-family: Arial; margin:10%; }
+p,table { font-family: Times; }
+table   { border-collapse:collapse; }
+td, th  { border:1px solid black; padding:5px; text-align:center; }
+img     { border: 0; } 
+</style>
+</head>
+<body>
+Escaping quotes inside text:<br/>
+`3+"hi there"+5` <br/>
+`3+"hi there"+5"whee"-4` <br/>
+`3+"hi \"there\"" - 4` <br/>
+`3+text(hi "there")+4`
+Unterminated quotes:<br/>
+`3+"hi there+5` <br/>
+`3+"hi \"there\" - 4` <br/>
+Double prime:<br/>
+`f^''(x)`<br/>
+`3+f^'(x)+f^''(x)`
+</body>
+</html>

@@ -455,6 +455,13 @@ var unittests = [
 //issue86
 {input: "3 + id(hi)(x^2)+class(red)(4)", output:"<mn>3</mn><mo>+</mo><mrow id=\"hi\"><mrow><msup><mi>x</mi><mn>2</mn></msup></mrow></mrow><mo>+</mo><mrow class=\"red\"><mrow><mn>4</mn></mrow></mrow>"},
 
+//issue88
+{input: "3+\"hi there\"+5\"whee\"-4", output:"<mn>3</mn><mo>+</mo><mrow><mtext>hi there</mtext></mrow><mo>+</mo><mn>5</mn><mrow><mtext>whee</mtext></mrow><mo>-</mo><mn>4</mn>"},
+{input: "3+\"hi \\\"there\\\"\" +5\"whee\"-4", output:"<mn>3</mn><mo>+</mo><mrow><mtext>hi \"there\"</mtext></mrow><mo>+</mo><mn>5</mn><mrow><mtext>whee</mtext></mrow><mo>-</mo><mn>4</mn>"},
+{input: "3+\"hi there+5", output:"<mn>3</mn><mo>+</mo><mrow><mtext>hi there+5</mtext></mrow>"},
+{input: "3+\"hi \\\"there\\\" - 4", output:"<mn>3</mn><mo>+</mo><mrow><mtext>hi \"there\" - 4</mtext></mrow>"},
+
+
 //bad/incomplete input
 {input: "3/", output:"<mfrac><mn>3</mn><mo></mo></mfrac>"},
 {input: "2^", output:"<msup><mn>2</mn><mo></mo></msup>"},

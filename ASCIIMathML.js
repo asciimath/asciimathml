@@ -361,6 +361,7 @@ var AMsymbols = [
 {input:"/_",  tag:"mo", output:"\u2220",  tex:"angle", ttype:CONST},
 {input:"/_\\",  tag:"mo", output:"\u25B3",  tex:"triangle", ttype:CONST},
 {input:"'",   tag:"mo", output:"\u2032",  tex:"prime", ttype:CONST},
+{input:"''",   tag:"mo", output:"\u2033", tex:null, ttype:CONST},
 {input:"tilde", tag:"mover", output:"~", tex:null, ttype:UNARY, acc:true},
 {input:"\\ ",  tag:"mo", output:"\u00A0", tex:null, ttype:CONST},
 {input:"frown",  tag:"mo", output:"\u2322", tex:null, ttype:CONST},
@@ -666,10 +667,18 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
       if (str.charAt(0)=="{") i=str.indexOf("}");
       else if (str.charAt(0)=="(") i=str.indexOf(")");
       else if (str.charAt(0)=="[") i=str.indexOf("]");
-      else if (symbol==AMquote) i=str.slice(1).indexOf("\"")+1;
+      else if (symbol==AMquote) {
+        i=0;
+      	do {
+      	  i=str.indexOf("\"",i+1);
+      	} while (str.charAt(i-1)=='\\' && i!=-1);
+      }
       else i = 0;
       if (i==-1) i = str.length;
       st = str.slice(1,i);
+      if (symbol==AMquote) {
+        st = st.replace(/\\\"/g,"\"");
+      }
       if (st.charAt(0) == " ") {
         node = createMmlNode("mspace");
         node.setAttribute("width","1ex");

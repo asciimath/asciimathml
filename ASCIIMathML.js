@@ -360,8 +360,8 @@ var AMsymbols = [
 {input:":'",  tag:"mo", output:"\u2235",  tex:"because", ttype:CONST},
 {input:"/_",  tag:"mo", output:"\u2220",  tex:"angle", ttype:CONST},
 {input:"/_\\",  tag:"mo", output:"\u25B3",  tex:"triangle", ttype:CONST},
-{input:"'",   tag:"mo", output:"\u2032",  tex:"prime", ttype:CONST},
-{input:"''",   tag:"mo", output:"\u2033", tex:null, ttype:CONST},
+{input:"'",   tag:"mo", output:"\u2032",  tex:"prime", ttype:CONST, tietoprev:"msup"},
+{input:"''",   tag:"mo", output:"\u2033", tex:null, ttype:CONST, tietoprev:"msup"},
 {input:"tilde", tag:"mover", output:"~", tex:null, ttype:UNARY, acc:true},
 {input:"\\ ",  tag:"mo", output:"\u00A0", tex:null, ttype:CONST},
 {input:"frown",  tag:"mo", output:"\u2322", tex:null, ttype:CONST},
@@ -884,7 +884,7 @@ function AMparseIexpr(str) {
     		str = result[1];
     	}
     }
-  }
+  } 
   return [node,str];
 }
 
@@ -906,6 +906,13 @@ function AMparseExpr(str,rightbracket) {
       str = result[1];
       AMremoveBrackets(node);
       node = createMmlNode(symbol.tag,node);
+      node.appendChild(result[0]);
+      newFrag.appendChild(node);
+      symbol = AMgetSymbol(str);
+    } else if (symbol.tietoprev) {
+      node = createMmlNode(symbol.tietoprev,node);
+      result = AMparseSexpr(str);
+      str = result[1];
       node.appendChild(result[0]);
       newFrag.appendChild(node);
       symbol = AMgetSymbol(str);

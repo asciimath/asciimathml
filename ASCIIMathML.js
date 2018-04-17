@@ -360,8 +360,7 @@ var AMsymbols = [
 {input:":'",  tag:"mo", output:"\u2235",  tex:"because", ttype:CONST},
 {input:"/_",  tag:"mo", output:"\u2220",  tex:"angle", ttype:CONST},
 {input:"/_\\",  tag:"mo", output:"\u25B3",  tex:"triangle", ttype:CONST},
-{input:"'",   tag:"mo", output:"\u2032",  tex:"prime", ttype:CONST, tietoprev:"msup"},
-{input:"''",   tag:"mo", output:"\u2033", tex:null, ttype:CONST, tietoprev:"msup"},
+{input:"'",   tag:"mo", output:["\u2032","\u2033","\u2034","\u2057"],  tex:"prime", ttype:CONST, tietoprev:"msup"},
 {input:"tilde", tag:"mover", output:"~", tex:null, ttype:UNARY, acc:true},
 {input:"\\ ",  tag:"mo", output:"\u00A0", tex:null, ttype:CONST},
 {input:"frown",  tag:"mo", output:"\u2322", tex:null, ttype:CONST},
@@ -501,7 +500,7 @@ function initSymbols() {
     if (AMsymbols[i].tex) {
       AMsymbols.push({input:AMsymbols[i].tex,
         tag:AMsymbols[i].tag, output:AMsymbols[i].output, ttype:AMsymbols[i].ttype,
-        acc:(AMsymbols[i].acc||false)});
+        acc:(AMsymbols[i].acc||false), tietoprev:(AMsymbols[i].tietoprev||false)});
     }
   }
   refreshSymbols();
@@ -569,6 +568,27 @@ function AMgetSymbol(str) {
   AMpreviousSymbol=AMcurrentSymbol;
   if (match!=""){
     AMcurrentSymbol=AMsymbols[mk].ttype;
+  	//handle case where output depends on repetition of a character, like primes
+  	if (typeof AMsymbols[mk].output=="object") {
+  		var nextsym, insym, outsym, symcnt = 1;
+  		insym = AMsymbols[mk].input;
+  		nextsym = str.substr(symcnt*AMsymbols[mk].input.length, AMsymbols[mk].input.length);
+   		while (nextsym == AMsymbols[mk].input) {
+  			symcnt++;
+  			insym += nextsym;
+  			nextsym = str.substr(symcnt*AMsymbols[mk].input.length, AMsymbols[mk].input.length);
+  		}
+  		if (symcnt <= AMsymbols[mk].output.length) {
+  			outsym = AMsymbols[mk].output[symcnt-1];
+  		} else {
+  			outsym = '';
+  			for (var i=0;i<symcnt;i++) {
+  				outsym += AMsymbols[mk].output[0];
+  			}
+  		}
+  		return {tag:AMsymbols[mk].tag, input: insym, output:outsym, 
+  				ttype:AMsymbols[mk].ttype, tietoprev:AMsymbols[mk].tietoprev};
+  	}
     return AMsymbols[mk];
   }
 // if str[0] is a digit or - return maxsubstring of digits.digits

@@ -701,7 +701,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
                              document.createTextNode(symbol.output)),str];
       if (typeof symbol.func == "boolean" && symbol.func) { // functions hack
         st = str.charAt(0);
-          if (st=="^" || st=="_" || st=="/" || st=="|" || st=="," ||
+          if (st=="^" || st=="_" || st=="/" || st=="|" || st=="," || st=="'" || 
              (symbol.input.length==1 && symbol.input.match(/\w/) && st!="(")) {
           return [createMmlNode(symbol.tag,
                     document.createTextNode(symbol.output)),str];
@@ -875,16 +875,23 @@ function AMparseIexpr(str) {
       node = createMmlNode(symbol.tag,node);
       node.appendChild(result[0]);
     }
-    if (typeof sym1.func != 'undefined' && sym1.func) {
-    	sym2 = AMgetSymbol(str);
-    	if (sym2.ttype != INFIX && sym2.ttype != RIGHTBRACKET) {
+    symbol = AMgetSymbol(str);
+  }
+  if (symbol.tietoprev) {
+      node = createMmlNode(symbol.tietoprev,node);
+      result = AMparseSexpr(str);
+      str = result[1];
+      node.appendChild(result[0]);
+      symbol = AMgetSymbol(str);
+  }
+  if (typeof sym1.func != 'undefined' && sym1.func) {
+    	if (symbol.ttype != INFIX && symbol.ttype != RIGHTBRACKET) {
     		result = AMparseIexpr(str);
     		node = createMmlNode("mrow",node);
     		node.appendChild(result[0]);
     		str = result[1];
     	}
-    }
-  } 
+  }
   return [node,str];
 }
 
@@ -906,13 +913,6 @@ function AMparseExpr(str,rightbracket) {
       str = result[1];
       AMremoveBrackets(node);
       node = createMmlNode(symbol.tag,node);
-      node.appendChild(result[0]);
-      newFrag.appendChild(node);
-      symbol = AMgetSymbol(str);
-    } else if (symbol.tietoprev) {
-      node = createMmlNode(symbol.tietoprev,node);
-      result = AMparseSexpr(str);
-      str = result[1];
       node.appendChild(result[0]);
       newFrag.appendChild(node);
       symbol = AMgetSymbol(str);

@@ -856,7 +856,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
 }
 
 function AMparseIexpr(str) {
-  var symbol, sym1, sym2, node, result, underover;
+  var symbol, sym1, sym2, node, result, underover, dofunc=false;
   str = AMremoveCharsAndBlanks(str,0);
   sym1 = AMgetSymbol(str);
   result = AMparseSexpr(str);
@@ -896,15 +896,16 @@ function AMparseIexpr(str) {
       node.appendChild(result[0]);
     }
     symbol = AMgetSymbol(str);
+    dofunc = true;
   }
-  if (symbol.tietoprev) {
+  if (symbol.tietoprev) { //connect in any primes
       node = createMmlNode(symbol.tietoprev,node);
       result = AMparseSexpr(str);
       str = result[1];
       node.appendChild(result[0]);
       symbol = AMgetSymbol(str);
   }
-  if (typeof sym1.func != 'undefined' && sym1.func) {
+  if (dofunc && typeof sym1.func != 'undefined' && sym1.func) {
     	if (symbol.ttype != INFIX && symbol.ttype != RIGHTBRACKET) {
     		result = AMparseIexpr(str);
     		node = createMmlNode("mrow",node);

@@ -362,7 +362,7 @@ var unittests = [
 {input: "[(2,3),(4,5)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none\"><mtr><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd></mtr><mtr><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
 {input: "[(2,3,4,5)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none none none\"><mtr><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
 {input: "((1),(2))", output:"<mrow><mo>(</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1</mn></mtd></mtr><mtr><mtd><mn>2</mn></mtd></mtr></mtable><mo>)</mo></mrow>"},
-{input: "{(1,if,x ge 3),(2,if,x gt 3):}", output:"<mrow><mo>{</mo><mtable columnalign=\"left\" columnlines=\"none none none\"><mtr><mtd><mn>1</mn></mtd><mtd><mrow><mspace width=\"1ex\"></mspace><mo>if</mo><mspace width=\"1ex\"></mspace></mrow></mtd><mtd><mi>x</mi><mo>≥</mo><mn>3</mn></mtd></mtr><mtr><mtd><mn>2</mn></mtd><mtd><mrow><mspace width=\"1ex\"></mspace><mo>if</mo><mspace width=\"1ex\"></mspace></mrow></mtd><mtd><mi>x</mi><mo>&gt;</mo><mn>3</mn></mtd></mtr></mtable></mrow>"},
+{input: "{(1,if,x ge 3),(2,if,x gt 3):}", output:"<mrow><mo>{</mo><mtable columnlines=\"none none none\" columnalign=\"left\"><mtr><mtd><mn>1</mn></mtd><mtd><mrow><mspace width=\"1ex\"></mspace><mo>if</mo><mspace width=\"1ex\"></mspace></mrow></mtd><mtd><mi>x</mi><mo>≥</mo><mn>3</mn></mtd></mtr><mtr><mtd><mn>2</mn></mtd><mtd><mrow><mspace width=\"1ex\"></mspace><mo>if</mo><mspace width=\"1ex\"></mspace></mrow></mtd><mtd><mi>x</mi><mo>&gt;</mo><mn>3</mn></mtd></mtr></mtable></mrow>"},
 
 //from the existing demos
 {input: "int_2^3 3dx", output:"<mrow><msubsup><mo>∫</mo><mn>2</mn><mn>3</mn></msubsup></mrow><mn>3</mn><mrow><mi>d</mi><mi>x</mi></mrow>"},
@@ -460,6 +460,15 @@ var unittests = [
 {input: "3+\"hi \\\"there\\\"\" +5\"whee\"-4", output:"<mn>3</mn><mo>+</mo><mrow><mtext>hi \"there\"</mtext></mrow><mo>+</mo><mn>5</mn><mrow><mtext>whee</mtext></mrow><mo>-</mo><mn>4</mn>"},
 {input: "3+\"hi there+5", output:"<mn>3</mn><mo>+</mo><mrow><mtext>hi there+5</mtext></mrow>"},
 {input: "3+\"hi \\\"there\\\" - 4", output:"<mn>3</mn><mo>+</mo><mrow><mtext>hi \"there\" - 4</mtext></mrow>"},
+{input: "3+f'(x)+f''+f^2+f_2+(x+2)'(x)+3^f'", output:"<mn>3</mn><mo>+</mo><mrow><msup><mi>f</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow><mo>+</mo><msup><mi>f</mi><mo>″</mo></msup><mo>+</mo><msup><mi>f</mi><mn>2</mn></msup><mo>+</mo><msub><mi>f</mi><mn>2</mn></msub><mo>+</mo><msup><mrow><mo>(</mo><mi>x</mi><mo>+</mo><mn>2</mn><mo>)</mo></mrow><mo>′</mo></msup><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow><mo>+</mo><msup><msup><mn>3</mn><mi>f</mi></msup><mo>′</mo></msup>"},
+{input: "p'(x)+p''(x)+p'''(x)+p''''(x)+p'''''(x)+f'''(x)", output:"<msup><mi>p</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow><mo>+</mo><msup><mi>p</mi><mo>″</mo></msup><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow><mo>+</mo><msup><mi>p</mi><mo>‴</mo></msup><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow><mo>+</mo><msup><mi>p</mi><mo>⁗</mo></msup><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow><mo>+</mo><msup><mi>p</mi><mo>′′′′′</mo></msup><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow><mo>+</mo><mrow><msup><mi>f</mi><mo>‴</mo></msup><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow>"},
+{input: "g''", output:"<mrow><msup><mi>g</mi><mo>″</mo></msup><mo></mo></mrow>"},
+{input: "fprimeprime(x)", output:"<mrow><msup><mi>f</mi><mo>″</mo></msup><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow>"},
+{input: "f'''(x)/3", output:"<mfrac><mrow><msup><mi>f</mi><mo>‴</mo></msup><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow><mn>3</mn></mfrac>"},
+{input: "f^2(x)/3 + f(x)/3 + f'(x)/3+sin'(x)/2 + k'(x)/3+k^2(x)/3", output:"<mfrac><mrow><msup><mi>f</mi><mn>2</mn></msup><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow><mn>3</mn></mfrac><mo>+</mo><mfrac><mrow><mi>f</mi><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow><mn>3</mn></mfrac><mo>+</mo><mfrac><mrow><msup><mi>f</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow><mn>3</mn></mfrac><mo>+</mo><mfrac><mrow><msup><mo>sin</mo><mo>′</mo></msup><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow><mn>2</mn></mfrac><mo>+</mo><msup><mi>k</mi><mo>′</mo></msup><mfrac><mrow><mi>x</mi></mrow><mn>3</mn></mfrac><mo>+</mo><msup><mi>k</mi><mn>2</mn></msup><mfrac><mrow><mi>x</mi></mrow><mn>3</mn></mfrac>"},
+{input: "f'/3 - f'+2/3 + f'+/3 + f_2'(x)/3 + f_2'/3 + f_2'+/3 + f'+3", output:"<mfrac><msup><mi>f</mi><mo>′</mo></msup><mn>3</mn></mfrac><mo>-</mo><msup><mi>f</mi><mo>′</mo></msup><mo>+</mo><mfrac><mn>2</mn><mn>3</mn></mfrac><mo>+</mo><msup><mi>f</mi><mo>′</mo></msup><mfrac><mo>+</mo><mn>3</mn></mfrac><mo>+</mo><mfrac><mrow><msup><msub><mi>f</mi><mn>2</mn></msub><mo>′</mo></msup><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow><mn>3</mn></mfrac><mo>+</mo><mfrac><msup><msub><mi>f</mi><mn>2</mn></msub><mo>′</mo></msup><mn>3</mn></mfrac><mo>+</mo><msup><msub><mi>f</mi><mn>2</mn></msub><mo>′</mo></msup><mfrac><mo>+</mo><mn>3</mn></mfrac><mo>+</mo><msup><mi>f</mi><mo>′</mo></msup><mo>+</mo><mn>3</mn>"},
+{input: "sin+3 - sin^2+3", output:"<mo>sin</mo><mo>+</mo><mn>3</mn><mo>-</mo><msup><mo>sin</mo><mn>2</mn></msup><mo>+</mo><mn>3</mn>"},
+{input: "3^sin(x) + 3^sin^2(x) + 4^f'(x)", output:"<msup><mn>3</mn><mrow><mo>sin</mo><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow></msup><mo>+</mo><msup><mn>3</mn><mo>sin</mo></msup><mo>^</mo><mn>2</mn><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow><mo>+</mo><msup><msup><mn>4</mn><mi>f</mi></msup><mo>′</mo></msup><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow>", comment:"this isn't ideal, but best we can do without totally mangaling the grammar"},
 
 
 //bad/incomplete input
@@ -467,7 +476,7 @@ var unittests = [
 {input: "2^", output:"<msup><mn>2</mn><mo></mo></msup>"},
 {input: "2^+3", output:"<msup><mn>2</mn><mo>+</mo></msup><mn>3</mn>"},
 {input: "/4", output:"<mo>/</mo><mn>4</mn>"},
-{input: "2^- +3", output:"<msup><mn>2</mn><mrow><mo>-</mo><mo>+</mo></mrow></msup><mn>3</mn>", comment:"This seems wrong"},
+{input: "2^- +3", output:"<msup><mn>2</mn><mo>-</mo></msup><mo>+</mo><mn>3</mn>", comment:"changed w issue 88 - maybe better now?"},
 {input: "lim_(x rarr 2^-) f(x)", output:"<munder><mo>lim</mo><mrow><mi>x</mi><mo>→</mo><msup><mn>2</mn><mo>-</mo></msup></mrow></munder><mrow><mi>f</mi><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow>"},
 ];
 

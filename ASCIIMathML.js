@@ -722,6 +722,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
       if (typeof symbol.func == "boolean" && symbol.func) { // functions hack
         st = str.charAt(0);
           if (st=="^" || st=="_" || st=="/" || st=="|" || st=="," || st=="'" || 
+              st=='+' || st=='-' ||
              (symbol.input.length==1 && symbol.input.match(/\w/) && st!="(")) {
           return [createMmlNode(symbol.tag,
                     document.createTextNode(symbol.output)),str];
@@ -904,9 +905,11 @@ function AMparseIexpr(str) {
       str = result[1];
       node.appendChild(result[0]);
       symbol = AMgetSymbol(str);
+      dofunc = true;
   }
   if (dofunc && typeof sym1.func != 'undefined' && sym1.func) {
-    	if (symbol.ttype != INFIX && symbol.ttype != RIGHTBRACKET) {
+    	if (symbol.ttype != INFIX && symbol.ttype != RIGHTBRACKET
+    	    && symbol.input != '+' && symbol.input != '-') {
     		result = AMparseIexpr(str);
     		node = createMmlNode("mrow",node);
     		node.appendChild(result[0]);

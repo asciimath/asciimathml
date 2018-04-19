@@ -836,11 +836,7 @@ function AMTparseExpr(str,rightbracket) {
 						mxout += subarr.join('&');
 					}
 				}
-				if (columnaligns.indexOf("|")==-1) {
-					mxout = "\\matrix{"+mxout+"}";
-				} else {
-					mxout = "\\begin{array}{"+columnaligns+"} "+mxout+"\\end{array}";
-				}
+				mxout = "\\begin{array}{"+columnaligns+"} "+mxout+"\\end{array}";
 
 				if (matrix) { newFrag = mxout;}
 			}

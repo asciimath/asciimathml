@@ -456,6 +456,13 @@ var unittests = [
 //issue86
 {input: "3 + id(hi)(x^2)+class(red)(4)", output:"<mn>3</mn><mo>+</mo><mrow id=\"hi\"><mrow><msup><mi>x</mi><mn>2</mn></msup></mrow></mrow><mo>+</mo><mrow class=\"red\"><mrow><mn>4</mn></mrow></mrow>"},
 
+//issue 94
+{input: "f^2(x)/5", output:"<mfrac><mrow><msup><mi>f</mi><mn>2</mn></msup><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow><mn>5</mn></mfrac>"},
+{input: "f^2x/5", output:"<msup><mi>f</mi><mn>2</mn></msup><mfrac><mi>x</mi><mn>5</mn></mfrac>"},
+{input: "1/f^2x^2", output:"<mfrac><mn>1</mn><msup><mi>f</mi><mn>2</mn></msup></mfrac><msup><mi>x</mi><mn>2</mn></msup>"},
+{input: "1/fx^2", output:"<mfrac><mn>1</mn><mi>f</mi></mfrac><msup><mi>x</mi><mn>2</mn></msup>"},
+{input: "f'(x)/5", output:"<mi>f</mi><mo>′</mo><mfrac><mrow><mi>x</mi></mrow><mn>5</mn></mfrac>"},
+
 //overparen
 {input: "overparen(AB)", output:"<mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⏜</mo></mover>"},
 {input: "overarc(AB)", output:"<mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⏜</mo></mover>"},

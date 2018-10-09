@@ -692,7 +692,8 @@ function AMTparseIexpr($str) {
 		}
 		if (isset($sym1['func']) && $sym1['func']) {
 			$sym2 = $this->AMgetSymbol($str);
-			if (!isset($sym2['infix']) && !isset($sym2['rightbracket'])) {
+			if (!isset($sym2['infix']) && !isset($sym2['rightbracket']) &&
+			    (strlen($sym1['input'])>1 || isset($sym2['leftbracket']))) {
 				$result = $this->AMTparseIexpr($str);
 				$node = '{'.$node.$result[0].'}';
 				$str = $result[1];

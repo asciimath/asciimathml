@@ -292,6 +292,7 @@ var AMsymbols = [
 {input:"<=",  tag:"mo", output:"\u2264", tex:"le", ttype:CONST},
 {input:"lt=", tag:"mo", output:"\u2264", tex:"leq", ttype:CONST},
 {input:"gt",  tag:"mo", output:">",      tex:null, ttype:CONST},
+{input:"mgt", tag:"mo", output:"\u2A20", tex:null, ttype:CONST},
 {input:">=",  tag:"mo", output:"\u2265", tex:"ge", ttype:CONST},
 {input:"gt=", tag:"mo", output:"\u2265", tex:"geq", ttype:CONST},
 {input:"-<",  tag:"mo", output:"\u227A", tex:"prec", ttype:CONST},

@@ -143,6 +143,7 @@ var unittests = [
 {input: "glb", output:"<mo>glb</mo>"},
 {input: "grad", output:"<mo>∇</mo>"},
 {input: "gt", output:"<mo>&gt;</mo>"},
+{input: "mgt", output:"<mo>⨠</mo>"},
 {input: "gt=", output:"<mo>≥</mo>"},
 {input: "hArr", output:"<mo>⇔</mo>"},
 {input: "harr", output:"<mo>↔</mo>"},

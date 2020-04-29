@@ -690,8 +690,15 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
   case UNARY:
       str = AMremoveCharsAndBlanks(str,symbol.input.length);
       result = AMparseSexpr(str);
-      if (result[0]==null) return [createMmlNode(symbol.tag,
-                             document.createTextNode(symbol.output)),str];
+      
+      if (result[0]==null) { 
+      	if (symbol.tag=="mi" || symbol.tag=="mo") {
+      	  return [createMmlNode(symbol.tag,
+                    document.createTextNode(symbol.output)),str];
+      	} else {
+      	  result[0] = createMmlNode("mi", ""); 
+      	}
+      }
       if (typeof symbol.func == "boolean" && symbol.func) { // functions hack
         st = str.charAt(0);
           if (st=="^" || st=="_" || st=="/" || st=="|" || st=="," ||

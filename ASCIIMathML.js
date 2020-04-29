@@ -938,7 +938,9 @@ function AMparseExpr(str,rightbracket) {
           if (matrix) matrix = node.nodeName=="mrow" &&
             (i==m-1 || node.nextSibling.nodeName=="mo" &&
             node.nextSibling.firstChild.nodeValue==",")&&
+            node.firstChild.firstChild &&
             node.firstChild.firstChild.nodeValue==left &&
+            node.lastChild.firstChild &&
             node.lastChild.firstChild.nodeValue==right;
           if (matrix)
             for (var j=0; j<node.childNodes.length; j++)

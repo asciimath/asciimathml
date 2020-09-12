@@ -463,6 +463,9 @@ var unittests = [
 {input: "1/fx^2", output:"<mfrac><mn>1</mn><mi>f</mi></mfrac><msup><mi>x</mi><mn>2</mn></msup>"},
 {input: "f'(x)/5", output:"<mi>f</mi><mo>′</mo><mfrac><mrow><mi>x</mi></mrow><mn>5</mn></mfrac>"},
 
+// issue 113
+{input: "[[1,2]]/4", output:"<mfrac><mrow><mo>[</mo><mtable columnlines=\"none none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr></mtable><mo>]</mo></mrow><mn>4</mn></mfrac>"},
+{input: "(x+2)/3", output:"<mfrac><mrow><mi>x</mi><mo>+</mo><mn>2</mn></mrow><mn>3</mn></mfrac>"},
 //overparen
 {input: "overparen(AB)", output:"<mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⏜</mo></mover>"},
 {input: "overarc(AB)", output:"<mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⏜</mo></mover>"},

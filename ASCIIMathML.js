@@ -148,7 +148,7 @@ function displayWarnings(warnings) {
   nd.appendChild(document.createTextNode("For instructions see the "));
   var an = createElementXHTML("a");
   an.appendChild(document.createTextNode("ASCIIMathML"));
-  an.setAttribute("href","http://www.chapman.edu/~jipsen/asciimath.html");
+  an.setAttribute("href","http://asciimath.org");
   nd.appendChild(an);
   nd.appendChild(document.createTextNode(" homepage"));
   an = createElementXHTML("div");

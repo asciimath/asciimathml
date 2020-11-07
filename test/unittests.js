@@ -468,6 +468,11 @@ var unittests = [
 // issue 113
 {input: "[[1,2]]/4", output:"<mfrac><mrow><mo>[</mo><mtable columnlines=\"none none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr></mtable><mo>]</mo></mrow><mn>4</mn></mfrac>"},
 {input: "(x+2)/3", output:"<mfrac><mrow><mi>x</mi><mo>+</mo><mn>2</mn></mrow><mn>3</mn></mfrac>"},
+
+// issue 114
+{input: "u_-3 + u_- 3", output:"<msub><mi>u</mi><mrow><mo>-</mo><mn>3</mn></mrow></msub><mo>+</mo><msub><mi>u</mi><mo>-</mo></msub><mn>3</mn>"},
+{input: "2^- +3", output:"<msup><mn>2</mn><mo>-</mo></msup><mo>+</mo><mn>3</mn>"},
+
 //overparen
 {input: "overparen(AB)", output:"<mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⏜</mo></mover>"},
 {input: "overarc(AB)", output:"<mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⏜</mo></mover>"},
@@ -477,7 +482,6 @@ var unittests = [
 {input: "2^", output:"<msup><mn>2</mn><mo></mo></msup>"},
 {input: "2^+3", output:"<msup><mn>2</mn><mo>+</mo></msup><mn>3</mn>"},
 {input: "/4", output:"<mo>/</mo><mn>4</mn>"},
-{input: "2^- +3", output:"<msup><mn>2</mn><mrow><mo>-</mo><mo>+</mo></mrow></msup><mn>3</mn>", comment:"This seems wrong"},
 {input: "lim_(x rarr 2^-) f(x)", output:"<munder><mo>lim</mo><mrow><mi>x</mi><mo>→</mo><msup><mn>2</mn><mo>-</mo></msup></mrow></munder><mrow><mi>f</mi><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow>"},
 ];
 

@@ -439,7 +439,7 @@ function AMgetSymbol($str) {
 		$st = substr($str,0,1);
 		$isop = (('A'>$st || $st>'Z') && ('a'>$st || $st>'z'));
 	}
-	if ($st=='-' && $this->AMpreviousSymbolinfix == true) {
+	if ($st=='-' && $str[1]!==' ' && $this->AMpreviousSymbolinfix == true) {
 		$this->AMcurrentSymbolinfix = true;
 		return array('input'=>$st, 'unary'=>true, 'func'=>true, 'val'=>true);
 	}

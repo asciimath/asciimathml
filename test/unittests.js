@@ -477,6 +477,9 @@ var unittests = [
 {input: "overparen(AB)", output:"<mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⏜</mo></mover>"},
 {input: "overarc(AB)", output:"<mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⏜</mo></mover>"},
 
+//mp
+{input: "(x-+5)(xmp5)", output:"<mrow><mo>(</mo><mi>x</mi><mo>∓</mo><mn>5</mn><mo>)</mo></mrow><mrow><mo>(</mo><mi>x</mi><mo>∓</mo><mn>5</mn><mo>)</mo></mrow>"},
+
 //bad/incomplete input
 {input: "3/", output:"<mfrac><mn>3</mn><mo></mo></mfrac>"},
 {input: "2^", output:"<msup><mn>2</mn><mo></mo></msup>"},

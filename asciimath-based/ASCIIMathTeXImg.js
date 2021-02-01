@@ -151,6 +151,7 @@ var AMsymbols = [
 {input:"~=",  tag:"mo", output:"\u2245", tex:"stackrel{\\sim}{=}", notexcopy: true, ttype:CONST}, //back hack b/c mimetex doesn't support /cong
 {input:"cong",   tag:"mo", output:"~=", tex:null, ttype:DEFINITION},
 {input:"~~",  tag:"mo", output:"\u2248", tex:"approx", ttype:CONST},
+{input:"~",  tag:"mo", output:"\u223C", tex:"sim", ttype:CONST},
 {input:"prop", tag:"mo", output:"\u221D", tex:"propto", ttype:CONST},
 
 //logical symbols

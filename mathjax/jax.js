@@ -501,6 +501,7 @@ var AMsymbols = [
 {input:"-=",  tag:"mo", output:"\u2261", tex:"equiv", ttype:CONST},
 {input:"~=",  tag:"mo", output:"\u2245", tex:"cong", ttype:CONST},
 {input:"~~",  tag:"mo", output:"\u2248", tex:"approx", ttype:CONST},
+{input:"~",  tag:"mo", output:"\u223C", tex:"sim", ttype:CONST},
 {input:"prop", tag:"mo", output:"\u221D", tex:"propto", ttype:CONST},
 
 //logical symbols

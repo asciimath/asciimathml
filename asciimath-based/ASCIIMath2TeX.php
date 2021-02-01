@@ -135,6 +135,7 @@ array( 'input'=>'-=', 'tex'=>'equiv'),
 array( 'input'=>'~=', 'tex'=>'stackrel{\sim}{=}', 'notexcopy'=>TRUE),
 array( 'input'=>'cong', 'output'=>'~=', 'definition'=>TRUE),
 array( 'input'=>'~~', 'tex'=>'approx'),
+array( 'input'=>'~', 'tex'=>'sim'),
 array( 'input'=>'prop', 'tex'=>'propto'),
 
 // Logical symbols

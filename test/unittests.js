@@ -473,6 +473,9 @@ var unittests = [
 {input: "u_-3 + u_- 3", output:"<msub><mi>u</mi><mrow><mo>-</mo><mn>3</mn></mrow></msub><mo>+</mo><msub><mi>u</mi><mo>-</mo></msub><mn>3</mn>"},
 {input: "2^- +3", output:"<msup><mn>2</mn><mo>-</mo></msup><mo>+</mo><mn>3</mn>"},
 
+// issue 124
+{input: "1 1. 1.2 .3 1.2.3", output:"<mn>1</mn><mn>1.</mn><mn>1.2</mn><mn>.3</mn><mn>1.2</mn><mn>.3</mn>"},
+
 //overparen
 {input: "overparen(AB)", output:"<mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⏜</mo></mover>"},
 {input: "overarc(AB)", output:"<mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⏜</mo></mover>"},

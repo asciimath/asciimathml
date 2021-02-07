@@ -776,9 +776,9 @@ function AMgetSymbol(str) {
   }
   if (st == decimalsign) {
     st = str.slice(k,k+1);
+    k++;
     if ("0"<=st && st<="9") {
       integ = false;
-      k++;
       while ("0"<=st && st<="9" && k<=str.length) {
         st = str.slice(k,k+1);
         k++;

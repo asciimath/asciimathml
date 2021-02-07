@@ -422,9 +422,9 @@ function AMgetSymbol($str) {
 	}
 	if ($st == $this->decimalsign) {
 		$st = substr($str,$k,1);
+		$k++;
 		if ('0'<=$st && $st<='9') {
 			$integ = false;
-			$k++;
 			while ('0'<=$st && $st<='9' && $k<=strlen($str)) {
 				$st = substr($str,$k,1);
 				$k++;

@@ -310,6 +310,7 @@ var AMsymbols = [
 {input:"-=",  tag:"mo", output:"\u2261", tex:"equiv", ttype:CONST},
 {input:"~=",  tag:"mo", output:"\u2245", tex:"cong", ttype:CONST},
 {input:"~~",  tag:"mo", output:"\u2248", tex:"approx", ttype:CONST},
+{input:"~",  tag:"mo", output:"\u223C", tex:"sim", ttype:CONST},
 {input:"prop", tag:"mo", output:"\u221D", tex:"propto", ttype:CONST},
 
 //logical symbols
@@ -355,6 +356,7 @@ var AMsymbols = [
 {input:"del",  tag:"mo", output:"\u2202", tex:"partial", ttype:CONST},
 {input:"grad", tag:"mo", output:"\u2207", tex:"nabla", ttype:CONST},
 {input:"+-",   tag:"mo", output:"\u00B1", tex:"pm", ttype:CONST},
+{input:"-+",   tag:"mo", output:"\u2213", tex:"mp", ttype:CONST},
 {input:"O/",   tag:"mo", output:"\u2205", tex:"emptyset", ttype:CONST},
 {input:"oo",   tag:"mo", output:"\u221E", tex:"infty", ttype:CONST},
 {input:"aleph", tag:"mo", output:"\u2135", tex:null, ttype:CONST},

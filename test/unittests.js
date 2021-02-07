@@ -476,9 +476,15 @@ var unittests = [
 // issue 124
 {input: "1 1. 1.2 .3 1.2.3", output:"<mn>1</mn><mn>1.</mn><mn>1.2</mn><mn>.3</mn><mn>1.2</mn><mn>.3</mn>"},
 
+// sim
+{input: "3~2,5sim4", output:"<mn>3</mn><mo>∼</mo><mn>2</mn><mo>,</mo><mn>5</mn><mo>∼</mo><mn>4</mn>"},
+
 //overparen
 {input: "overparen(AB)", output:"<mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⏜</mo></mover>"},
 {input: "overarc(AB)", output:"<mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⏜</mo></mover>"},
+
+//mp
+{input: "(x-+5)(xmp5)", output:"<mrow><mo>(</mo><mi>x</mi><mo>∓</mo><mn>5</mn><mo>)</mo></mrow><mrow><mo>(</mo><mi>x</mi><mo>∓</mo><mn>5</mn><mo>)</mo></mrow>"},
 
 //bad/incomplete input
 {input: "3/", output:"<mfrac><mn>3</mn><mo></mo></mfrac>"},

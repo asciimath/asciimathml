@@ -25,9 +25,24 @@ THE SOFTWARE.
 */
 
 //var AMTcgiloc = '';			//set to the URL of your LaTex renderer
-var noMathRender = false;
 
-(function() {
+// UMD export from https://github.com/umdjs/umd/blob/master/templates/returnExports.js
+// if the module has no dependencies, the above pattern can be simplified to
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) {
+      // AMD. Register as an anonymous module.
+      define([], factory);
+  } else if (typeof module === 'object' && module.exports) {
+      // Node. Does not work with strict CommonJS, but
+      // only CommonJS-like environments that support module.exports,
+      // like Node.
+      module.exports = factory();
+  } else {
+      // Browser globals (root is window)
+      root.returnExports = factory();
+}
+}(typeof self !== 'undefined' ? self : this, function () {
+
 var config = {
   translateOnLoad: true,		  //true to autotranslate
   mathcolor: "",       	      // defaults to back, or specify any other color
@@ -875,6 +890,28 @@ function AMTparseAMtoTeX(str) {
   return AMTparseExpr(str.replace(/^\s+/g,""),false)[0];
 }
 
+AMinitSymbols();
+
+return {
+  parse: AMTparseAMtoTeX,
+  config: config,
+}
+
+}));
+
+
+(function() {
+
+// Return if AMD, CommonJS or not browser
+// I.e. only run when imported using "script" tag
+if (typeof define === 'function' && define.amd) return;
+if (typeof module === 'object' && module.exports) return;
+if (typeof window === 'undefined') return; // Not browser
+
+// "Import" UMD exports. Exported as window.* later
+var AMTparseAMtoTeX = window.returnExports.parse;
+var config = window.returnExports.config;
+
 function AMparseMath(str) {
  //DLMOD to remove &nbsp;, which editor adds on multiple spaces
   str = str.replace(/(&nbsp;|\u00a0|&#160;)/g,"");
@@ -1016,8 +1053,6 @@ function translate(spanclassAM) {
 var AMbody;
 var AMtranslated = false;
 var AMnoMathML = true;
-
-AMinitSymbols();
 
 window.translate = translate;
 window.AMTconfig = config;

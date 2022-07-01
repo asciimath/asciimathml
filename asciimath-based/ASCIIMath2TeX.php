@@ -266,6 +266,7 @@ array( 'input'=>'larr', 'tex'=>'leftarrow'),
 array( 'input'=>'harr', 'tex'=>'leftrightarrow'),
 array( 'input'=>'rArr', 'tex'=>'Rightarrow'),
 array( 'input'=>'lArr', 'tex'=>'Leftarrow'),
+array( 'input'=>'dArr', 'tex'=>'Downarrow'),
 array( 'input'=>'hArr', 'tex'=>'Leftrightarrow'),
 
 // Commands with argument

@@ -109,6 +109,7 @@ var unittests = [
 {input: "csch", output:"<mrow><mo>csch</mo><mo></mo></mrow>"},
 {input: "cup", output:"<mo>∪</mo>"},
 {input: "darr", output:"<mo>↓</mo>"},
+{input: "dArr", output:"<mo>⇓</mo>"},
 {input: "ddot", output:"<mover><mo></mo><mo>..</mo></mover>"},
 {input: "ddots", output:"<mo>⋱</mo>"},
 {input: "del", output:"<mo>∂</mo>"},

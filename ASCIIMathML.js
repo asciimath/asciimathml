@@ -451,6 +451,7 @@ var AMsymbols = [
 {input:"harr", tag:"mo", output:"\u2194", tex:"leftrightarrow", ttype:CONST},
 {input:"rArr", tag:"mo", output:"\u21D2", tex:"Rightarrow", ttype:CONST},
 {input:"lArr", tag:"mo", output:"\u21D0", tex:"Leftarrow", ttype:CONST},
+{input:"dArr", tag:"mo", output:"\u21D3", tex:"Downarrow", ttype:CONST},
 {input:"hArr", tag:"mo", output:"\u21D4", tex:"Leftrightarrow", ttype:CONST},
 //commands with argument
 {input:"sqrt", tag:"msqrt", output:"sqrt", tex:null, ttype:UNARY},

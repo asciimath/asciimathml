@@ -284,6 +284,8 @@ var AMsymbols = [
 {input:"nnn", tag:"mo", output:"\u22C2", tex:"bigcap", ttype:UNDEROVER},
 {input:"uu",  tag:"mo", output:"\u222A", tex:"cup", ttype:CONST},
 {input:"uuu", tag:"mo", output:"\u22C3", tex:"bigcup", ttype:UNDEROVER},
+{input:"dag", tag:"mo", output:"\u2020", tex:"dagger", ttype:CONST},
+{input:"ddag", tag:"mo", output:"\u2021", tex:"ddagger", ttype:CONST},
 
 //binary relation symbols
 {input:"!=",  tag:"mo", output:"\u2260", tex:"ne", ttype:CONST},

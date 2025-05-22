@@ -21,6 +21,7 @@ function makeimg($AMstring) {
 
 echo '<p>'.makeimg('[(1,2,3,|,4),(1,2,3,|,5)]').'</p>';
 echo '<p>'.makeimg('[(1,2,3,4),(1,2,3,5)]').'</p>';
+echo '<p>'.makeimg('2./3').'</p>';
 ?>
 </body>
 </html>

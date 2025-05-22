@@ -111,6 +111,7 @@ var unittests = [
 {input: "dag", output:"<mo>†</mo>"},
 {input: "dagger", output:"<mo>†</mo>"},
 {input: "darr", output:"<mo>↓</mo>"},
+{input: "dArr", output:"<mo>⇓</mo>"},
 {input: "ddag", output:"<mo>‡</mo>"},
 {input: "ddagger", output:"<mo>‡</mo>"},
 {input: "ddot", output:"<mover><mo></mo><mo>..</mo></mover>"},

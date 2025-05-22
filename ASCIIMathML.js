@@ -284,6 +284,8 @@ var AMsymbols = [
 {input:"nnn", tag:"mo", output:"\u22C2", tex:"bigcap", ttype:UNDEROVER},
 {input:"uu",  tag:"mo", output:"\u222A", tex:"cup", ttype:CONST},
 {input:"uuu", tag:"mo", output:"\u22C3", tex:"bigcup", ttype:UNDEROVER},
+{input:"dag", tag:"mo", output:"\u2020", tex:"dagger", ttype:CONST},
+{input:"ddag", tag:"mo", output:"\u2021", tex:"ddagger", ttype:CONST},
 
 //binary relation symbols
 {input:"!=",  tag:"mo", output:"\u2260", tex:"ne", ttype:CONST},
@@ -1067,6 +1069,7 @@ function AMautomathrec(str) {
   var arr = str.split(AMdelimiter1);
   var re1 = new RegExp("(^|\\s)([b-zB-HJ-Z+*<>]|"+texcommand+ambigAMtoken+simpleAMtoken+")(\\s|\\n|$)","g");
   var re2 = new RegExp("(^|\\s)([a-z]|"+texcommand+ambigAMtoken+simpleAMtoken+")([,.])","g"); // removed |\d+ for now
+  var i;
   for (i=0; i<arr.length; i++)   //single nonenglish tokens
     if (i%2==0) {
       arr[i] = arr[i].replace(re1," `$2`$3");

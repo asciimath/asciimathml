@@ -111,6 +111,8 @@ array( 'input'=>'nn', 'tex'=>'cap'),
 array( 'input'=>'nnn', 'tex'=>'bigcap', 'underover'=>TRUE),
 array( 'input'=>'uu', 'tex'=>'cup'),
 array( 'input'=>'uuu', 'tex'=>'bigcup', 'underover'=>TRUE),
+array( 'input'=>'dag', 'tex'=>'dagger'),
+array( 'input'=>'ddag', 'tex'=>'ddagger'),
 
 
 // Binary relation symbols

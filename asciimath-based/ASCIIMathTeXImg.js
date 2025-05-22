@@ -126,6 +126,8 @@ var AMsymbols = [
 {input:"uuu", tag:"mo", output:"\u22C3", tex:"bigcup", ttype:UNDEROVER},
 {input:"overset", tag:"mover", output:"stackrel", tex:null, ttype:BINARY},
 {input:"underset", tag:"munder", output:"stackrel", tex:null, ttype:BINARY},
+{input:"dag", tag:"mo", output:"\u2020", tex:"dagger", ttype:CONST},
+{input:"ddag", tag:"mo", output:"\u2021", tex:"ddagger", ttype:CONST},
 
 //binary relation symbols
 {input:"!=",  tag:"mo", output:"\u2260", tex:"ne", ttype:CONST},

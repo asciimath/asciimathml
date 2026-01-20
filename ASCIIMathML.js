@@ -465,7 +465,7 @@ var AMsymbols = [
 {input:"underset", tag:"munder", output:"stackrel", tex:null, ttype:BINARY},
 {input:"_",    tag:"msub",  output:"_",    tex:null, ttype:INFIX},
 {input:"^",    tag:"msup",  output:"^",    tex:null, ttype:INFIX},
-{input:"hat", tag:"mover", output:"\u005E", tex:null, ttype:UNARY, acc:true},
+{input:"hat", tag:"mover", output:"\u0302", tex:null, ttype:UNARY, acc:true},
 {input:"bar", tag:"mover", output:"\u00AF", tex:"overline", ttype:UNARY, acc:true},
 {input:"vec", tag:"mover", output:"\u2192", tex:null, ttype:UNARY, acc:true},
 {input:"dot", tag:"mover", output:".",      tex:null, ttype:UNARY, acc:true},
@@ -609,9 +609,9 @@ function AMgetSymbol(str) {
   }
   if (st=="-" && str.charAt(1)!==' ' && AMpreviousSymbol==INFIX) {
     AMcurrentSymbol = INFIX;  //trick "/" into recognizing "-" on second parse
-    return {input:st, tag:tagst, output:st, ttype:UNARY, func:true};
+    return {input:st, tag:tagst, output:st=="-"?"\u2212":st, ttype:UNARY, func:true};
   }
-  return {input:st, tag:tagst, output:st, ttype:CONST};
+  return {input:st, tag:tagst, output:st=="-"?"\u2212":st, ttype:CONST};
 }
 
 function AMremoveBrackets(node) {
@@ -734,15 +734,13 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
 	return [node,result[1]];
       } else if (typeof symbol.acc == "boolean" && symbol.acc) {   // accent
         node = createMmlNode(symbol.tag,result[0]);
-        var accnode = createMmlNode("mo",document.createTextNode(symbol.output));
-        if (symbol.input=="vec" && (
-		(result[0].nodeName=="mrow" && result[0].childNodes.length==1
-			&& result[0].firstChild.firstChild.nodeValue !== null
-			&& result[0].firstChild.firstChild.nodeValue.length==1) ||
-		(result[0].firstChild && result[0].firstChild.nodeValue !== null
-			&& result[0].firstChild.nodeValue.length==1) )) {
-			accnode.setAttribute("stretchy",false);
+        if (symbol.tag == 'mover' && symbol.ttype == UNARY) {
+          node.setAttribute("accent","true");
+        } else if (symbol.tag == 'munder' && symbol.ttype == UNARY) {
+          node.setAttribute("accentunder","true");
         }
+        var accnode = createMmlNode("mo",document.createTextNode(symbol.output));
+        accnode.setAttribute("stretchy",true)
         node.appendChild(accnode);
         return [node,result[1]];
       } else {                        // font change command

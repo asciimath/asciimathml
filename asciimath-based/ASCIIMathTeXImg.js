@@ -150,6 +150,8 @@ var AMsymbols = [
 {input:"sube", tag:"mo", output:"\u2286", tex:"subseteq", ttype:CONST},
 {input:"supe", tag:"mo", output:"\u2287", tex:"supseteq", ttype:CONST},
 {input:"-=",  tag:"mo", output:"\u2261", tex:"equiv", ttype:CONST},
+{input:"!-=", tag:"mo", output:"\u2262", tex:"not\\equiv", ttype:CONST},
+{input:"notequiv",   tag:"mo", output:"!-=", tex:null, ttype:DEFINITION},
 {input:"~=",  tag:"mo", output:"\u2245", tex:"stackrel{\\sim}{=}", notexcopy: true, ttype:CONST}, //back hack b/c mimetex doesn't support /cong
 {input:"cong",   tag:"mo", output:"~=", tex:null, ttype:DEFINITION},
 {input:"~~",  tag:"mo", output:"\u2248", tex:"approx", ttype:CONST},

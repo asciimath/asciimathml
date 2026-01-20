@@ -579,6 +579,7 @@ function AMgetSymbol(str) {
 // if str[0] is a digit or - return maxsubstring of digits.digits
   AMcurrentSymbol=CONST;
   k = 1;
+  var useddecimal = false;
   st = str.slice(0,1);
   var integ = true;
   while ("0"<=st && st<="9" && k<=str.length) {
@@ -587,9 +588,15 @@ function AMgetSymbol(str) {
   }
   if (st == decimalsign) {
     st = str.slice(k,k+1);
-    k++;
+    if (k > 1 && (decimalsign == "." || st != " ") && k<str.length) {
+      k++;
+      useddecimal = true;
+    }
     if ("0"<=st && st<="9") {
       integ = false;
+      if (!useddecimal) {
+        k++;
+      }
       while ("0"<=st && st<="9" && k<=str.length) {
         st = str.slice(k,k+1);
         k++;
@@ -1188,7 +1195,7 @@ else if(typeof window.attachEvent != 'undefined'){
       generic();
     };
   }else{
-    window.onload = generic;
+    window.onload = generic; 
   }
 }
 
@@ -1198,4 +1205,5 @@ asciimath.newsymbol = newsymbol;
 asciimath.AMprocesssNode = AMprocessNode;
 asciimath.parseMath = parseMath;
 asciimath.translate = translate;
+asciimath.setdecimal = function (ds) { decimalsign = ds;}
 })();

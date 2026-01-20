@@ -437,7 +437,7 @@ function AMgetSymbol(str) {
     st = str.slice(k,k+1);
     k++;
   }
-  if (st == config.decimalsign) {
+  if (st == config.decimalsign && k<str.length) {
     st = str.slice(k,k+1);
     k++;
     if ("0"<=st && st<="9") {

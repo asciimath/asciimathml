@@ -475,6 +475,9 @@ var unittests = [
 
 // issue 124
 {input: "1 1. 1.2 .3 1.2.3", output:"<mn>1</mn><mn>1.</mn><mn>1.2</mn><mn>.3</mn><mn>1.2</mn><mn>.3</mn>"},
+{input: "3/4.", output:"<mfrac><mn>3</mn><mn>4</mn></mfrac><mo>.</mo>"}, // don't include . at end of string
+{input: "3/4. ", output:"<mfrac><mn>3</mn><mn>4.</mn></mfrac>"},
+{input: "1 1, 1,2 ,3 1,2,3", output:"<mn>1</mn><mn>1</mn><mo>,</mo><mn>1,2</mn><mn>,3</mn><mn>1,2</mn><mn>,3</mn>", decimal: ","}, 
 
 // sim
 {input: "3~2,5sim4", output:"<mn>3</mn><mo>∼</mo><mn>2</mn><mo>,</mo><mn>5</mn><mo>∼</mo><mn>4</mn>"},
@@ -509,14 +512,23 @@ function runTests() {
 		var outstr = '{input: "'+txt.replace(/\\/g,"\\\\").replace(/"/g,'\\"')+'", output:"'+out+'"},\n';
 		$("#newtestout").text($("#newtestout").text()+outstr);		
 	})
-	var res,tr,td;
+	var res,tr,td,lastdec;
 	var tbody = document.getElementById("testout");
 	for (var i=0;i<unittests.length;i++) {
+		if (unittests[i].decimal !== undefined) {
+			asciimath.setdecimal(unittests[i].decimal);
+		}
 		res = asciimath.parseMath(unittests[i].input);
+		if (unittests[i].decimal !== undefined) {
+			asciimath.setdecimal(".");
+		}
 		tr = document.createElement("tr");
 		
 		td = document.createElement("td");
 		td.appendChild(document.createTextNode(unittests[i].input));
+		if (unittests[i].decimal !== undefined) {
+			td.appendChild(document.createTextNode(" (decimal='"+unittests[i].decimal+"')"));
+		}
 		tr.appendChild(td);
 		
 		td = document.createElement("td");

@@ -112,6 +112,7 @@ var AMsymbols = [
 {input:"divide",   tag:"mo", output:"-:", tex:null, ttype:DEFINITION},
 {input:"@",  tag:"mo", output:"\u2218", tex:"circ", ttype:CONST},
 {input:"o+", tag:"mo", output:"\u2295", tex:"oplus", ttype:CONST},
+{input:"o-", tag:"mo", output:"\u2296", tex:"ominus", ttype:CONST},
 {input:"ox", tag:"mo", output:"\u2297", tex:"otimes", ttype:CONST},
 {input:"o.", tag:"mo", output:"\u2299", tex:"odot", ttype:CONST},
 {input:"sum", tag:"mo", output:"\u2211", tex:null, ttype:UNDEROVER},
@@ -247,6 +248,7 @@ var AMsymbols = [
 {input:"ZZ",  tag:"mo", output:"\u2124", tex:"mathbb{Z}", ttype:CONST, notexcopy:true},
 {input:"f",   tag:"mi", output:"f",      tex:null, ttype:UNARY, func:true, val:true},
 {input:"g",   tag:"mi", output:"g",      tex:null, ttype:UNARY, func:true, val:true},
+{input:"hbar", tag:"mo", output:"\u210F", tex:null, ttype:CONST},
 {input:"''", tag:"mo", output:"''", tex:null, val:true},
 {input:"'''", tag:"mo", output:"'''", tex:null, val:true},
 {input:"''''", tag:"mo", output:"''''", tex:null, val:true},
@@ -261,6 +263,9 @@ var AMsymbols = [
 {input:"arcsin",  tag:"mo", output:"arcsin", tex:null, ttype:UNARY, func:true},
 {input:"arccos",  tag:"mo", output:"arccos", tex:null, ttype:UNARY, func:true},
 {input:"arctan",  tag:"mo", output:"arctan", tex:null, ttype:UNARY, func:true},
+{input:"arcsec",  tag:"mo", output:"arcsec", tex:null, ttype:UNARY, func:true},
+{input:"arccsc",  tag:"mo", output:"arccsc", tex:null, ttype:UNARY, func:true},
+{input:"arccot",  tag:"mo", output:"arccot", tex:null, ttype:UNARY, func:true},
 {input:"sinh", tag:"mo", output:"sinh", tex:null, ttype:UNARY, func:true},
 {input:"cosh", tag:"mo", output:"cosh", tex:null, ttype:UNARY, func:true},
 {input:"tanh", tag:"mo", output:"tanh", tex:null, ttype:UNARY, func:true},
@@ -318,6 +323,7 @@ var AMsymbols = [
 {input:"lArr", tag:"mo", output:"\u21D0", tex:"Leftarrow", ttype:CONST},
 {input:"dArr", tag:"mo", output:"\u21D3", tex:"Downarrow", ttype:CONST},
 {input:"hArr", tag:"mo", output:"\u21D4", tex:"Leftrightarrow", ttype:CONST},
+{input:"rightleftharpoons",   tag:"mo", output:"\u21CC", tex:null, ttype:CONST},
 
 //commands with argument
 AMsqrt, AMroot, AMfrac, AMdiv, AMover, AMsub, AMsup,

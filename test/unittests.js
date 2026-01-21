@@ -491,6 +491,15 @@ var unittests = [
 {input: "\\not\\subset", output:"<mo>⊄</mo>"}, // latex style
 {input: "notsubset", output:"<mo>⊄</mo>"}, // semi-latex style
 
+//add_misc_symbols 
+{input: "o-", output:"<mo>⊖</mo>"},
+{input: "ominus", output:"<mo>⊖</mo>"},
+{input: "arcsec", output:"<mrow><mo>arcsec</mo><mo></mo></mrow>"},
+{input: "arccot", output:"<mrow><mo>arccot</mo><mo></mo></mrow>"},
+{input: "arccsc", output:"<mrow><mo>arccsc</mo><mo></mo></mrow>"},
+{input: "rightleftharpoons", output:"<mo>⇌</mo>"},
+{input: "hbar", output:"<mo>ℏ</mo>"},
+
 // sim
 {input: "3~2,5sim4", output:"<mn>3</mn><mo>∼</mo><mn>2</mn><mo>,</mo><mn>5</mn><mo>∼</mo><mn>4</mn>"},
 //overparen

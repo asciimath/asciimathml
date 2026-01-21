@@ -57,14 +57,7 @@ var fixphi = true;  		//false to return to legacy phi/varphi mapping
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-var isIE = (navigator.appName.slice(0,9)=="Microsoft");
 var noMathML = false, translated = false;
-
-if (isIE) { // add MathPlayer info to IE webpages
-  document.write("<object id=\"mathplayer\"\
-  classid=\"clsid:32F66A20-7614-11D4-BD11-00104BD3F987\"></object>");
-  document.write("<?import namespace=\"m\" implementation=\"#mathplayer\"?>");
-}
 
 // Add a stylesheet, replacing any previous custom stylesheet (adapted from TW)
 function setStylesheet(s) {
@@ -94,7 +87,7 @@ setStylesheet("#AMMLcloseDiv \{font-size:0.8em; padding-top:1em; color:#014\}\n#
 function init(){
 	var msg, warnings = new Array();
 	if (document.getElementById==null){
-		alert("This webpage requires a recent browser such as Mozilla Firefox");
+		alert("This webpage requires a recent browser");
 		return null;
 	}
 	if (checkForMathML && (msg = checkMathML())) warnings.push(msg);
@@ -104,23 +97,26 @@ function init(){
 }
 
 function checkMathML(){
-  if (navigator.appName.slice(0,8)=="Netscape")
-    if (navigator.appVersion.slice(0,1)>="5") noMathML = null;
-    else noMathML = true;
-  else if (navigator.appName.slice(0,9)=="Microsoft")
-    try {
-        var ActiveX = new ActiveXObject("MathPlayer.Factory.1");
-        noMathML = null;
-    } catch (e) {
-        noMathML = true;
-    }
-  else if (navigator.appName.slice(0,5)=="Opera")
-    if (navigator.appVersion.slice(0,3)>="9.5") noMathML = null;
-  else noMathML = true;
+  var container = document.createElement("div");
+  container.style.position = "absolute";
+  container.style.visibility = "hidden";
+  container.style.whiteSpace = "nowrap";
+
+  container.innerHTML = '<math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mi>a</mi><mi>b</mi></mfrac></math>';
+  document.body.appendChild(container);
+
+  var math = container.querySelector("math");
+  var supported =
+    math &&
+    math.getBoundingClientRect().height > 0 &&
+    math.getBoundingClientRect().width > 0;
+
+  document.body.removeChild(container);
+  noMathML = !supported;
 
   //noMathML = true; //uncomment to check
   if (noMathML && notifyIfNoMathML) {
-    var msg = "To view the ASCIIMathML notation use Internet Explorer + MathPlayer or Mozilla Firefox 2.0 or later.";
+    var msg = "To view the ASCIIMathML notation a modern browser is required.";
     if (alertIfNoMathML)
        alert(msg);
     else return msg;
@@ -169,21 +165,18 @@ function translate(spanclassAM) {
 }
 
 function createElementXHTML(t) {
-  if (isIE) return document.createElement(t);
-  else return document.createElementNS("http://www.w3.org/1999/xhtml",t);
+  return document.createElementNS("http://www.w3.org/1999/xhtml",t);
 }
 
 var AMmathml = "http://www.w3.org/1998/Math/MathML";
 
 function AMcreateElementMathML(t) {
-  if (isIE) return document.createElement("m:"+t);
-  else return document.createElementNS(AMmathml,t);
+  return document.createElementNS(AMmathml,t);
 }
 
 function createMmlNode(t,frag) {
   var node;
-  if (isIE) node = document.createElement("m:"+t);
-  else node = document.createElementNS(AMmathml,t);
+  node = document.createElementNS(AMmathml,t);
   if (frag) node.appendChild(frag);
   return node;
 }
@@ -761,7 +754,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
         node.appendChild(accnode);
         return [node,result[1]];
       } else {                        // font change command
-        if (!isIE && typeof symbol.codes != "undefined") {
+        if (typeof symbol.codes != "undefined") {
           for (i=0; i<result[0].childNodes.length; i++)
             if (result[0].childNodes[i].nodeName=="mi" || result[0].nodeName=="mi") {
               st = (result[0].nodeName=="mi"?result[0].firstChild.nodeValue:

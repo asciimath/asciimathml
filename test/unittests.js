@@ -483,6 +483,14 @@ var unittests = [
 {input: "\\not\\equiv", output:"<mo>≢</mo>"},
 {input: "notequiv", output:"<mo>≢</mo>"},
 
+// issue 136
+{input: "!sup", output:"<mo>⊅</mo>"}, // normal entry
+{input: "!sub", output:"<mo>⊄</mo>"},
+{input: "!sube", output:"<mo>⊈</mo>"},
+{input: "!supe", output:"<mo>⊉</mo>"},
+{input: "\\not\\subset", output:"<mo>⊄</mo>"}, // latex style
+{input: "notsubset", output:"<mo>⊄</mo>"}, // semi-latex style
+
 // sim
 {input: "3~2,5sim4", output:"<mn>3</mn><mo>∼</mo><mn>2</mn><mo>,</mo><mn>5</mn><mo>∼</mo><mn>4</mn>"},
 //overparen

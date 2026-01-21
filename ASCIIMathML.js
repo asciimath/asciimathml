@@ -318,6 +318,8 @@ var AMsymbols = [
 {input:"!supe", tag:"mo", output:"\u2289", tex:"not\\supseteq", ttype:CONST},
 {input:"notsupseteq",   tag:"mo", output:"!supe", tex:null, ttype:DEFINITION},
 {input:"-=",  tag:"mo", output:"\u2261", tex:"equiv", ttype:CONST},
+{input:"!-=", tag:"mo", output:"\u2262", tex:"not\\equiv", ttype:CONST},
+{input:"notequiv",   tag:"mo", output:"!-=", tex:null, ttype:DEFINITION},
 {input:"~=",  tag:"mo", output:"\u2245", tex:"cong", ttype:CONST},
 {input:"~~",  tag:"mo", output:"\u2248", tex:"approx", ttype:CONST},
 {input:"~",  tag:"mo", output:"\u223C", tex:"sim", ttype:CONST},

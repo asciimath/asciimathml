@@ -478,6 +478,11 @@ var unittests = [
 {input: "u_-3 + u_- 3", output:"<msub><mi>u</mi><mrow><mo>-</mo><mn>3</mn></mrow></msub><mo>+</mo><msub><mi>u</mi><mo>-</mo></msub><mn>3</mn>"},
 {input: "2^- +3", output:"<msup><mn>2</mn><mo>-</mo></msup><mo>+</mo><mn>3</mn>"},
 
+// issue 133
+{input: "!-=", output:"<mo>≢</mo>"},
+{input: "\\not\\equiv", output:"<mo>≢</mo>"},
+{input: "notequiv", output:"<mo>≢</mo>"},
+
 // issue 136
 {input: "!sup", output:"<mo>⊅</mo>"}, // normal entry
 {input: "!sub", output:"<mo>⊄</mo>"},

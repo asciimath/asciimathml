@@ -57,14 +57,7 @@ var fixphi = true;  		//false to return to legacy phi/varphi mapping
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-var isIE = (navigator.appName.slice(0,9)=="Microsoft");
 var noMathML = false, translated = false;
-
-if (isIE) { // add MathPlayer info to IE webpages
-  document.write("<object id=\"mathplayer\"\
-  classid=\"clsid:32F66A20-7614-11D4-BD11-00104BD3F987\"></object>");
-  document.write("<?import namespace=\"m\" implementation=\"#mathplayer\"?>");
-}
 
 // Add a stylesheet, replacing any previous custom stylesheet (adapted from TW)
 function setStylesheet(s) {
@@ -94,7 +87,7 @@ setStylesheet("#AMMLcloseDiv \{font-size:0.8em; padding-top:1em; color:#014\}\n#
 function init(){
 	var msg, warnings = new Array();
 	if (document.getElementById==null){
-		alert("This webpage requires a recent browser such as Mozilla Firefox");
+		alert("This webpage requires a recent browser");
 		return null;
 	}
 	if (checkForMathML && (msg = checkMathML())) warnings.push(msg);
@@ -104,23 +97,26 @@ function init(){
 }
 
 function checkMathML(){
-  if (navigator.appName.slice(0,8)=="Netscape")
-    if (navigator.appVersion.slice(0,1)>="5") noMathML = null;
-    else noMathML = true;
-  else if (navigator.appName.slice(0,9)=="Microsoft")
-    try {
-        var ActiveX = new ActiveXObject("MathPlayer.Factory.1");
-        noMathML = null;
-    } catch (e) {
-        noMathML = true;
-    }
-  else if (navigator.appName.slice(0,5)=="Opera")
-    if (navigator.appVersion.slice(0,3)>="9.5") noMathML = null;
-  else noMathML = true;
+  var container = document.createElement("div");
+  container.style.position = "absolute";
+  container.style.visibility = "hidden";
+  container.style.whiteSpace = "nowrap";
+
+  container.innerHTML = '<math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mi>a</mi><mi>b</mi></mfrac></math>';
+  document.body.appendChild(container);
+
+  var math = container.querySelector("math");
+  var supported =
+    math &&
+    math.getBoundingClientRect().height > 0 &&
+    math.getBoundingClientRect().width > 0;
+
+  document.body.removeChild(container);
+  noMathML = !supported;
 
   //noMathML = true; //uncomment to check
   if (noMathML && notifyIfNoMathML) {
-    var msg = "To view the ASCIIMathML notation use Internet Explorer + MathPlayer or Mozilla Firefox 2.0 or later.";
+    var msg = "To view the ASCIIMathML notation a modern browser is required.";
     if (alertIfNoMathML)
        alert(msg);
     else return msg;
@@ -169,21 +165,18 @@ function translate(spanclassAM) {
 }
 
 function createElementXHTML(t) {
-  if (isIE) return document.createElement(t);
-  else return document.createElementNS("http://www.w3.org/1999/xhtml",t);
+  return document.createElementNS("http://www.w3.org/1999/xhtml",t);
 }
 
 var AMmathml = "http://www.w3.org/1998/Math/MathML";
 
 function AMcreateElementMathML(t) {
-  if (isIE) return document.createElement("m:"+t);
-  else return document.createElementNS(AMmathml,t);
+  return document.createElementNS(AMmathml,t);
 }
 
 function createMmlNode(t,frag) {
   var node;
-  if (isIE) node = document.createElement("m:"+t);
-  else node = document.createElementNS(AMmathml,t);
+  node = document.createElementNS(AMmathml,t);
   if (frag) node.appendChild(frag);
   return node;
 }
@@ -198,15 +191,13 @@ function newsymbol(symbolobj) {
   refreshSymbols();
 }
 
-// character lists for Mozilla/Netscape fonts
+// unicode characters for math variants
 var AMcal = ["\uD835\uDC9C","\u212C","\uD835\uDC9E","\uD835\uDC9F","\u2130","\u2131","\uD835\uDCA2","\u210B","\u2110","\uD835\uDCA5","\uD835\uDCA6","\u2112","\u2133","\uD835\uDCA9","\uD835\uDCAA","\uD835\uDCAB","\uD835\uDCAC","\u211B","\uD835\uDCAE","\uD835\uDCAF","\uD835\uDCB0","\uD835\uDCB1","\uD835\uDCB2","\uD835\uDCB3","\uD835\uDCB4","\uD835\uDCB5","\uD835\uDCB6","\uD835\uDCB7","\uD835\uDCB8","\uD835\uDCB9","\u212F","\uD835\uDCBB","\u210A","\uD835\uDCBD","\uD835\uDCBE","\uD835\uDCBF","\uD835\uDCC0","\uD835\uDCC1","\uD835\uDCC2","\uD835\uDCC3","\u2134","\uD835\uDCC5","\uD835\uDCC6","\uD835\uDCC7","\uD835\uDCC8","\uD835\uDCC9","\uD835\uDCCA","\uD835\uDCCB","\uD835\uDCCC","\uD835\uDCCD","\uD835\uDCCE","\uD835\uDCCF"];
-
 var AMfrk = ["\uD835\uDD04","\uD835\uDD05","\u212D","\uD835\uDD07","\uD835\uDD08","\uD835\uDD09","\uD835\uDD0A","\u210C","\u2111","\uD835\uDD0D","\uD835\uDD0E","\uD835\uDD0F","\uD835\uDD10","\uD835\uDD11","\uD835\uDD12","\uD835\uDD13","\uD835\uDD14","\u211C","\uD835\uDD16","\uD835\uDD17","\uD835\uDD18","\uD835\uDD19","\uD835\uDD1A","\uD835\uDD1B","\uD835\uDD1C","\u2128","\uD835\uDD1E","\uD835\uDD1F","\uD835\uDD20","\uD835\uDD21","\uD835\uDD22","\uD835\uDD23","\uD835\uDD24","\uD835\uDD25","\uD835\uDD26","\uD835\uDD27","\uD835\uDD28","\uD835\uDD29","\uD835\uDD2A","\uD835\uDD2B","\uD835\uDD2C","\uD835\uDD2D","\uD835\uDD2E","\uD835\uDD2F","\uD835\uDD30","\uD835\uDD31","\uD835\uDD32","\uD835\uDD33","\uD835\uDD34","\uD835\uDD35","\uD835\uDD36","\uD835\uDD37"];
-
-var AMbbb = ["\uD835\uDD38","\uD835\uDD39","\u2102","\uD835\uDD3B","\uD835\uDD3C","\uD835\uDD3D","\uD835\uDD3E","\u210D","\uD835\uDD40","\uD835\uDD41","\uD835\uDD42","\uD835\uDD43","\uD835\uDD44","\u2115","\uD835\uDD46","\u2119","\u211A","\u211D","\uD835\uDD4A","\uD835\uDD4B","\uD835\uDD4C","\uD835\uDD4D","\uD835\uDD4E","\uD835\uDD4F","\uD835\uDD50","\u2124","\uD835\uDD52","\uD835\uDD53","\uD835\uDD54","\uD835\uDD55","\uD835\uDD56","\uD835\uDD57","\uD835\uDD58","\uD835\uDD59","\uD835\uDD5A","\uD835\uDD5B","\uD835\uDD5C","\uD835\uDD5D","\uD835\uDD5E","\uD835\uDD5F","\uD835\uDD60","\uD835\uDD61","\uD835\uDD62","\uD835\uDD63","\uD835\uDD64","\uD835\uDD65","\uD835\uDD66","\uD835\uDD67","\uD835\uDD68","\uD835\uDD69","\uD835\uDD6A","\uD835\uDD6B"];
-/*var AMcal = [0xEF35,0x212C,0xEF36,0xEF37,0x2130,0x2131,0xEF38,0x210B,0x2110,0xEF39,0xEF3A,0x2112,0x2133,0xEF3B,0xEF3C,0xEF3D,0xEF3E,0x211B,0xEF3F,0xEF40,0xEF41,0xEF42,0xEF43,0xEF44,0xEF45,0xEF46];
-var AMfrk = [0xEF5D,0xEF5E,0x212D,0xEF5F,0xEF60,0xEF61,0xEF62,0x210C,0x2111,0xEF63,0xEF64,0xEF65,0xEF66,0xEF67,0xEF68,0xEF69,0xEF6A,0x211C,0xEF6B,0xEF6C,0xEF6D,0xEF6E,0xEF6F,0xEF70,0xEF71,0x2128];
-var AMbbb = [0xEF8C,0xEF8D,0x2102,0xEF8E,0xEF8F,0xEF90,0xEF91,0x210D,0xEF92,0xEF93,0xEF94,0xEF95,0xEF96,0x2115,0xEF97,0x2119,0x211A,0x211D,0xEF98,0xEF99,0xEF9A,0xEF9B,0xEF9C,0xEF9D,0xEF9E,0x2124];*/
+var AMbbb = ["\uD835\uDD38","\uD835\uDD39","\u2102","\uD835\uDD3B","\uD835\uDD3C","\uD835\uDD3D","\uD835\uDD3E","\u210D","\uD835\uDD40","\uD835\uDD41","\uD835\uDD42","\uD835\uDD43","\uD835\uDD44","\u2115","\uD835\uDD46","\u2119","\u211A","\u211D","\uD835\uDD4A","\uD835\uDD4B","\uD835\uDD4C","\uD835\uDD4D","\uD835\uDD4E","\uD835\uDD4F","\uD835\uDD50","\u2124","\uD835\uDD52","\uD835\uDD53","\uD835\uDD54","\uD835\uDD55","\uD835\uDD56","\uD835\uDD57","\uD835\uDD58","\uD835\uDD59","\uD835\uDD5A","\uD835\uDD5B","\uD835\uDD5C","\uD835\uDD5D","\uD835\uDD5E","\uD835\uDD5F","\uD835\uDD60","\uD835\uDD61","\uD835\uDD62","\uD835\uDD63","\uD835\uDD64","\uD835\uDD65","\uD835\uDD66","\uD835\uDD67","\uD835\uDD68","\uD835\uDD69","\uD835\uDD6A","\uD835\uDD6B", 0x1D7D8];
+var AMbb = [0x1D400, 0x1D41A, 0x1D7CE];  // Mathematical Bold
+var AMsf = [0x1D5A0, 0x1D5BA, 0x1D7E2];  // Mathematical Sans-Serif
+var AMtt = [0x1D670, 0x1D68A, 0x1D7F6];  // Mathematical Monospace
 
 var CONST = 0, UNARY = 1, BINARY = 2, INFIX = 3, LEFTBRACKET = 4,
     RIGHTBRACKET = 5, SPACE = 6, UNDEROVER = 7, DEFINITION = 8,
@@ -482,7 +473,7 @@ var AMsymbols = [
 {input:"underset", tag:"munder", output:"stackrel", tex:null, ttype:BINARY},
 {input:"_",    tag:"msub",  output:"_",    tex:null, ttype:INFIX},
 {input:"^",    tag:"msup",  output:"^",    tex:null, ttype:INFIX},
-{input:"hat", tag:"mover", output:"\u005E", tex:null, ttype:UNARY, acc:true},
+{input:"hat", tag:"mover", output:"\u0302", tex:null, ttype:UNARY, acc:true},
 {input:"bar", tag:"mover", output:"\u00AF", tex:"overline", ttype:UNARY, acc:true},
 {input:"vec", tag:"mover", output:"\u2192", tex:null, ttype:UNARY, acc:true},
 {input:"dot", tag:"mover", output:".",      tex:null, ttype:UNARY, acc:true},
@@ -498,16 +489,16 @@ var AMsymbols = [
 {input:"class", tag:"mrow", ttype:BINARY},
 {input:"cancel", tag:"menclose", output:"cancel", tex:null, ttype:UNARY},
 AMquote,
-{input:"bb", tag:"mstyle", atname:"mathvariant", atval:"bold", output:"bb", tex:null, ttype:UNARY},
-{input:"mathbf", tag:"mstyle", atname:"mathvariant", atval:"bold", output:"mathbf", tex:null, ttype:UNARY},
-{input:"sf", tag:"mstyle", atname:"mathvariant", atval:"sans-serif", output:"sf", tex:null, ttype:UNARY},
+{input:"bb", tag:"mstyle", atname:"mathvariant", atval:"bold", output:"bb", tex:null, ttype:UNARY, codes:AMbb},
+{input:"mathbf", tag:"mstyle", atname:"mathvariant", atval:"bold", output:"mathbf", tex:null, ttype:UNARY, codes:AMbb},
+{input:"sf", tag:"mstyle", atname:"mathvariant", atval:"sans-serif", output:"sf", tex:null, ttype:UNARY, codes:AMsf},
 {input:"mathsf", tag:"mstyle", atname:"mathvariant", atval:"sans-serif", output:"mathsf", tex:null, ttype:UNARY},
 {input:"bbb", tag:"mstyle", atname:"mathvariant", atval:"double-struck", output:"bbb", tex:null, ttype:UNARY, codes:AMbbb},
 {input:"mathbb", tag:"mstyle", atname:"mathvariant", atval:"double-struck", output:"mathbb", tex:null, ttype:UNARY, codes:AMbbb},
 {input:"cc",  tag:"mstyle", atname:"mathvariant", atval:"script", output:"cc", tex:null, ttype:UNARY, codes:AMcal},
 {input:"mathcal", tag:"mstyle", atname:"mathvariant", atval:"script", output:"mathcal", tex:null, ttype:UNARY, codes:AMcal},
-{input:"tt",  tag:"mstyle", atname:"mathvariant", atval:"monospace", output:"tt", tex:null, ttype:UNARY},
-{input:"mathtt", tag:"mstyle", atname:"mathvariant", atval:"monospace", output:"mathtt", tex:null, ttype:UNARY},
+{input:"tt",  tag:"mstyle", atname:"mathvariant", atval:"monospace", output:"tt", tex:null, ttype:UNARY, codes:AMtt},
+{input:"mathtt", tag:"mstyle", atname:"mathvariant", atval:"monospace", output:"mathtt", tex:null, ttype:UNARY, codes:AMtt},
 {input:"fr",  tag:"mstyle", atname:"mathvariant", atval:"fraktur", output:"fr", tex:null, ttype:UNARY, codes:AMfrk},
 {input:"mathfrak",  tag:"mstyle", atname:"mathvariant", atval:"fraktur", output:"mathfrak", tex:null, ttype:UNARY, codes:AMfrk}
 ];
@@ -626,9 +617,9 @@ function AMgetSymbol(str) {
   }
   if (st=="-" && str.charAt(1)!==' ' && AMpreviousSymbol==INFIX) {
     AMcurrentSymbol = INFIX;  //trick "/" into recognizing "-" on second parse
-    return {input:st, tag:tagst, output:st, ttype:UNARY, func:true};
+    return {input:st, tag:tagst, output:st=="-"?"\u2212":st, ttype:UNARY, func:true};
   }
-  return {input:st, tag:tagst, output:st, ttype:CONST};
+  return {input:st, tag:tagst, output:st=="-"?"\u2212":st, ttype:CONST};
 }
 
 function AMremoveBrackets(node) {
@@ -751,19 +742,17 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
 	return [node,result[1]];
       } else if (typeof symbol.acc == "boolean" && symbol.acc) {   // accent
         node = createMmlNode(symbol.tag,result[0]);
-        var accnode = createMmlNode("mo",document.createTextNode(symbol.output));
-        if (symbol.input=="vec" && (
-		(result[0].nodeName=="mrow" && result[0].childNodes.length==1
-			&& result[0].firstChild.firstChild.nodeValue !== null
-			&& result[0].firstChild.firstChild.nodeValue.length==1) ||
-		(result[0].firstChild && result[0].firstChild.nodeValue !== null
-			&& result[0].firstChild.nodeValue.length==1) )) {
-			accnode.setAttribute("stretchy",false);
+        if (symbol.tag == 'mover' && symbol.ttype == UNARY) {
+          node.setAttribute("accent","true");
+        } else if (symbol.tag == 'munder' && symbol.ttype == UNARY) {
+          node.setAttribute("accentunder","true");
         }
+        var accnode = createMmlNode("mo",document.createTextNode(symbol.output));
+        accnode.setAttribute("stretchy",true)
         node.appendChild(accnode);
         return [node,result[1]];
       } else {                        // font change command
-        if (!isIE && typeof symbol.codes != "undefined") {
+        /*if (typeof symbol.codes != "undefined") {
           for (i=0; i<result[0].childNodes.length; i++)
             if (result[0].childNodes[i].nodeName=="mi" || result[0].nodeName=="mi") {
               st = (result[0].nodeName=="mi"?result[0].firstChild.nodeValue:
@@ -785,7 +774,11 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
         }
         node = createMmlNode(symbol.tag,result[0]);
         node.setAttribute(symbol.atname,symbol.atval);
-        return [node,result[1]];
+        */
+        if (typeof symbol.codes != "undefined") {
+          AMmapChars(result[0], symbol.codes);
+        }
+        return [result[0],result[1]];
       }
   case BINARY:
     str = AMremoveCharsAndBlanks(str,symbol.input.length);
@@ -857,6 +850,40 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
     str = AMremoveCharsAndBlanks(str,symbol.input.length);
     return [createMmlNode(symbol.tag,        //its a constant
                              document.createTextNode(symbol.output)),str];
+  }
+}
+
+// walks a node, and maps characters according to codemap
+function AMmapChars(node, codemap) {
+  var tag = node.tagName.toUpperCase();
+  if (tag == "MI" || tag == "MO" || tag == "MN") {
+    var st = node.firstChild.nodeValue.toString();
+    var newst = "";
+    for (var j=0; j<st.length; j++) {
+      console.log("Mapping "+st.charAt(j));
+      if (st.charCodeAt(j)>64 && st.charCodeAt(j)<91) {
+        if (codemap.length == 3) {
+          newst += String.fromCodePoint(codemap[0] + st.charCodeAt(j) - 65);
+        } else {
+          newst += codemap[st.charCodeAt(j)-65];
+        }
+      } else if (st.charCodeAt(j)>96 && st.charCodeAt(j)<123) {
+        if (codemap.length == 3) {
+          newst += String.fromCodePoint(codemap[1] + st.charCodeAt(j) - 97);
+        } else {
+          newst += codemap[st.charCodeAt(j)-71];
+        }
+      } else if (st.charCodeAt(j)>47 && st.charCodeAt(j)<58 && (codemap.length == 3 || codemap.length == 53)) {
+        newst += String.fromCodePoint((codemap.length==3?codemap[2]:codemap[52]) + st.charCodeAt(j) - 48);
+      } else {
+        newst += st.charAt(j);
+      }
+    }
+    node.replaceChild(document.createTextNode(newst), node.firstChild);
+  } else {
+    for (var i=0; i<node.childNodes.length; i++) {
+      AMmapChars(node.childNodes[i], codemap);
+    }
   }
 }
 

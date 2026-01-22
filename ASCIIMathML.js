@@ -51,6 +51,9 @@ var displaystyle = true;      // puts limits above and below large operators
 var showasciiformulaonhover = true; // helps students learn ASCIIMath
 var decimalsign = ".";        // if "," then when writing lists or matrices put
 			      //a space after the "," like `(1, 2)` not `(1,2)`
+var listseparator = ",";      // when decimalsign="," you can opt to use ";" as listseparator
+            //which will eliminate the need to a space after the "," in lists and matrices
+            //and will allow "3," to be interpreted as a single number.
 var AMdelimiter1 = "`", AMescape1 = "\\\\`"; // can use other characters
 var AMdocumentId = "wikitext" // PmWiki element containing math (default=body)
 var fixphi = true;  		//false to return to legacy phi/varphi mapping
@@ -588,7 +591,7 @@ function AMgetSymbol(str) {
   }
   if (st == decimalsign) {
     st = str.slice(k,k+1);
-    if (k > 1 && (decimalsign == "." || st != " ") && k<str.length) {
+    if (k > 1 && (decimalsign != listseparator || st != " ") && k<str.length) {
       k++;
       useddecimal = true;
     }
@@ -713,7 +716,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
       }
       if (typeof symbol.func == "boolean" && symbol.func) { // functions hack
         st = str.charAt(0);
-          if (st=="^" || st=="_" || st=="/" || st=="|" || st=="," ||
+          if (st=="^" || st=="_" || st=="/" || st=="|" || st==listseparator ||
              (symbol.input.length==1 && symbol.input.match(/\w/) && st!="(")) {
           return [createMmlNode(symbol.tag,
                     document.createTextNode(symbol.output)),str];
@@ -829,7 +832,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
     st = "";
     if (result[0].lastChild!=null)
       st = result[0].lastChild.firstChild.nodeValue;
-    if (st == "|" && str.charAt(0)!==",") { // its an absolute value subterm
+    if (st == "|" && str.charAt(0)!==listseparator) { // its an absolute value subterm
       node = createMmlNode("mo",document.createTextNode(symbol.output));
       node = createMmlNode("mrow",node);
       node.appendChild(result[0]);
@@ -949,14 +952,14 @@ function AMparseExpr(str,rightbracket) {
           node = newFrag.childNodes[i];
           if (matrix) matrix = node.nodeName=="mrow" &&
             (i==m-1 || node.nextSibling.nodeName=="mo" &&
-            node.nextSibling.firstChild.nodeValue==",")&&
+            node.nextSibling.firstChild.nodeValue==listseparator)&&
             node.firstChild.firstChild &&
             node.firstChild.firstChild.nodeValue==left &&
             node.lastChild.firstChild &&
             node.lastChild.firstChild.nodeValue==right;
           if (matrix)
             for (var j=0; j<node.childNodes.length; j++)
-              if (node.childNodes[j].firstChild.nodeValue==",")
+              if (node.childNodes[j].firstChild.nodeValue==listseparator)
                 pos[i][pos[i].length]=j;
           if (matrix && i>1) matrix = pos[i].length == pos[i-2].length;
         }
@@ -1206,4 +1209,5 @@ asciimath.AMprocesssNode = AMprocessNode;
 asciimath.parseMath = parseMath;
 asciimath.translate = translate;
 asciimath.setdecimal = function (ds) { decimalsign = ds;}
+asciimath.setlistseparator = function (ls) { listseparator = ls;}
 })();

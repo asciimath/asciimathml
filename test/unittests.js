@@ -478,6 +478,10 @@ var unittests = [
 {input: "3/4.", output:"<mfrac><mn>3</mn><mn>4</mn></mfrac><mo>.</mo>"}, // don't include . at end of string
 {input: "3/4. ", output:"<mfrac><mn>3</mn><mn>4.</mn></mfrac>"},
 {input: "1 1, 1,2 ,3 1,2,3", output:"<mn>1</mn><mn>1</mn><mo>,</mo><mn>1,2</mn><mn>,3</mn><mn>1,2</mn><mn>,3</mn>", decimal: ","}, 
+{input: "1 1, 1,2 ,3 1,2,3 1,2;3", output:"<mn>1</mn><mn>1,</mn><mn>1,2</mn><mn>,3</mn><mn>1,2</mn><mn>,3</mn><mn>1,2</mn><mo>;</mo><mn>3</mn>", decimal: ",", list: ";"},
+{input: "[(1,2),(3,4)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1,2</mn></mtd></mtr><mtr><mtd><mn>3,4</mn></mtd></mtr></mtable><mo>]</mo></mrow>", decimal: ","},
+{input: "[(1, 2),(3, 4)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>]</mo></mrow>", decimal: ","},
+{input: "[(1;3);(3;5)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>3</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>5</mn></mtd></mtr></mtable><mo>]</mo></mrow>", decimal: ",", list: ";"},
 
 // sim
 {input: "3~2,5sim4", output:"<mn>3</mn><mo>∼</mo><mn>2</mn><mo>,</mo><mn>5</mn><mo>∼</mo><mn>4</mn>"},
@@ -518,9 +522,15 @@ function runTests() {
 		if (unittests[i].decimal !== undefined) {
 			asciimath.setdecimal(unittests[i].decimal);
 		}
+		if (unittests[i].list !== undefined) {
+			asciimath.setlistseparator(unittests[i].list);
+		}
 		res = asciimath.parseMath(unittests[i].input);
 		if (unittests[i].decimal !== undefined) {
 			asciimath.setdecimal(".");
+		}
+		if (unittests[i].list !== undefined) {
+			asciimath.setlistseparator(",");
 		}
 		tr = document.createElement("tr");
 		
@@ -528,6 +538,9 @@ function runTests() {
 		td.appendChild(document.createTextNode(unittests[i].input));
 		if (unittests[i].decimal !== undefined) {
 			td.appendChild(document.createTextNode(" (decimal='"+unittests[i].decimal+"')"));
+		}
+		if (unittests[i].list !== undefined) {
+			td.appendChild(document.createTextNode(" (list='"+unittests[i].list+"')"));
 		}
 		tr.appendChild(td);
 		

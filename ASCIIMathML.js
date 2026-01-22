@@ -750,7 +750,19 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
           node.setAttribute("accentunder","true");
         }
         var accnode = createMmlNode("mo",document.createTextNode(symbol.output));
-        accnode.setAttribute("stretchy",true)
+        if (symbol.input=="vec" && (
+          (result[0].nodeName=="mrow" && result[0].childNodes.length==1
+            && result[0].firstChild.firstChild.nodeValue !== null
+            && result[0].firstChild.firstChild.nodeValue.length==1) ||
+          (result[0].firstChild && result[0].firstChild.nodeValue !== null
+            && result[0].firstChild.nodeValue.length==1) )
+        ) {
+          // special case of single character base for vector accent,
+          // where stretchy can make it look bad
+          accnode.setAttribute("stretchy",false);
+        }else{
+          accnode.setAttribute("stretchy",true);
+        }
         node.appendChild(accnode);
         return [node,result[1]];
       } else {                        // font change command

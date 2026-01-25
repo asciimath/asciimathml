@@ -108,7 +108,12 @@ var unittests = [
 {input: "csc", output:"<mrow><mo>csc</mo><mo></mo></mrow>"},
 {input: "csch", output:"<mrow><mo>csch</mo><mo></mo></mrow>"},
 {input: "cup", output:"<mo>∪</mo>"},
+{input: "dag", output:"<mo>†</mo>"},
+{input: "dagger", output:"<mo>†</mo>"},
 {input: "darr", output:"<mo>↓</mo>"},
+{input: "dArr", output:"<mo>⇓</mo>"},
+{input: "ddag", output:"<mo>‡</mo>"},
+{input: "ddagger", output:"<mo>‡</mo>"},
 {input: "ddot", output:"<mover><mo></mo><mo>..</mo></mover>"},
 {input: "ddots", output:"<mo>⋱</mo>"},
 {input: "del", output:"<mo>∂</mo>"},
@@ -482,6 +487,28 @@ var unittests = [
 {input: "[(1,2),(3,4)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1,2</mn></mtd></mtr><mtr><mtd><mn>3,4</mn></mtd></mtr></mtable><mo>]</mo></mrow>", decimal: ","},
 {input: "[(1, 2),(3, 4)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>]</mo></mrow>", decimal: ","},
 {input: "[(1;3);(3;5)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>3</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>5</mn></mtd></mtr></mtable><mo>]</mo></mrow>", decimal: ",", list: ";"},
+
+// issue 133
+{input: "!-=", output:"<mo>≢</mo>"},
+{input: "\\not\\equiv", output:"<mo>≢</mo>"},
+{input: "notequiv", output:"<mo>≢</mo>"},
+
+// issue 136
+{input: "!sup", output:"<mo>⊅</mo>"}, // normal entry
+{input: "!sub", output:"<mo>⊄</mo>"},
+{input: "!sube", output:"<mo>⊈</mo>"},
+{input: "!supe", output:"<mo>⊉</mo>"},
+{input: "\\not\\subset", output:"<mo>⊄</mo>"}, // latex style
+{input: "notsubset", output:"<mo>⊄</mo>"}, // semi-latex style
+
+//add_misc_symbols 
+{input: "o-", output:"<mo>⊖</mo>"},
+{input: "ominus", output:"<mo>⊖</mo>"},
+{input: "arcsec", output:"<mrow><mo>arcsec</mo><mo></mo></mrow>"},
+{input: "arccot", output:"<mrow><mo>arccot</mo><mo></mo></mrow>"},
+{input: "arccsc", output:"<mrow><mo>arccsc</mo><mo></mo></mrow>"},
+{input: "rightleftharpoons", output:"<mo>⇌</mo>"},
+{input: "hbar", output:"<mo>ℏ</mo>"},
 
 // sim
 {input: "3~2,5sim4", output:"<mn>3</mn><mo>∼</mo><mn>2</mn><mo>,</mo><mn>5</mn><mo>∼</mo><mn>4</mn>"},

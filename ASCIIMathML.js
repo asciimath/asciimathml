@@ -275,6 +275,7 @@ var AMsymbols = [
 {input:"divide",   tag:"mo", output:"-:", tex:null, ttype:DEFINITION},
 {input:"@",  tag:"mo", output:"\u2218", tex:"circ", ttype:CONST},
 {input:"o+", tag:"mo", output:"\u2295", tex:"oplus", ttype:CONST},
+{input:"o-", tag:"mo", output:"\u2296", tex:"ominus", ttype:CONST},
 {input:"ox", tag:"mo", output:"\u2297", tex:"otimes", ttype:CONST},
 {input:"o.", tag:"mo", output:"\u2299", tex:"odot", ttype:CONST},
 {input:"sum", tag:"mo", output:"\u2211", tex:null, ttype:UNDEROVER},
@@ -287,6 +288,8 @@ var AMsymbols = [
 {input:"nnn", tag:"mo", output:"\u22C2", tex:"bigcap", ttype:UNDEROVER},
 {input:"uu",  tag:"mo", output:"\u222A", tex:"cup", ttype:CONST},
 {input:"uuu", tag:"mo", output:"\u22C3", tex:"bigcup", ttype:UNDEROVER},
+{input:"dag", tag:"mo", output:"\u2020", tex:"dagger", ttype:CONST},
+{input:"ddag", tag:"mo", output:"\u2021", tex:"ddagger", ttype:CONST},
 
 //binary relation symbols
 {input:"!=",  tag:"mo", output:"\u2260", tex:"ne", ttype:CONST},
@@ -307,10 +310,20 @@ var AMsymbols = [
 {input:"in",  tag:"mo", output:"\u2208", tex:null, ttype:CONST},
 {input:"!in", tag:"mo", output:"\u2209", tex:"notin", ttype:CONST},
 {input:"sub", tag:"mo", output:"\u2282", tex:"subset", ttype:CONST},
+{input:"!sub", tag:"mo", output:"\u2284", tex:"not\\subset", ttype:CONST},
+{input:"notsubset",   tag:"mo", output:"!sub", tex:null, ttype:DEFINITION},
 {input:"sup", tag:"mo", output:"\u2283", tex:"supset", ttype:CONST},
+{input:"!sup", tag:"mo", output:"\u2285", tex:"not\\supset", ttype:CONST},
+{input:"notsupset",   tag:"mo", output:"!sup", tex:null, ttype:DEFINITION},
 {input:"sube", tag:"mo", output:"\u2286", tex:"subseteq", ttype:CONST},
+{input:"!sube", tag:"mo", output:"\u2288", tex:"not\\subseteq", ttype:CONST},
+{input:"notsubseteq",   tag:"mo", output:"!sube", tex:null, ttype:DEFINITION},
 {input:"supe", tag:"mo", output:"\u2287", tex:"supseteq", ttype:CONST},
+{input:"!supe", tag:"mo", output:"\u2289", tex:"not\\supseteq", ttype:CONST},
+{input:"notsupseteq",   tag:"mo", output:"!supe", tex:null, ttype:DEFINITION},
 {input:"-=",  tag:"mo", output:"\u2261", tex:"equiv", ttype:CONST},
+{input:"!-=", tag:"mo", output:"\u2262", tex:"not\\equiv", ttype:CONST},
+{input:"notequiv",   tag:"mo", output:"!-=", tex:null, ttype:DEFINITION},
 {input:"~=",  tag:"mo", output:"\u2245", tex:"cong", ttype:CONST},
 {input:"~~",  tag:"mo", output:"\u2248", tex:"approx", ttype:CONST},
 {input:"~",  tag:"mo", output:"\u223C", tex:"sim", ttype:CONST},
@@ -390,6 +403,7 @@ var AMsymbols = [
 {input:"ZZ",  tag:"mo", output:"\u2124", tex:null, ttype:CONST},
 {input:"f",   tag:"mi", output:"f",      tex:null, ttype:UNARY, func:true},
 {input:"g",   tag:"mi", output:"g",      tex:null, ttype:UNARY, func:true},
+{input:"hbar", tag:"mo", output:"\u210F", tex:null, ttype:CONST},
 
 //standard functions
 {input:"lim",  tag:"mo", output:"lim", tex:null, ttype:UNDEROVER},
@@ -406,6 +420,9 @@ var AMsymbols = [
 {input:"arcsin",  tag:"mo", output:"arcsin", tex:null, ttype:UNARY, func:true},
 {input:"arccos",  tag:"mo", output:"arccos", tex:null, ttype:UNARY, func:true},
 {input:"arctan",  tag:"mo", output:"arctan", tex:null, ttype:UNARY, func:true},
+{input:"arcsec",  tag:"mo", output:"arcsec", tex:null, ttype:UNARY, func:true},
+{input:"arccsc",  tag:"mo", output:"arccsc", tex:null, ttype:UNARY, func:true},
+{input:"arccot",  tag:"mo", output:"arccot", tex:null, ttype:UNARY, func:true},
 {input:"coth",  tag:"mo", output:"coth", tex:null, ttype:UNARY, func:true},
 {input:"sech",  tag:"mo", output:"sech", tex:null, ttype:UNARY, func:true},
 {input:"csch",  tag:"mo", output:"csch", tex:null, ttype:UNARY, func:true},
@@ -454,7 +471,10 @@ var AMsymbols = [
 {input:"harr", tag:"mo", output:"\u2194", tex:"leftrightarrow", ttype:CONST},
 {input:"rArr", tag:"mo", output:"\u21D2", tex:"Rightarrow", ttype:CONST},
 {input:"lArr", tag:"mo", output:"\u21D0", tex:"Leftarrow", ttype:CONST},
+{input:"dArr", tag:"mo", output:"\u21D3", tex:"Downarrow", ttype:CONST},
 {input:"hArr", tag:"mo", output:"\u21D4", tex:"Leftrightarrow", ttype:CONST},
+{input:"rightleftharpoons",   tag:"mo", output:"\u21CC", tex:null, ttype:CONST},
+
 //commands with argument
 {input:"sqrt", tag:"msqrt", output:"sqrt", tex:null, ttype:UNARY},
 {input:"root", tag:"mroot", output:"root", tex:null, ttype:BINARY},
@@ -746,7 +766,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
 		(result[0].nodeName=="mrow" && result[0].childNodes.length==1
 			&& result[0].firstChild.firstChild.nodeValue !== null
 			&& result[0].firstChild.firstChild.nodeValue.length==1) ||
-		(result[0].firstChild.nodeValue !== null
+		(result[0].firstChild && result[0].firstChild.nodeValue !== null
 			&& result[0].firstChild.nodeValue.length==1) )) {
 			accnode.setAttribute("stretchy",false);
         }
@@ -1076,6 +1096,7 @@ function AMautomathrec(str) {
   var arr = str.split(AMdelimiter1);
   var re1 = new RegExp("(^|\\s)([b-zB-HJ-Z+*<>]|"+texcommand+ambigAMtoken+simpleAMtoken+")(\\s|\\n|$)","g");
   var re2 = new RegExp("(^|\\s)([a-z]|"+texcommand+ambigAMtoken+simpleAMtoken+")([,.])","g"); // removed |\d+ for now
+  var i;
   for (i=0; i<arr.length; i++)   //single nonenglish tokens
     if (i%2==0) {
       arr[i] = arr[i].replace(re1," `$2`$3");

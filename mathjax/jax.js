@@ -477,6 +477,8 @@ var AMsymbols = [
 {input:"nnn", tag:"mo", output:"\u22C2", tex:"bigcap", ttype:UNDEROVER},
 {input:"uu",  tag:"mo", output:"\u222A", tex:"cup", ttype:CONST},
 {input:"uuu", tag:"mo", output:"\u22C3", tex:"bigcup", ttype:UNDEROVER},
+{input:"dag", tag:"mo", output:"\u2020", tex:"dagger", ttype:CONST},
+{input:"ddag", tag:"mo", output:"\u2021", tex:"ddagger", ttype:CONST},
 
 //binary relation symbols
 {input:"!=",  tag:"mo", output:"\u2260", tex:"ne", ttype:CONST},
@@ -642,6 +644,7 @@ var AMsymbols = [
 {input:"harr", tag:"mo", output:"\u2194", tex:"leftrightarrow", ttype:CONST},
 {input:"rArr", tag:"mo", output:"\u21D2", tex:"Rightarrow", ttype:CONST},
 {input:"lArr", tag:"mo", output:"\u21D0", tex:"Leftarrow", ttype:CONST},
+{input:"dArr", tag:"mo", output:"\u21D3", tex:"Downarrow", ttype:CONST},
 {input:"hArr", tag:"mo", output:"\u21D4", tex:"Leftrightarrow", ttype:CONST},
 //commands with argument
 {input:"sqrt", tag:"msqrt", output:"sqrt", tex:null, ttype:UNARY},

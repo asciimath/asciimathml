@@ -37,6 +37,7 @@ class AMtoTeX
 {
 
 var $decimalsign = "."; //change if needed - might mess up matrices if comma
+var $listseparator = ","; 
 var $AMpreviousSymbolinfix = false;
 var $AMcurrentSymbolinfix = false;
 var $AMnames = array();
@@ -434,6 +435,7 @@ function AMgetSymbol($str) {
 	}
 	$this->AMcurrentSymbolinfix = false;
 	$k = 1;
+	$useddecimal = false;
 	$st = substr($str,0,1);
 	$integ = true;
 	while ('0'<=$st && $st<='9' && $k<=strlen($str)) {
@@ -442,9 +444,18 @@ function AMgetSymbol($str) {
 	}
 	if ($st == $this->decimalsign) {
 		$st = substr($str,$k,1);
+		if ($k > 1 && 
+			($this->decimalsign != $this->listseparator || $st != ' ') && 
+			$k<strlen($str)
+		) {
+			$k++;
+			$useddecimal = true;
+		}
 		if ('0'<=$st && $st<='9') {
 			$integ = false;
-			$k++;
+			if (!$useddecimal) {
+				$k++;
+			}
 			while ('0'<=$st && $st<='9' && $k<=strlen($str)) {
 				$st = substr($str,$k,1);
 				$k++;
@@ -587,11 +598,11 @@ function AMTparseSexpr($str) {
 		} else { $i = 0;}
 		if ($i==-1) { $i = strlen($str);}
 		$st = substr($str,1,$i-1);
-		if ($st[0]== " ") {
+		if (strlen($st)>0 && $st[0]== " ") {
 			$newFrag .= '\\ ';
 		}
 		$newFrag .= '\\text{'.$st.'}';
-		if ($st[strlen($st)-1]== " ") {
+		if (strlen($st)>0 && $st[strlen($st)-1]== " ") {
 			$newFrag .= '\\ ';
 		}
 		$str = $this->AMremoveCharsAndBlanks($str,$i+1);
@@ -604,7 +615,7 @@ function AMTparseSexpr($str) {
 		}
 		if (isset($symbol['func'])) {
 			$st = $str[0];
-			if ($st=='^' || $st=='_' || $st=='/' || $st=='|' || $st==',' || (($symbol['input']=='f' || $symbol['input']=='g')  && $st!='(')) {
+			if ($st=='^' || $st=='_' || $st=='/' || $st=='|' || $st==$this->listseparator || (($symbol['input']=='f' || $symbol['input']=='g')  && $st!='(')) {
 				return array('{'.$this->AMTgetTeXsymbol($symbol).'}',$str);
 			} else {
 				$node = '{'.$this->AMTgetTeXsymbol($symbol).'{'.$result[0].'}}';
@@ -657,7 +668,7 @@ function AMTparseSexpr($str) {
 		$result = $this->AMTparseExpr($str,false);
 		$this->AMnestingDepth--;
 		$st = $result[0][strlen($result[0])-1];
-		if ($st == '|') {
+		if ($st == '|' && (strlen($str)==0 || $str[0] != $this->listseparator)) {
 			$node = '{\\left|'.$result[0].'}';
 			return array($node,$result[1]);
 		} else {
@@ -667,7 +678,7 @@ function AMTparseSexpr($str) {
 	} else {
 		$str = $this->AMremoveCharsAndBlanks($str,strlen($symbol['input']));
 		$texsymbol = $this->AMTgetTeXsymbol($symbol);
-		if ($texsymbol[0]=='\\' || (isset($symbol['isop']) && $symbol['isop']==true)) {
+		if ((strlen($texsymbol)>0 && $texsymbol[0]=='\\') || (isset($symbol['isop']) && $symbol['isop']==true)) {
 			return array($texsymbol,$str);
 		} else {
 			return array('{'.$texsymbol.'}',$str);
@@ -754,7 +765,7 @@ function AMTparseExpr($str,$rightbracket) {
 	} while ((!isset($symbol['rightbracket']) && (!isset($symbol['leftright']) || $rightbracket) || $this->AMnestingDepth==0) && $symbol!=null && $symbol['input']!='');
 	if (isset($symbol['rightbracket']) || isset($symbol['leftright'])) {
 		$len = strlen($newFrag);
-		if ($len>2 && $newFrag[0]=='{' && strpos($newFrag,',')>0) {
+		if ($len>2 && $newFrag[0]=='{' && strpos($newFrag, $this->listseparator)>0) {
 			$right = $newFrag[$len-2];
 			if ($right==')' || $right==']') {
 				$left = $newFrag[6];
@@ -775,7 +786,7 @@ function AMTparseExpr($str,$rightbracket) {
 						if ($newFrag[$i]==$left) { $mxnestingd++;}
 						if ($newFrag[$i]==$right) {
 							$mxnestingd--;
-							if ($mxnestingd==0 && $newFragLen>$i+3 && $newFrag[$i+2]==',' && $newFrag[$i+3]=='{') {
+							if ($mxnestingd==0 && $newFragLen>$i+3 && $newFrag[$i+2]==$this->listseparator && $newFrag[$i+3]=='{') {
 								array_push($pos,$i+2);
 								$lastsubposstart= $i+2;
 								$subpos[$lastsubposstart] = array($i+2);
@@ -785,7 +796,7 @@ function AMTparseExpr($str,$rightbracket) {
 						}
 						if ($newFrag[$i]=='[' || $newFrag[$i]=='(' || $newFrag[$i]=='{') {$mxanynestingd++;}
 						if ($newFrag[$i]==']' || $newFrag[$i]==')' || $newFrag[$i]=='}') {$mxanynestingd--;}
-						if ($newFrag[$i]==',' && $mxanynestingd==1) {
+						if ($newFrag[$i]==$this->listseparator && $mxanynestingd==1) {
 							$subpos[$lastsubposstart][] = $i;
 						}
 						if ($mxanynestingd<0) {  //happens at the end of the row

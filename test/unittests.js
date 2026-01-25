@@ -478,6 +478,16 @@ var unittests = [
 {input: "u_-3 + u_- 3", output:"<msub><mi>u</mi><mrow><mo>-</mo><mn>3</mn></mrow></msub><mo>+</mo><msub><mi>u</mi><mo>-</mo></msub><mn>3</mn>"},
 {input: "2^- +3", output:"<msup><mn>2</mn><mo>-</mo></msup><mo>+</mo><mn>3</mn>"},
 
+// issue 124
+{input: "1 1. 1.2 .3 1.2.3", output:"<mn>1</mn><mn>1.</mn><mn>1.2</mn><mn>.3</mn><mn>1.2</mn><mn>.3</mn>"},
+{input: "3/4.", output:"<mfrac><mn>3</mn><mn>4</mn></mfrac><mo>.</mo>"}, // don't include . at end of string
+{input: "3/4. ", output:"<mfrac><mn>3</mn><mn>4.</mn></mfrac>"},
+{input: "1 1, 1,2 ,3 1,2,3", output:"<mn>1</mn><mn>1</mn><mo>,</mo><mn>1,2</mn><mn>,3</mn><mn>1,2</mn><mn>,3</mn>", decimal: ","}, 
+{input: "1 1, 1,2 ,3 1,2,3 1,2;3", output:"<mn>1</mn><mn>1,</mn><mn>1,2</mn><mn>,3</mn><mn>1,2</mn><mn>,3</mn><mn>1,2</mn><mo>;</mo><mn>3</mn>", decimal: ",", list: ";"},
+{input: "[(1,2),(3,4)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1,2</mn></mtd></mtr><mtr><mtd><mn>3,4</mn></mtd></mtr></mtable><mo>]</mo></mrow>", decimal: ","},
+{input: "[(1, 2),(3, 4)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>]</mo></mrow>", decimal: ","},
+{input: "[(1;3);(3;5)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>3</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>5</mn></mtd></mtr></mtable><mo>]</mo></mrow>", decimal: ",", list: ";"},
+
 // issue 133
 {input: "!-=", output:"<mo>≢</mo>"},
 {input: "\\not\\equiv", output:"<mo>≢</mo>"},
@@ -502,6 +512,7 @@ var unittests = [
 
 // sim
 {input: "3~2,5sim4", output:"<mn>3</mn><mo>∼</mo><mn>2</mn><mo>,</mo><mn>5</mn><mo>∼</mo><mn>4</mn>"},
+
 //overparen
 {input: "overparen(AB)", output:"<mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⏜</mo></mover>"},
 {input: "overarc(AB)", output:"<mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⏜</mo></mover>"},
@@ -532,14 +543,32 @@ function runTests() {
 		var outstr = '{input: "'+txt.replace(/\\/g,"\\\\").replace(/"/g,'\\"')+'", output:"'+out+'"},\n';
 		$("#newtestout").text($("#newtestout").text()+outstr);		
 	})
-	var res,tr,td;
+	var res,tr,td,lastdec;
 	var tbody = document.getElementById("testout");
 	for (var i=0;i<unittests.length;i++) {
+		if (unittests[i].decimal !== undefined) {
+			asciimath.setdecimal(unittests[i].decimal);
+		}
+		if (unittests[i].list !== undefined) {
+			asciimath.setlistseparator(unittests[i].list);
+		}
 		res = asciimath.parseMath(unittests[i].input);
+		if (unittests[i].decimal !== undefined) {
+			asciimath.setdecimal(".");
+		}
+		if (unittests[i].list !== undefined) {
+			asciimath.setlistseparator(",");
+		}
 		tr = document.createElement("tr");
 		
 		td = document.createElement("td");
 		td.appendChild(document.createTextNode(unittests[i].input));
+		if (unittests[i].decimal !== undefined) {
+			td.appendChild(document.createTextNode(" (decimal='"+unittests[i].decimal+"')"));
+		}
+		if (unittests[i].list !== undefined) {
+			td.appendChild(document.createTextNode(" (list='"+unittests[i].list+"')"));
+		}
 		tr.appendChild(td);
 		
 		td = document.createElement("td");

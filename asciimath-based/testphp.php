@@ -19,9 +19,11 @@ function makeimg($AMstring) {
 	return '<img src="'.$url.'" />';
 }
 
-echo '<p>'.makeimg('3 !sup A').'</p>';
+echo '<p>'.makeimg('[(1,2,3,|,4),(1,2,3,|,5)]').'</p>';
+echo '<p>'.makeimg('[(1,2,3,4),(1,2,3,5)]').'</p>';echo '<p>'.makeimg('3 !sup A').'</p>';
 echo '<p>'.makeimg('3 \\not\\supset A').'</p>';
 echo '<p>'.makeimg('3 notsupset A').'</p>';
+echo '<p>'.makeimg('2./3').'</p>';
 ?>
 </body>
 </html>

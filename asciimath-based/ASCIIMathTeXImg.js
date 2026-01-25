@@ -34,6 +34,7 @@ var config = {
   displaystyle: true,         // puts limits above and below large operators
   showasciiformulaonhover: true, // helps students learn ASCIIMath
   decimalsign: ".",           // change to "," if you like, beware of `(1,2)`!
+  listseparator: ",",
   AMdelimiter1: "`", AMescape1: "\\\\`", // can use other characters
   AMusedelimiter2: false, 	  //whether to use second delimiter below
   AMdelimiter2: "$", AMescape2: "\\\\\\$", AMdelimiter2regexp: "\\$",
@@ -449,6 +450,7 @@ function AMgetSymbol(str) {
 // if str[0] is a digit or - return maxsubstring of digits.digits
   AMcurrentSymbol=CONST;
   k = 1;
+  var useddecimal = false;
   st = str.slice(0,1);
   var integ = true;
 
@@ -458,9 +460,15 @@ function AMgetSymbol(str) {
   }
   if (st == config.decimalsign) {
     st = str.slice(k,k+1);
+    if (k > 1 && (config.decimalsign != config.listseparator || st != " ") && k<str.length) {
+      k++;
+      useddecimal = true;
+    }
     if ("0"<=st && st<="9") {
       integ = false;
-      k++;
+      if (!useddecimal) {
+        k++;
+      }
       while ("0"<=st && st<="9" && k<=str.length) {
         st = str.slice(k,k+1);
         k++;
@@ -488,13 +496,13 @@ function AMTremoveBrackets(node) {
   if (node.charAt(0)=='{' && node.charAt(node.length-1)=='}') {
     var leftchop = 0;
 
-    st = node.substr(1,5);
+    st = node.substring(1,6);
     if (st=='\\left') {
     	    st = node.charAt(6);
     	    if (st=="(" || st=="[" || st=="{") {
     	    	    leftchop = 7;
     	    } else {
-    	    	    st = node.substr(6,7);
+    	    	    st = node.substring(6,13);
     	    	    if (st=='\\lbrace') {
     	    	    	    leftchop = 13;
     	    	    }
@@ -507,13 +515,13 @@ function AMTremoveBrackets(node) {
     }
     if (leftchop>0) {
     	    //st = node.charAt(node.length-7);
-    	    st = node.substr(node.length-8);
+    	    st = node.substring(node.length-8);
     	    if (st=="\\right)}" || st=="\\right]}" || st=='\\right.}') {
-    	    	    node = '{'+node.substr(leftchop);
-    	    	    node = node.substr(0,node.length-8)+'}';
+    	    	    node = '{'+node.substing(leftchop);
+    	    	    node = node.substring(0,node.length-8)+'}';
     	    } else if (st=='\\rbrace}') {
-    	    	    node = '{'+node.substr(leftchop);
-    	    	    node = node.substr(0,node.length-14)+'}';
+    	    	    node = '{'+node.substring(leftchop);
+    	    	    node = node.substring(0,node.length-14)+'}';
     	    }
     }
   }
@@ -575,21 +583,21 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
     result = AMTparseExpr(str,true);
     AMnestingDepth--;
     var leftchop = 0;
-    if (result[0].substr(0,6)=="\\right") {
+    if (result[0].substring(0,6)=="\\right") {
     	    st = result[0].charAt(6);
     	    if (st==")" || st=="]" || st=="}") {
     	    	    leftchop = 6;
     	    } else if (st==".") {
     	    	    leftchop = 7;
     	    } else {
-    	    	    st = result[0].substr(6,7);
+    	    	    st = result[0].substring(6,13);
     	    	    if (st=='\\rbrace') {
     	    	    	    leftchop = 13;
     	    	    }
     	    }
     }
     if (leftchop>0) {
-	    result[0] = result[0].substr(leftchop);
+	    result[0] = result[0].substring(leftchop);
 	    if (typeof symbol.invisible == "boolean" && symbol.invisible)
 		    node = '{'+result[0]+'}';
 	    else {
@@ -627,7 +635,7 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
       if (result[0]==null) return ['{'+AMTgetTeXsymbol(symbol)+'}',str];
       if (typeof symbol.func == "boolean" && symbol.func) { // functions hack
         st = str.charAt(0);
-        if (st=="^" || st=="_" || st=="/" || st=="|" || st=="," || (symbol.input.length==1 && symbol.input.match(/\w/) && st!="(")) {
+        if (st=="^" || st=="_" || st=="/" || st=="|" || st==config.listseparator || (symbol.input.length==1 && symbol.input.match(/\w/) && st!="(")) {
           return ['{'+AMTgetTeXsymbol(symbol)+'}',str];
         } else {
 		node = '{'+AMTgetTeXsymbol(symbol)+'{'+result[0]+'}}';
@@ -678,7 +686,7 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
     var st = "";
     st = result[0].charAt(result[0].length -1);
 //alert(result[0].lastChild+"***"+st);
-    if (st == "|" && str.charAt(0)!==",") { // its an absolute value subterm
+    if (st == "|" && str.charAt(0)!==config.listseparator) { // its an absolute value subterm
 	    node = '{\\left|'+result[0]+'}';
       return [node,result[1]];
     } else { // the "|" is a \mid
@@ -772,7 +780,7 @@ function AMTparseExpr(str,rightbracket) {
   if (symbol.ttype == RIGHTBRACKET || symbol.ttype == LEFTRIGHT) {
 //    if (AMnestingDepth > 0) AMnestingDepth--;
 	var len = newFrag.length;
-	if (len>2 && newFrag.charAt(0)=='{' && newFrag.indexOf(',')>0) { //could be matrix (total rewrite from .js)
+	if (len>2 && newFrag.charAt(0)=='{' && newFrag.indexOf(config.listseparator)>0) { //could be matrix (total rewrite from .js)
 		var right = newFrag.charAt(len - 2);
 		if (right==')' || right==']') {
 			var left = newFrag.charAt(6);
@@ -791,7 +799,7 @@ function AMTparseExpr(str,rightbracket) {
 					if (newFrag.charAt(i)==left) mxnestingd++;
 					if (newFrag.charAt(i)==right) {
 						mxnestingd--;
-						if (mxnestingd==0 && newFrag.charAt(i+2)==',' && newFrag.charAt(i+3)=='{') {
+						if (mxnestingd==0 && newFrag.charAt(i+2)==config.listseparator && newFrag.charAt(i+3)=='{') {
 							pos.push(i+2);
 							lastsubposstart = i+2;
 							subpos[lastsubposstart] = [i+2];
@@ -799,7 +807,7 @@ function AMTparseExpr(str,rightbracket) {
 					}
 					if (newFrag.charAt(i)=='[' || newFrag.charAt(i)=='(' || newFrag.charAt(i)=='{') { mxanynestingd++;}
 					if (newFrag.charAt(i)==']' || newFrag.charAt(i)==')' || newFrag.charAt(i)=='}') { mxanynestingd--;}
-					if (newFrag.charAt(i)==',' && mxanynestingd==1) {
+					if (newFrag.charAt(i)==config.listseparator && mxanynestingd==1) {
 						subpos[lastsubposstart].push(i);
 					}
 					if (mxanynestingd<0) {  //happens at the end of the row
@@ -817,9 +825,8 @@ function AMTparseExpr(str,rightbracket) {
 					for (i=0;i<pos.length-1;i++) {
 						if (i>0) mxout += '\\\\';
 						if (i==0) {
-							//var subarr = newFrag.substr(pos[i]+7,pos[i+1]-pos[i]-15).split(',');
 							if (subpos[pos[i]].length==1) {
-								var subarr = [newFrag.substr(pos[i]+7,pos[i+1]-pos[i]-15)];
+                var subarr = [newFrag.substring(pos[i]+7,pos[i+1]-8)];
 							} else {
 								var subarr = [newFrag.substring(pos[i]+7,subpos[pos[i]][1])];
 								for (var j=2;j<subpos[pos[i]].length;j++) {
@@ -828,9 +835,8 @@ function AMTparseExpr(str,rightbracket) {
 								subarr.push(newFrag.substring(subpos[pos[i]][subpos[pos[i]].length-1]+1,pos[i+1]-8));
 							}
 						} else {
-							//var subarr = newFrag.substr(pos[i]+8,pos[i+1]-pos[i]-16).split(',');
 							if (subpos[pos[i]].length==1) {
-								var subarr = [newFrag.substr(pos[i]+8,pos[i+1]-pos[i]-16)];
+								var subarr = [newFrag.substring(pos[i]+8,pos[i+1]-8)];
 							} else {
 								var subarr = [newFrag.substring(pos[i]+8,subpos[pos[i]][1])];
 								for (var j=2;j<subpos[pos[i]].length;j++) {

@@ -853,24 +853,24 @@ export class AsciiMathParser {
    */
   private parseExpr(str: string, rightbracket: boolean): ParseResult {
     let symbol: Symbol | null;
-    let node: INodeAdapter;
+    let node: INodeAdapter | null;
     let result: ParseResult;
     const newFrag = this.configuration.create('inferredMrow');
 
     do {
       str = this.removeCharsAndBlanks(str, 0);
       result = this.parseIexpr(str);
-      if (result[0] === null) {
-        return [null, str];
-      }
+
       node = result[0];
       str = result[1];
       symbol = this.getSymbol(str);
 
-      if (symbol !== null && symbol.ttype === TokenType.INFIX && symbol.input === '/') {
+      if (node !== null && symbol !== null && 
+        symbol.ttype === TokenType.INFIX && symbol.input === '/'
+      ) {
         str = this.removeCharsAndBlanks(str, symbol.input.length);
         result = this.parseIexpr(str);
-        if (result[0] == null) {
+        if (result[0] === null) {
           const box = this.configuration.create('mo');
           box.appendChild(this.configuration.createText('\u25A1'));
           result[0] = box;
@@ -884,7 +884,7 @@ export class AsciiMathParser {
         this.appendUnwrap(result[0], frac);
         newFrag.appendChild(frac);
         symbol = this.getSymbol(str);
-      } else if (node != null) {
+      } else if (node !== null) {
         this.appendUnwrap(node, newFrag);
       }
     } while (
@@ -1043,6 +1043,7 @@ export class AsciiMathParser {
         }
       }
       str = this.removeCharsAndBlanks(str, symbol.input.length);
+      console.log(symbol);
       if (!symbol.invisible) {
         const mo = this.configuration.create('mo');
         mo.appendChild(this.configuration.createText(symbol.output));

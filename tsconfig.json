@@ -5,7 +5,7 @@
     "moduleResolution": "Node",
     "rootDir": "ts",
     "outDir": "dist/cjs",
-    "strict": false,
+    "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,

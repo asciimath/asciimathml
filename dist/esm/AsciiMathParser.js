@@ -48,7 +48,7 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
-import { AMsymbols, AMquote, } from './AsciiMathSymbols';
+import { AMsymbols, AMquote, } from './AsciiMathSymbols.js';
 /**
  * The main AsciiMath Parser class.
  */

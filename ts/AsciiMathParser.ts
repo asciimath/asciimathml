@@ -8,7 +8,7 @@ import {
   TokenType,
   AMsymbols,
   AMquote,
-} from './AsciiMathSymbols';
+} from './AsciiMathSymbols.js';
 
 /**
  * Parse result tuple [node, remaining string]

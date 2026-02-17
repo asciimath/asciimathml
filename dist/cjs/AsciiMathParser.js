@@ -51,7 +51,7 @@ var __values = (this && this.__values) || function(o) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AsciiMathParser = void 0;
-var AsciiMathSymbols_1 = require("./AsciiMathSymbols");
+var AsciiMathSymbols_js_1 = require("./AsciiMathSymbols.js");
 /**
  * The main AsciiMath Parser class.
  */
@@ -129,7 +129,7 @@ var AsciiMathParser = /** @class */ (function () {
         var e_1, _a;
         var _b, _c, _d;
         // Copy base symbols
-        this.symbols = __spreadArray([], __read(AsciiMathSymbols_1.AMsymbols), false);
+        this.symbols = __spreadArray([], __read(AsciiMathSymbols_js_1.AMsymbols), false);
         if (this.configuration.options.additionalSymbols) {
             try {
                 for (var _e = __values(this.configuration.options.additionalSymbols), _f = _e.next(); !_f.done; _f = _e.next()) {
@@ -413,7 +413,7 @@ var AsciiMathParser = /** @class */ (function () {
                 }
                 return [node, result[1]];
             case 10 /* TokenType.TEXT */:
-                if (symbol !== AsciiMathSymbols_1.AMquote) {
+                if (symbol !== AsciiMathSymbols_js_1.AMquote) {
                     str = this.removeCharsAndBlanks(str, symbol.input.length);
                 }
                 if (str.charAt(0) === '{') {
@@ -425,7 +425,7 @@ var AsciiMathParser = /** @class */ (function () {
                 else if (str.charAt(0) === '[') {
                     i = str.indexOf(']');
                 }
-                else if (symbol === AsciiMathSymbols_1.AMquote) {
+                else if (symbol === AsciiMathSymbols_js_1.AMquote) {
                     i = str.slice(1).indexOf('"') + 1;
                 }
                 else {

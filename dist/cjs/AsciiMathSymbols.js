@@ -1,19 +1,22 @@
+"use strict";
 /*
  * AsciiMath Symbols
  */
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AMsymbols = exports.AMquote = exports.AMtt = exports.AMsf = exports.AMbb = exports.AMbbb = exports.AMfrk = exports.AMcal = void 0;
 // Character lists for special fonts
-export const AMcal = [0x1D49C, 0x212C, 0x1D49E, 0x1D49F, 0x2130, 0x2131, 0x1D4A2, 0x210B, 0x2110, 0x1D4A5, 0x1D4A6, 0x2112, 0x2133, 0x1D4A9, 0x1D4AA, 0x1D4AB, 0x1D4AC, 0x211B, 0x1D4AE, 0x1D4AF, 0x1D4B0, 0x1D4B1, 0x1D4B2, 0x1D4B3, 0x1D4B4, 0x1D4B5, 0x1D4B6, 0x1D4B7, 0x1D4B8, 0x1D4B9, 0x212F, 0x1D4BB, 0x210A, 0x1D4BD, 0x1D4BE, 0x1D4BF, 0x1D4C0, 0x1D4C1, 0x1D4C2, 0x1D4C3, 0x2134, 0x1D4C5, 0x1D4C6, 0x1D4C7, 0x1D4C8, 0x1D4C9, 0x1D4CA, 0x1D4CB, 0x1D4CC, 0x1D4CD, 0x1D4CE, 0x1D4CF];
-export const AMfrk = [0x1D504, 0x1D505, 0x212D, 0x1D507, 0x1D508, 0x1D509, 0x1D50A, 0x210C, 0x2111, 0x1D50D, 0x1D50E, 0x1D50F, 0x1D510, 0x1D511, 0x1D512, 0x1D513, 0x1D514, 0x211C, 0x1D516, 0x1D517, 0x1D518, 0x1D519, 0x1D51A, 0x1D51B, 0x1D51C, 0x2128, 0x1D51E, 0x1D51F, 0x1D520, 0x1D521, 0x1D522, 0x1D523, 0x1D524, 0x1D525, 0x1D526, 0x1D527, 0x1D528, 0x1D529, 0x1D52A, 0x1D52B, 0x1D52C, 0x1D52D, 0x1D52E, 0x1D52F, 0x1D530, 0x1D531, 0x1D532, 0x1D533, 0x1D534, 0x1D535, 0x1D536, 0x1D537];
-export const AMbbb = [0x1D538, 0x1D539, 0x2102, 0x1D53B, 0x1D53C, 0x1D53D, 0x1D53E, 0x210D, 0x1D540, 0x1D541, 0x1D542, 0x1D543, 0x1D544, 0x2115, 0x1D546, 0x2119, 0x211A, 0x211D, 0x1D54A, 0x1D54B, 0x1D54C, 0x1D54D, 0x1D54E, 0x1D54F, 0x1D550, 0x2124, 0x1D552, 0x1D553, 0x1D554, 0x1D555, 0x1D556, 0x1D557, 0x1D558, 0x1D559, 0x1D55A, 0x1D55B, 0x1D55C, 0x1D55D, 0x1D55E, 0x1D55F, 0x1D560, 0x1D561, 0x1D562, 0x1D563, 0x1D564, 0x1D565, 0x1D566, 0x1D567, 0x1D568, 0x1D569, 0x1D56A, 0x1D56B, 0x1D7D8];
-export const AMbb = [0x1D400, 0x1D41A, 0x1D7CE]; // Mathematical Bold
-export const AMsf = [0x1D5A0, 0x1D5BA, 0x1D7E2]; // Mathematical Sans-Serif
-export const AMtt = [0x1D670, 0x1D68A, 0x1D7F6]; // Mathematical Monospace
+exports.AMcal = [0x1D49C, 0x212C, 0x1D49E, 0x1D49F, 0x2130, 0x2131, 0x1D4A2, 0x210B, 0x2110, 0x1D4A5, 0x1D4A6, 0x2112, 0x2133, 0x1D4A9, 0x1D4AA, 0x1D4AB, 0x1D4AC, 0x211B, 0x1D4AE, 0x1D4AF, 0x1D4B0, 0x1D4B1, 0x1D4B2, 0x1D4B3, 0x1D4B4, 0x1D4B5, 0x1D4B6, 0x1D4B7, 0x1D4B8, 0x1D4B9, 0x212F, 0x1D4BB, 0x210A, 0x1D4BD, 0x1D4BE, 0x1D4BF, 0x1D4C0, 0x1D4C1, 0x1D4C2, 0x1D4C3, 0x2134, 0x1D4C5, 0x1D4C6, 0x1D4C7, 0x1D4C8, 0x1D4C9, 0x1D4CA, 0x1D4CB, 0x1D4CC, 0x1D4CD, 0x1D4CE, 0x1D4CF];
+exports.AMfrk = [0x1D504, 0x1D505, 0x212D, 0x1D507, 0x1D508, 0x1D509, 0x1D50A, 0x210C, 0x2111, 0x1D50D, 0x1D50E, 0x1D50F, 0x1D510, 0x1D511, 0x1D512, 0x1D513, 0x1D514, 0x211C, 0x1D516, 0x1D517, 0x1D518, 0x1D519, 0x1D51A, 0x1D51B, 0x1D51C, 0x2128, 0x1D51E, 0x1D51F, 0x1D520, 0x1D521, 0x1D522, 0x1D523, 0x1D524, 0x1D525, 0x1D526, 0x1D527, 0x1D528, 0x1D529, 0x1D52A, 0x1D52B, 0x1D52C, 0x1D52D, 0x1D52E, 0x1D52F, 0x1D530, 0x1D531, 0x1D532, 0x1D533, 0x1D534, 0x1D535, 0x1D536, 0x1D537];
+exports.AMbbb = [0x1D538, 0x1D539, 0x2102, 0x1D53B, 0x1D53C, 0x1D53D, 0x1D53E, 0x210D, 0x1D540, 0x1D541, 0x1D542, 0x1D543, 0x1D544, 0x2115, 0x1D546, 0x2119, 0x211A, 0x211D, 0x1D54A, 0x1D54B, 0x1D54C, 0x1D54D, 0x1D54E, 0x1D54F, 0x1D550, 0x2124, 0x1D552, 0x1D553, 0x1D554, 0x1D555, 0x1D556, 0x1D557, 0x1D558, 0x1D559, 0x1D55A, 0x1D55B, 0x1D55C, 0x1D55D, 0x1D55E, 0x1D55F, 0x1D560, 0x1D561, 0x1D562, 0x1D563, 0x1D564, 0x1D565, 0x1D566, 0x1D567, 0x1D568, 0x1D569, 0x1D56A, 0x1D56B, 0x1D7D8];
+exports.AMbb = [0x1D400, 0x1D41A, 0x1D7CE]; // Mathematical Bold
+exports.AMsf = [0x1D5A0, 0x1D5BA, 0x1D7E2]; // Mathematical Sans-Serif
+exports.AMtt = [0x1D670, 0x1D68A, 0x1D7F6]; // Mathematical Monospace
 // Quote symbol
-export const AMquote = { input: "\"", tag: "mtext", output: "mbox", tex: null, ttype: 10 /* TokenType.TEXT */ };
+exports.AMquote = { input: "\"", tag: "mtext", output: "mbox", tex: null, ttype: 10 /* TokenType.TEXT */ };
 /**
  * Main symbol table for AsciiMath
  */
-export const AMsymbols = [
+exports.AMsymbols = [
     // Greek symbols
     { input: "alpha", tag: "mi", output: "\u03B1", tex: null, ttype: 0 /* TokenType.CONST */ },
     { input: "beta", tag: "mi", output: "\u03B2", tex: null, ttype: 0 /* TokenType.CONST */ },
@@ -285,17 +288,17 @@ export const AMsymbols = [
     { input: "id", tag: "mrow", output: "id", tex: null, ttype: 2 /* TokenType.BINARY */ },
     { input: "class", tag: "mrow", output: "class", tex: null, ttype: 2 /* TokenType.BINARY */ },
     { input: "cancel", tag: "menclose", output: "cancel", tex: null, ttype: 1 /* TokenType.UNARY */ },
-    AMquote,
-    { input: "bb", tag: "mstyle", atname: "mathvariant", atval: "bold", output: "bb", tex: null, ttype: 1 /* TokenType.UNARY */, codes: AMbb },
-    { input: "mathbf", tag: "mstyle", atname: "mathvariant", atval: "bold", output: "mathbf", tex: null, ttype: 1 /* TokenType.UNARY */, codes: AMbb },
-    { input: "sf", tag: "mstyle", atname: "mathvariant", atval: "sans-serif", output: "sf", tex: null, ttype: 1 /* TokenType.UNARY */, codes: AMsf },
-    { input: "mathsf", tag: "mstyle", atname: "mathvariant", atval: "sans-serif", output: "mathsf", tex: null, ttype: 1 /* TokenType.UNARY */, codes: AMsf },
-    { input: "bbb", tag: "mstyle", atname: "mathvariant", atval: "double-struck", output: "bbb", tex: null, ttype: 1 /* TokenType.UNARY */, codes: AMbbb },
-    { input: "mathbb", tag: "mstyle", atname: "mathvariant", atval: "double-struck", output: "mathbb", tex: null, ttype: 1 /* TokenType.UNARY */, codes: AMbbb },
-    { input: "cc", tag: "mstyle", atname: "mathvariant", atval: "script", output: "cc", tex: null, ttype: 1 /* TokenType.UNARY */, codes: AMcal },
-    { input: "mathcal", tag: "mstyle", atname: "mathvariant", atval: "script", output: "mathcal", tex: null, ttype: 1 /* TokenType.UNARY */, codes: AMcal },
-    { input: "tt", tag: "mstyle", atname: "mathvariant", atval: "monospace", output: "tt", tex: null, ttype: 1 /* TokenType.UNARY */, codes: AMtt },
-    { input: "mathtt", tag: "mstyle", atname: "mathvariant", atval: "monospace", output: "mathtt", tex: null, ttype: 1 /* TokenType.UNARY */, codes: AMtt },
-    { input: "fr", tag: "mstyle", atname: "mathvariant", atval: "fraktur", output: "fr", tex: null, ttype: 1 /* TokenType.UNARY */, codes: AMfrk },
-    { input: "mathfrak", tag: "mstyle", atname: "mathvariant", atval: "fraktur", output: "mathfrak", tex: null, ttype: 1 /* TokenType.UNARY */, codes: AMfrk }
+    exports.AMquote,
+    { input: "bb", tag: "mstyle", atname: "mathvariant", atval: "bold", output: "bb", tex: null, ttype: 1 /* TokenType.UNARY */, codes: exports.AMbb },
+    { input: "mathbf", tag: "mstyle", atname: "mathvariant", atval: "bold", output: "mathbf", tex: null, ttype: 1 /* TokenType.UNARY */, codes: exports.AMbb },
+    { input: "sf", tag: "mstyle", atname: "mathvariant", atval: "sans-serif", output: "sf", tex: null, ttype: 1 /* TokenType.UNARY */, codes: exports.AMsf },
+    { input: "mathsf", tag: "mstyle", atname: "mathvariant", atval: "sans-serif", output: "mathsf", tex: null, ttype: 1 /* TokenType.UNARY */, codes: exports.AMsf },
+    { input: "bbb", tag: "mstyle", atname: "mathvariant", atval: "double-struck", output: "bbb", tex: null, ttype: 1 /* TokenType.UNARY */, codes: exports.AMbbb },
+    { input: "mathbb", tag: "mstyle", atname: "mathvariant", atval: "double-struck", output: "mathbb", tex: null, ttype: 1 /* TokenType.UNARY */, codes: exports.AMbbb },
+    { input: "cc", tag: "mstyle", atname: "mathvariant", atval: "script", output: "cc", tex: null, ttype: 1 /* TokenType.UNARY */, codes: exports.AMcal },
+    { input: "mathcal", tag: "mstyle", atname: "mathvariant", atval: "script", output: "mathcal", tex: null, ttype: 1 /* TokenType.UNARY */, codes: exports.AMcal },
+    { input: "tt", tag: "mstyle", atname: "mathvariant", atval: "monospace", output: "tt", tex: null, ttype: 1 /* TokenType.UNARY */, codes: exports.AMtt },
+    { input: "mathtt", tag: "mstyle", atname: "mathvariant", atval: "monospace", output: "mathtt", tex: null, ttype: 1 /* TokenType.UNARY */, codes: exports.AMtt },
+    { input: "fr", tag: "mstyle", atname: "mathvariant", atval: "fraktur", output: "fr", tex: null, ttype: 1 /* TokenType.UNARY */, codes: exports.AMfrk },
+    { input: "mathfrak", tag: "mstyle", atname: "mathvariant", atval: "fraktur", output: "mathfrak", tex: null, ttype: 1 /* TokenType.UNARY */, codes: exports.AMfrk }
 ];

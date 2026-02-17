@@ -2,8 +2,8 @@
  * AsciiMath DOM Parser
  */
 
-import { INodeAdapter, IParseOptions } from './NodeAdapter';
-import { AsciiMathParser } from './AsciiMathParser';
+import { INodeAdapter, IParseOptions } from './NodeAdapter.js';
+import { AsciiMathParser } from './AsciiMathParser.js';
 
 export class DOMNodeAdapter implements INodeAdapter {
   constructor(private element: Node) {}
@@ -19,9 +19,9 @@ export class DOMNodeAdapter implements INodeAdapter {
     return this.element.textContent;
   }
   get childNodes(): INodeAdapter[] {
-    return Array.from(this.element.childNodes)
-      .filter(n => (n.nodeType === 1 || n.nodeType === 3))
-      .map(n => new DOMNodeAdapter(n as Node));
+    return Array.prototype.slice.call(this.element.childNodes)
+    .filter(function(n) { return n.nodeType === 1 || n.nodeType === 3; })
+    .map(function(n) { return new DOMNodeAdapter(n); });
   }
   
   removeFirstChild(): void {

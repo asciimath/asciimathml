@@ -1,0 +1,20 @@
+export interface INodeAdapter {
+    kind: string;
+    text: string | null;
+    childNodes: INodeAdapter[];
+    removeFirstChild(): void;
+    removeLastChild(): void;
+    setAttribute(name: string, value: string): void;
+    getAttribute(name: string): string | number | boolean | undefined;
+    appendChild(child: INodeAdapter): void;
+    replaceChild(newChild: INodeAdapter, oldChild: INodeAdapter): void;
+}
+export interface IParseOptions<T extends INodeAdapter> {
+    create(tag: string, children?: T[]): T;
+    createText(text: string): T;
+    options: {
+        decimalsign: string;
+        displaystyle: boolean;
+        additionalSymbols?: any[];
+    };
+}

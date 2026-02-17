@@ -1,4 +1,4 @@
-import { INodeAdapter } from './NodeAdapter';
+import { INodeAdapter } from './NodeAdapter.js';
 export declare class DOMNodeAdapter implements INodeAdapter {
     private element;
     constructor(element: Node);

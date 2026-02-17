@@ -2,7 +2,7 @@
  * AsciiMath Parser
  */
 
-import { INodeAdapter, IParseOptions } from './NodeAdapter';
+import { INodeAdapter, IParseOptions } from './NodeAdapter.js';
 import {
   Symbol,
   TokenType,
@@ -687,6 +687,18 @@ export class AsciiMathParser {
     }
   }
 
+  private fromCodePoint(codePoint: number): string {
+    if (codePoint <= 0xFFFF) {
+      // Basic Multilingual Plane - fromCharCode works fine
+      return String.fromCharCode(codePoint);
+    }
+    // Supplementary planes - convert to surrogate pair
+    codePoint -= 0x10000;
+    var high = 0xD800 + (codePoint >> 10);
+    var low  = 0xDC00 + (codePoint & 0x3FF);
+    return String.fromCharCode(high, low);
+  }
+
   /*
   * Map characters in a node according to codemap
   * for font changes like double-struck, bold, etc.
@@ -702,18 +714,18 @@ export class AsciiMathParser {
       for (let j=0; j < st.length; j++) {
         if (st.charCodeAt(j)>64 && st.charCodeAt(j)<91) {
           if (codemap.length == 3) {
-            newst += String.fromCodePoint(codemap[0] + st.charCodeAt(j) - 65);
+            newst += this.fromCodePoint(codemap[0] + st.charCodeAt(j) - 65);
           } else {
-            newst += String.fromCodePoint(codemap[st.charCodeAt(j)-65]);
+            newst += this.fromCodePoint(codemap[st.charCodeAt(j)-65]);
           }
         } else if (st.charCodeAt(j)>96 && st.charCodeAt(j)<123) {
           if (codemap.length == 3) {
-            newst += String.fromCodePoint(codemap[1] + st.charCodeAt(j) - 97);
+            newst += this.fromCodePoint(codemap[1] + st.charCodeAt(j) - 97);
           } else {
-            newst += String.fromCodePoint(codemap[st.charCodeAt(j)-71]);
+            newst += this.fromCodePoint(codemap[st.charCodeAt(j)-71]);
           }
         } else if (st.charCodeAt(j)>47 && st.charCodeAt(j)<58 && (codemap.length == 3 || codemap.length == 53)) {
-          newst += String.fromCodePoint((codemap.length==3?codemap[2]:codemap[52]) + st.charCodeAt(j) - 48);
+          newst += this.fromCodePoint((codemap.length==3?codemap[2]:codemap[52]) + st.charCodeAt(j) - 48);
         } else {
           newst += st.charAt(j);
         }

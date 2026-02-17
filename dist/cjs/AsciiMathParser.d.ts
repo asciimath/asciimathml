@@ -1,4 +1,4 @@
-import { INodeAdapter, IParseOptions } from './NodeAdapter';
+import { INodeAdapter, IParseOptions } from './NodeAdapter.js';
 /**
  * The main AsciiMath Parser class.
  */
@@ -107,6 +107,7 @@ export declare class AsciiMathParser {
      * @returns {ParseResult} [node, remaining string]
      */
     private parseSexpr;
+    private fromCodePoint;
     private AMmapChars;
     /**
      * Parse an intermediate expression (handles subscripts and superscripts)

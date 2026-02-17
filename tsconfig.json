@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
-    "target": "ES6",
-    "module": "ESNext",
-    "moduleResolution": "node",
+    "module": "CommonJS",
+    "downlevelIteration": true,
+    "moduleResolution": "Node",
     "rootDir": "ts",
-    "outDir": "dist",
+    "outDir": "dist/cjs",
     "strict": false,
     "esModuleInterop": true,
     "skipLibCheck": true,

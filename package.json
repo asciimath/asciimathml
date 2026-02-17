@@ -13,13 +13,14 @@
   },
   "license": "MIT",
   "author": "",
-  "type": "commonjs",
+  "type": "module",
   "directories": {
     "test": "test"
   },
   "scripts": {
     "build": "esbuild ts/Parse.ts --bundle --format=iife --global-name=asciimath --target=es6 --outfile=dist/asciimathml.js",
     "watch": "esbuild ts/Parse.ts --bundle --format=iife --global-name=asciimath --target=es6 --outfile=dist/asciimathml.js --watch",
+    "compile": "tsc -p tsconfig.json && tsc -p tsconfig-esm.json",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

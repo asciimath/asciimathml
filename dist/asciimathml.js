@@ -33,6 +33,7 @@ var asciimath = (() => {
     return to;
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+  var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
 
   // ts/Parse.ts
   var Parse_exports = {};
@@ -353,44 +354,44 @@ var asciimath = (() => {
        *
        * @type {number}
        */
-      this.nestingDepth = 0;
+      __publicField(this, "nestingDepth", 0);
       /**
        * Previous symbol type
        *
        * @type {TokenType}
        */
-      this.previousSymbol = -1 /* NONE */;
+      __publicField(this, "previousSymbol", -1 /* NONE */);
       /**
        * Current symbol type
        *
        * @type {TokenType}
        */
-      this.currentSymbol = -1 /* NONE */;
+      __publicField(this, "currentSymbol", -1 /* NONE */);
       /**
        * Sorted array of symbol names for binary search
        *
        * @type {string[]}
        */
-      this.symbolNames = [];
+      __publicField(this, "symbolNames", []);
       /**
        * Symbol table including TeX aliases
        *
        * @type {Symbol[]}
        */
-      this.symbols = [];
+      __publicField(this, "symbols", []);
       /**
        * Decimal sign character
        *
        * @type {string}
        */
-      this.decimalsign = ".";
+      __publicField(this, "decimalsign", ".");
       /**
        * Display style (for limits)
        *
        * @type {boolean}
        */
-      this.displaystyle = true;
-      this.TokenTypeMap = {
+      __publicField(this, "displaystyle", true);
+      __publicField(this, "TokenTypeMap", {
         CONST: 0 /* CONST */,
         UNARY: 1 /* UNARY */,
         BINARY: 2 /* BINARY */,
@@ -403,7 +404,7 @@ var asciimath = (() => {
         LEFTRIGHT: 9 /* LEFTRIGHT */,
         TEXT: 10 /* TEXT */,
         UNARYUNDEROVER: 15 /* UNARYUNDEROVER */
-      };
+      });
       this.decimalsign = configuration.options.decimalsign;
       this.displaystyle = configuration.options.displaystyle;
       this.initSymbols();
@@ -872,6 +873,15 @@ var asciimath = (() => {
           return [node, str];
       }
     }
+    fromCodePoint(codePoint) {
+      if (codePoint <= 65535) {
+        return String.fromCharCode(codePoint);
+      }
+      codePoint -= 65536;
+      var high = 55296 + (codePoint >> 10);
+      var low = 56320 + (codePoint & 1023);
+      return String.fromCharCode(high, low);
+    }
     /*
     * Map characters in a node according to codemap
     * for font changes like double-struck, bold, etc.
@@ -887,18 +897,18 @@ var asciimath = (() => {
         for (let j = 0; j < st.length; j++) {
           if (st.charCodeAt(j) > 64 && st.charCodeAt(j) < 91) {
             if (codemap.length == 3) {
-              newst += String.fromCodePoint(codemap[0] + st.charCodeAt(j) - 65);
+              newst += this.fromCodePoint(codemap[0] + st.charCodeAt(j) - 65);
             } else {
-              newst += String.fromCodePoint(codemap[st.charCodeAt(j) - 65]);
+              newst += this.fromCodePoint(codemap[st.charCodeAt(j) - 65]);
             }
           } else if (st.charCodeAt(j) > 96 && st.charCodeAt(j) < 123) {
             if (codemap.length == 3) {
-              newst += String.fromCodePoint(codemap[1] + st.charCodeAt(j) - 97);
+              newst += this.fromCodePoint(codemap[1] + st.charCodeAt(j) - 97);
             } else {
-              newst += String.fromCodePoint(codemap[st.charCodeAt(j) - 71]);
+              newst += this.fromCodePoint(codemap[st.charCodeAt(j) - 71]);
             }
           } else if (st.charCodeAt(j) > 47 && st.charCodeAt(j) < 58 && (codemap.length == 3 || codemap.length == 53)) {
-            newst += String.fromCodePoint((codemap.length == 3 ? codemap[2] : codemap[52]) + st.charCodeAt(j) - 48);
+            newst += this.fromCodePoint((codemap.length == 3 ? codemap[2] : codemap[52]) + st.charCodeAt(j) - 48);
           } else {
             newst += st.charAt(j);
           }
@@ -1196,7 +1206,11 @@ var asciimath = (() => {
       return this.element.textContent;
     }
     get childNodes() {
-      return Array.from(this.element.childNodes).filter((n) => n.nodeType === 1 || n.nodeType === 3).map((n) => new _DOMNodeAdapter(n));
+      return Array.prototype.slice.call(this.element.childNodes).filter(function(n) {
+        return n.nodeType === 1 || n.nodeType === 3;
+      }).map(function(n) {
+        return new _DOMNodeAdapter(n);
+      });
     }
     removeFirstChild() {
       if (this.element instanceof Element) {
@@ -1239,8 +1253,10 @@ var asciimath = (() => {
   };
   var AsciiMath = class {
     constructor() {
-      this.AMdelimiter1 = "`";
-      this.AMescape1 = "\\\\`";
+      __publicField(this, "parser");
+      __publicField(this, "domConfig");
+      __publicField(this, "AMdelimiter1", "`");
+      __publicField(this, "AMescape1", "\\\\`");
       this.domConfig = {
         create: (tag) => {
           const el = document.createElementNS("http://www.w3.org/1998/Math/MathML", tag);

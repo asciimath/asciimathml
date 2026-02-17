@@ -1,16 +1,63 @@
 /*
  * AsciiMath Parser
  */
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
 import { AMsymbols, AMquote, } from './AsciiMathSymbols';
 /**
  * The main AsciiMath Parser class.
  */
-export class AsciiMathParser {
+var AsciiMathParser = /** @class */ (function () {
     /**
      * @constructor
      * @param {IParseOptions} configuration A parser configuration.
      */
-    constructor(configuration) {
+    function AsciiMathParser(configuration) {
         this.configuration = configuration;
         /**
          * Current nesting depth for tracking brackets
@@ -75,24 +122,35 @@ export class AsciiMathParser {
     /**
      * Initialize the symbol table
      */
-    initSymbols() {
-        var _a, _b, _c;
+    AsciiMathParser.prototype.initSymbols = function () {
+        var e_1, _a;
+        var _b, _c, _d;
         // Copy base symbols
-        this.symbols = [...AMsymbols];
+        this.symbols = __spreadArray([], __read(AMsymbols), false);
         if (this.configuration.options.additionalSymbols) {
-            for (const sym of this.configuration.options.additionalSymbols) {
-                const ttypeUpper = (_a = sym.ttype) === null || _a === void 0 ? void 0 : _a.toUpperCase();
-                if (ttypeUpper && (ttypeUpper in this.TokenTypeMap) && sym.input && sym.tag && sym.output) {
-                    this.symbols.push(Object.assign(Object.assign({}, sym), { ttype: this.TokenTypeMap[ttypeUpper], tex: (_b = sym.tex) !== null && _b !== void 0 ? _b : null }));
+            try {
+                for (var _e = __values(this.configuration.options.additionalSymbols), _f = _e.next(); !_f.done; _f = _e.next()) {
+                    var sym = _f.value;
+                    var ttypeUpper = (_b = sym.ttype) === null || _b === void 0 ? void 0 : _b.toUpperCase();
+                    if (ttypeUpper && (ttypeUpper in this.TokenTypeMap) && sym.input && sym.tag && sym.output) {
+                        this.symbols.push(__assign(__assign({}, sym), { ttype: this.TokenTypeMap[ttypeUpper], tex: (_c = sym.tex) !== null && _c !== void 0 ? _c : null }));
+                    }
                 }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (_f && !_f.done && (_a = _e.return)) _a.call(_e);
+                }
+                finally { if (e_1) throw e_1.error; }
             }
         }
         // Add TeX aliases
-        const symlen = this.symbols.length;
-        for (let i = 0; i < symlen; i++) {
+        var symlen = this.symbols.length;
+        for (var i = 0; i < symlen; i++) {
             if (this.symbols[i].tex) {
                 this.symbols.push({
-                    input: (_c = this.symbols[i].tex) !== null && _c !== void 0 ? _c : '',
+                    input: (_d = this.symbols[i].tex) !== null && _d !== void 0 ? _d : '',
                     tag: this.symbols[i].tag,
                     output: this.symbols[i].output,
                     tex: null,
@@ -102,14 +160,14 @@ export class AsciiMathParser {
             }
         }
         this.refreshSymbols();
-    }
+    };
     /**
      * Refresh the symbol name list (sort and extract names)
      */
-    refreshSymbols() {
-        this.symbols.sort((a, b) => (a.input > b.input ? 1 : -1));
-        this.symbolNames = this.symbols.map((s) => s.input);
-    }
+    AsciiMathParser.prototype.refreshSymbols = function () {
+        this.symbols.sort(function (a, b) { return (a.input > b.input ? 1 : -1); });
+        this.symbolNames = this.symbols.map(function (s) { return s.input; });
+    };
     /**
      * Remove n characters and any following blanks from the string
      *
@@ -117,20 +175,20 @@ export class AsciiMathParser {
      * @param {number} n Number of characters to remove
      * @returns {string} The processed string
      */
-    removeCharsAndBlanks(str, n) {
-        let st;
+    AsciiMathParser.prototype.removeCharsAndBlanks = function (str, n) {
+        var st;
         if (str.charAt(n) === '\\' && str.charAt(n + 1) !== '\\' && str.charAt(n + 1) !== ' ') {
             st = str.slice(n + 1);
         }
         else {
             st = str.slice(n);
         }
-        let i = 0;
+        var i = 0;
         while (i < st.length && st.charCodeAt(i) <= 32) {
             i++;
         }
         return st.slice(i);
-    }
+    };
     /**
      * Binary search for position where str appears or would be inserted
      *
@@ -139,10 +197,10 @@ export class AsciiMathParser {
      * @param {number} n Starting position
      * @returns {number} Position index
      */
-    position(arr, str, n) {
+    AsciiMathParser.prototype.position = function (arr, str, n) {
         if (n === 0) {
-            let h;
-            let m;
+            var h = void 0;
+            var m = void 0;
             n = -1;
             h = arr.length;
             while (n + 1 < h) {
@@ -157,27 +215,27 @@ export class AsciiMathParser {
             return h;
         }
         else {
-            let i;
+            var i = void 0;
             for (i = n; i < arr.length && arr[i] < str; i++)
                 ;
             return i;
         }
-    }
+    };
     /**
      * Get the maximal initial substring of str that appears in symbol names
      *
      * @param {string} str Input string
      * @returns {Symbol | null} The matched symbol or null
      */
-    getSymbol(str) {
-        let k = 0;
-        let j = 0;
-        let mk = -1;
-        let st;
-        let tagst;
-        let match = '';
-        let more = true;
-        for (let i = 1; i <= str.length && more; i++) {
+    AsciiMathParser.prototype.getSymbol = function (str) {
+        var k = 0;
+        var j = 0;
+        var mk = -1;
+        var st;
+        var tagst;
+        var match = '';
+        var more = true;
+        for (var i = 1; i <= str.length && more; i++) {
             st = str.slice(0, i);
             j = k;
             k = this.position(this.symbolNames, st, j);
@@ -200,7 +258,7 @@ export class AsciiMathParser {
         this.currentSymbol = 0 /* TokenType.CONST */;
         k = 1;
         st = str.slice(0, 1);
-        let integ = true;
+        var integ = true;
         while ('0' <= st && st <= '9' && k <= str.length) {
             st = str.slice(k, k + 1);
             k++;
@@ -233,7 +291,7 @@ export class AsciiMathParser {
             return { input: st, tag: tagst, output: st, tex: null, ttype: 1 /* TokenType.UNARY */, func: true };
         }
         return { input: st, tag: tagst, output: st, tex: null, ttype: 0 /* TokenType.CONST */ };
-    }
+    };
     /**
      * Append, unwrapping if needed
      * Since INodeAdapters don't have document fragments,
@@ -243,60 +301,71 @@ export class AsciiMathParser {
      * @param {INodeAdapter} toappend The node to append
      * @param {INodeAdapter} node The node to append to
      */
-    appendUnwrap(toappend, node) {
+    AsciiMathParser.prototype.appendUnwrap = function (toappend, node) {
+        var e_2, _a;
         if (toappend.kind === 'inferredMrow') { // 
-            for (const child of toappend.childNodes) {
-                node.appendChild(child);
+            try {
+                for (var _b = __values(toappend.childNodes), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var child = _c.value;
+                    node.appendChild(child);
+                }
+            }
+            catch (e_2_1) { e_2 = { error: e_2_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                }
+                finally { if (e_2) throw e_2.error; }
             }
         }
         else {
             node.appendChild(toappend);
         }
-    }
+    };
     /**
      * Remove brackets from a node if it's an mrow with bracket children
      *
      * @param {INodeAdapter} node The node to remove brackets from
      */
-    removeBrackets(node) {
+    AsciiMathParser.prototype.removeBrackets = function (node) {
         if (!node || !node.childNodes || node.childNodes.length === 0) {
             return;
         }
         if (node.kind === 'mrow' || node.kind === 'inferredMrow') {
-            const first = node.childNodes[0];
+            var first = node.childNodes[0];
             if (node.childNodes.length > 1 && node.childNodes[1].kind === 'mtable') {
                 return; // matrix case, do not remove brackets
             }
-            const last = node.childNodes[node.childNodes.length - 1];
+            var last = node.childNodes[node.childNodes.length - 1];
             if (first && first.childNodes[0]) {
-                const text = first.childNodes[0].text;
+                var text = first.childNodes[0].text;
                 if (text === '(' || text === '[' || text === '{') {
                     node.removeFirstChild();
                 }
             }
             if (last && last.childNodes[0]) {
-                const text = last.childNodes[0].text;
+                var text = last.childNodes[0].text;
                 if (text === ')' || text === ']' || text === '}') {
                     node.removeLastChild();
                 }
             }
         }
-    }
+    };
     /**
      * Parse a simple expression
      *
      * @param {string} str The string to parse
      * @returns {ParseResult} [node, remaining string]
      */
-    parseSexpr(str) {
+    AsciiMathParser.prototype.parseSexpr = function (str) {
         var _a, _b;
-        let symbol;
-        let node;
-        let result;
-        let result2;
-        let i;
-        let st;
-        let newFrag;
+        var symbol;
+        var node;
+        var result;
+        var result2;
+        var i;
+        var st;
+        var newFrag;
         str = this.removeCharsAndBlanks(str, 0);
         symbol = this.getSymbol(str);
         if (symbol === null ||
@@ -331,7 +400,7 @@ export class AsciiMathParser {
                     }
                 }
                 else {
-                    const mo = this.configuration.create('mo');
+                    var mo = this.configuration.create('mo');
                     mo.appendChild(this.configuration.createText(symbol.output));
                     node = this.configuration.create('mrow');
                     node.appendChild(mo);
@@ -364,15 +433,15 @@ export class AsciiMathParser {
                 st = str.slice(1, i);
                 node = this.configuration.create('mrow');
                 if (st.charAt(0) === ' ') {
-                    const mspace = this.configuration.create('mspace');
+                    var mspace = this.configuration.create('mspace');
                     mspace.setAttribute('width', '1ex');
                     node.appendChild(mspace);
                 }
-                const mtext = this.configuration.create(symbol.tag);
+                var mtext = this.configuration.create(symbol.tag);
                 mtext.appendChild(this.configuration.createText(st));
                 node.appendChild(mtext);
                 if (st.charAt(st.length - 1) === ' ') {
-                    const mspace = this.configuration.create('mspace');
+                    var mspace = this.configuration.create('mspace');
                     mspace.setAttribute('width', '1ex');
                     node.appendChild(mspace);
                 }
@@ -407,7 +476,7 @@ export class AsciiMathParser {
                         return [node, str];
                     }
                     else {
-                        const mo = this.configuration.create(symbol.tag);
+                        var mo = this.configuration.create(symbol.tag);
                         mo.appendChild(this.configuration.createText(symbol.output));
                         node = this.configuration.create('mrow');
                         node.appendChild(mo);
@@ -422,9 +491,9 @@ export class AsciiMathParser {
                     return [node, result[1]];
                 }
                 else if (symbol.rewriteleftright) {
-                    const mo1 = this.configuration.create('mo');
+                    var mo1 = this.configuration.create('mo');
                     mo1.appendChild(this.configuration.createText(symbol.rewriteleftright[0]));
-                    const mo2 = this.configuration.create('mo');
+                    var mo2 = this.configuration.create('mo');
                     mo2.appendChild(this.configuration.createText(symbol.rewriteleftright[1]));
                     node = this.configuration.create('mrow');
                     node.appendChild(mo1);
@@ -441,7 +510,7 @@ export class AsciiMathParser {
                 else if (symbol.acc) {
                     node = this.configuration.create(symbol.tag);
                     this.appendUnwrap(result[0], node);
-                    const accnode = this.configuration.create('mo');
+                    var accnode = this.configuration.create('mo');
                     accnode.appendChild(this.configuration.createText(symbol.output));
                     if (symbol.tag == 'mover' && symbol.ttype === 1 /* TokenType.UNARY */) {
                         accnode.setAttribute('accent', 'true');
@@ -452,7 +521,7 @@ export class AsciiMathParser {
                     accnode.setAttribute('stretchy', 'true');
                     // Special handling for vec with single character base
                     if (symbol.input === 'vec') {
-                        const r0 = result[0];
+                        var r0 = result[0];
                         if ((r0.kind === 'mrow' &&
                             r0.childNodes.length === 1 &&
                             r0.childNodes[0].childNodes[0] &&
@@ -575,13 +644,13 @@ export class AsciiMathParser {
             case 6 /* TokenType.SPACE */:
                 str = this.removeCharsAndBlanks(str, symbol.input.length);
                 node = this.configuration.create('mrow');
-                const mspace1 = this.configuration.create('mspace');
+                var mspace1 = this.configuration.create('mspace');
                 mspace1.setAttribute('width', '1ex');
                 node.appendChild(mspace1);
-                const mtext2 = this.configuration.create(symbol.tag);
+                var mtext2 = this.configuration.create(symbol.tag);
                 mtext2.appendChild(this.configuration.createText(symbol.output));
                 node.appendChild(mtext2);
-                const mspace2 = this.configuration.create('mspace');
+                var mspace2 = this.configuration.create('mspace');
                 mspace2.setAttribute('width', '1ex');
                 node.appendChild(mspace2);
                 return [node, str];
@@ -594,7 +663,7 @@ export class AsciiMathParser {
                 if (result[0] &&
                     result[0].childNodes.length > 0 &&
                     result[0].childNodes[result[0].childNodes.length - 1]) {
-                    const lastChild = result[0].childNodes[result[0].childNodes.length - 1];
+                    var lastChild = result[0].childNodes[result[0].childNodes.length - 1];
                     if (lastChild.kind === 'mo' &&
                         lastChild.childNodes[0] &&
                         lastChild.childNodes[0].text) {
@@ -602,7 +671,7 @@ export class AsciiMathParser {
                     }
                 }
                 if (st === '|' && str.charAt(0) !== ',' && result[0]) { // its an absolute value subterm
-                    const mo = this.configuration.create('mo');
+                    var mo = this.configuration.create('mo');
                     mo.appendChild(this.configuration.createText(symbol.output));
                     node = this.configuration.create('mrow');
                     node.appendChild(mo);
@@ -610,7 +679,7 @@ export class AsciiMathParser {
                     return [node, result[1]];
                 }
                 else { // the "|" is a \mid so use unicode 2223 (divides) for spacing
-                    const mo = this.configuration.create('mo');
+                    var mo = this.configuration.create('mo');
                     mo.appendChild(this.configuration.createText('\u2223'));
                     node = this.configuration.create('mrow');
                     node.appendChild(mo);
@@ -622,7 +691,18 @@ export class AsciiMathParser {
                 node.appendChild(this.configuration.createText(symbol.output));
                 return [node, str];
         }
-    }
+    };
+    AsciiMathParser.prototype.fromCodePoint = function (codePoint) {
+        if (codePoint <= 0xFFFF) {
+            // Basic Multilingual Plane - fromCharCode works fine
+            return String.fromCharCode(codePoint);
+        }
+        // Supplementary planes - convert to surrogate pair
+        codePoint -= 0x10000;
+        var high = 0xD800 + (codePoint >> 10);
+        var low = 0xDC00 + (codePoint & 0x3FF);
+        return String.fromCharCode(high, low);
+    };
     /*
     * Map characters in a node according to codemap
     * for font changes like double-struck, bold, etc.
@@ -630,30 +710,30 @@ export class AsciiMathParser {
     * @param {INodeAdapter} node The node to process
     * @param {number[]} codemap The code mapping array
     */
-    AMmapChars(node, codemap) {
-        const tag = node.kind;
+    AsciiMathParser.prototype.AMmapChars = function (node, codemap) {
+        var tag = node.kind;
         if (tag == "mi" || tag == "mo" || tag == "mn") {
-            const st = node.childNodes[0].text;
-            let newst = "";
-            for (let j = 0; j < st.length; j++) {
+            var st = node.childNodes[0].text;
+            var newst = "";
+            for (var j = 0; j < st.length; j++) {
                 if (st.charCodeAt(j) > 64 && st.charCodeAt(j) < 91) {
                     if (codemap.length == 3) {
-                        newst += String.fromCodePoint(codemap[0] + st.charCodeAt(j) - 65);
+                        newst += this.fromCodePoint(codemap[0] + st.charCodeAt(j) - 65);
                     }
                     else {
-                        newst += String.fromCodePoint(codemap[st.charCodeAt(j) - 65]);
+                        newst += this.fromCodePoint(codemap[st.charCodeAt(j) - 65]);
                     }
                 }
                 else if (st.charCodeAt(j) > 96 && st.charCodeAt(j) < 123) {
                     if (codemap.length == 3) {
-                        newst += String.fromCodePoint(codemap[1] + st.charCodeAt(j) - 97);
+                        newst += this.fromCodePoint(codemap[1] + st.charCodeAt(j) - 97);
                     }
                     else {
-                        newst += String.fromCodePoint(codemap[st.charCodeAt(j) - 71]);
+                        newst += this.fromCodePoint(codemap[st.charCodeAt(j) - 71]);
                     }
                 }
                 else if (st.charCodeAt(j) > 47 && st.charCodeAt(j) < 58 && (codemap.length == 3 || codemap.length == 53)) {
-                    newst += String.fromCodePoint((codemap.length == 3 ? codemap[2] : codemap[52]) + st.charCodeAt(j) - 48);
+                    newst += this.fromCodePoint((codemap.length == 3 ? codemap[2] : codemap[52]) + st.charCodeAt(j) - 48);
                 }
                 else {
                     newst += st.charAt(j);
@@ -662,24 +742,24 @@ export class AsciiMathParser {
             node.replaceChild(this.configuration.createText(newst), node.childNodes[0]);
         }
         else {
-            for (let i = 0; i < node.childNodes.length; i++) {
+            for (var i = 0; i < node.childNodes.length; i++) {
                 this.AMmapChars(node.childNodes[i], codemap);
             }
         }
-    }
+    };
     /**
      * Parse an intermediate expression (handles subscripts and superscripts)
      *
      * @param {string} str The string to parse
      * @returns {ParseResult} [node, remaining string]
      */
-    parseIexpr(str) {
-        let symbol;
-        let sym1;
-        let sym2;
-        let node;
-        let result;
-        let underover;
+    AsciiMathParser.prototype.parseIexpr = function (str) {
+        var symbol;
+        var sym1;
+        var sym2;
+        var node;
+        var result;
+        var underover;
         str = this.removeCharsAndBlanks(str, 0);
         sym1 = this.getSymbol(str);
         result = this.parseSexpr(str);
@@ -698,7 +778,7 @@ export class AsciiMathParser {
             str = this.removeCharsAndBlanks(str, symbol.input.length);
             result = this.parseSexpr(str);
             if (result[0] == null) {
-                const box = this.configuration.create('mo');
+                var box = this.configuration.create('mo');
                 box.appendChild(this.configuration.createText('\u25A1'));
                 result[0] = box;
             }
@@ -713,38 +793,38 @@ export class AsciiMathParser {
                 sym2 = this.getSymbol(str);
                 if (sym2 !== null && sym2.input === '^') {
                     str = this.removeCharsAndBlanks(str, sym2.input.length);
-                    const res2 = this.parseSexpr(str);
+                    var res2 = this.parseSexpr(str);
                     if (res2[0] === null) {
                         return [null, str];
                     }
                     this.removeBrackets(res2[0]);
                     str = res2[1];
-                    const tag = underover ? 'munderover' : 'msubsup';
-                    const lastnode = node;
+                    var tag = underover ? 'munderover' : 'msubsup';
+                    var lastnode = node;
                     node = this.configuration.create(tag);
                     this.appendUnwrap(lastnode, node);
                     this.appendUnwrap(result[0], node);
                     this.appendUnwrap(res2[0], node);
-                    const mrow = this.configuration.create('mrow');
+                    var mrow = this.configuration.create('mrow');
                     mrow.appendChild(node);
                     node = mrow;
                 }
                 else {
-                    const tag = underover ? 'munder' : 'msub';
-                    const lastnode = node;
+                    var tag = underover ? 'munder' : 'msub';
+                    var lastnode = node;
                     node = this.configuration.create(tag);
                     this.appendUnwrap(lastnode, node);
                     this.appendUnwrap(result[0], node);
                 }
             }
             else if (symbol.input === '^' && underover) {
-                const lastnode = node;
+                var lastnode = node;
                 node = this.configuration.create('mover');
                 this.appendUnwrap(lastnode, node);
                 this.appendUnwrap(result[0], node);
             }
             else {
-                const lastnode = node;
+                var lastnode = node;
                 node = this.configuration.create(symbol.tag);
                 this.appendUnwrap(lastnode, node);
                 this.appendUnwrap(result[0], node);
@@ -759,7 +839,7 @@ export class AsciiMathParser {
                     if (result[0] === null) {
                         return [null, str];
                     }
-                    const mrow = this.configuration.create('mrow');
+                    var mrow = this.configuration.create('mrow');
                     this.appendUnwrap(node, mrow);
                     this.appendUnwrap(result[0], mrow);
                     node = mrow;
@@ -768,7 +848,7 @@ export class AsciiMathParser {
             }
         }
         return [node, str];
-    }
+    };
     /**
      * Parse a full expression
      *
@@ -776,11 +856,12 @@ export class AsciiMathParser {
      * @param {boolean} rightbracket Whether we're inside brackets
      * @returns {ParseResult} [node, remaining string]
      */
-    parseExpr(str, rightbracket) {
-        let symbol;
-        let node;
-        let result;
-        const newFrag = this.configuration.create('inferredMrow');
+    AsciiMathParser.prototype.parseExpr = function (str, rightbracket) {
+        var e_3, _a, e_4, _b, e_5, _c, e_6, _d;
+        var symbol;
+        var node;
+        var result;
+        var newFrag = this.configuration.create('inferredMrow');
         do {
             str = this.removeCharsAndBlanks(str, 0);
             result = this.parseIexpr(str);
@@ -794,7 +875,7 @@ export class AsciiMathParser {
                 str = this.removeCharsAndBlanks(str, symbol.input.length);
                 result = this.parseIexpr(str);
                 if (result[0] == null) {
-                    const box = this.configuration.create('mo');
+                    var box = this.configuration.create('mo');
                     box.appendChild(this.configuration.createText('\u25A1'));
                     result[0] = box;
                 }
@@ -803,7 +884,7 @@ export class AsciiMathParser {
                 }
                 str = result[1];
                 this.removeBrackets(node);
-                const frac = this.configuration.create(symbol.tag);
+                var frac = this.configuration.create(symbol.tag);
                 this.appendUnwrap(node, frac);
                 this.appendUnwrap(result[0], frac);
                 newFrag.appendChild(frac);
@@ -820,26 +901,26 @@ export class AsciiMathParser {
         if (symbol !== null && (symbol.ttype === 5 /* TokenType.RIGHTBRACKET */ ||
             symbol.ttype === 9 /* TokenType.LEFTRIGHT */)) {
             // Matrix detection logic
-            const len = newFrag.childNodes.length;
+            var len = newFrag.childNodes.length;
             if (len > 0 &&
                 newFrag.childNodes[len - 1].kind === 'mrow' &&
                 newFrag.childNodes[len - 1].childNodes.length > 0) {
-                const lastMrow = newFrag.childNodes[len - 1];
-                const lastChild = lastMrow.childNodes[lastMrow.childNodes.length - 1];
-                const firstChild = lastMrow.childNodes[0];
+                var lastMrow = newFrag.childNodes[len - 1];
+                var lastChild = lastMrow.childNodes[lastMrow.childNodes.length - 1];
+                var firstChild = lastMrow.childNodes[0];
                 if (lastChild &&
                     lastChild.childNodes.length > 0 &&
                     firstChild &&
                     firstChild.childNodes.length > 0) {
-                    const right = lastChild.childNodes[0].text;
-                    const left = firstChild.childNodes[0].text;
+                    var right = lastChild.childNodes[0].text;
+                    var left = firstChild.childNodes[0].text;
                     if (right === ')' || right === ']') {
                         if ((left === '(' && right === ')' && symbol.output !== '}') ||
                             (left === '[' && right === ']')) {
-                            const pos = []; // positions of commas
-                            let matrix = true;
-                            const m = newFrag.childNodes.length;
-                            let i, j;
+                            var pos = []; // positions of commas
+                            var matrix = true;
+                            var m = newFrag.childNodes.length;
+                            var i = void 0, j = void 0;
                             for (i = 0; matrix && i < m; i = i + 2) {
                                 pos[i] = [];
                                 node = newFrag.childNodes[i];
@@ -870,15 +951,15 @@ export class AsciiMathParser {
                             }
                             // At least two rows or two columns
                             matrix = matrix && (pos.length > 1 || pos[0].length > 0);
-                            const columnlines = [];
+                            var columnlines = [];
                             if (matrix) {
-                                const table = this.configuration.create('inferredMrow');
+                                var table = this.configuration.create('inferredMrow');
                                 for (i = 0; i < m; i = i + 2) {
-                                    const row = this.configuration.create('inferredMrow');
-                                    let frag = this.configuration.create('inferredMrow');
+                                    var row = this.configuration.create('inferredMrow');
+                                    var frag = this.configuration.create('inferredMrow');
                                     node = newFrag.childNodes[0]; // <mrow>(-,-,...,-,-)</mrow>
-                                    const n = node.childNodes.length;
-                                    let k = 0;
+                                    var n = node.childNodes.length;
+                                    var k = 0;
                                     node.removeFirstChild(); // remove (
                                     for (j = 1; j < n - 1; j++) {
                                         if (typeof pos[i][k] !== 'undefined' && j === pos[i][k]) {
@@ -900,11 +981,21 @@ export class AsciiMathParser {
                                             else if (i === 0) {
                                                 columnlines.push('none');
                                             }
-                                            const mtd = this.configuration.create('mtd');
-                                            for (const child of frag.childNodes) {
-                                                mtd.appendChild(child);
+                                            var mtd_1 = this.configuration.create('mtd');
+                                            try {
+                                                for (var _e = (e_3 = void 0, __values(frag.childNodes)), _f = _e.next(); !_f.done; _f = _e.next()) {
+                                                    var child = _f.value;
+                                                    mtd_1.appendChild(child);
+                                                }
                                             }
-                                            row.appendChild(mtd);
+                                            catch (e_3_1) { e_3 = { error: e_3_1 }; }
+                                            finally {
+                                                try {
+                                                    if (_f && !_f.done && (_a = _e.return)) _a.call(_e);
+                                                }
+                                                finally { if (e_3) throw e_3.error; }
+                                            }
+                                            row.appendChild(mtd_1);
                                             frag = this.configuration.create('inferredMrow'); // reset frag
                                             k++;
                                         }
@@ -912,9 +1003,19 @@ export class AsciiMathParser {
                                             frag.appendChild(node.childNodes[0]);
                                         }
                                     }
-                                    const mtd = this.configuration.create('mtd');
-                                    for (const child of frag.childNodes) {
-                                        mtd.appendChild(child);
+                                    var mtd = this.configuration.create('mtd');
+                                    try {
+                                        for (var _g = (e_4 = void 0, __values(frag.childNodes)), _h = _g.next(); !_h.done; _h = _g.next()) {
+                                            var child = _h.value;
+                                            mtd.appendChild(child);
+                                        }
+                                    }
+                                    catch (e_4_1) { e_4 = { error: e_4_1 }; }
+                                    finally {
+                                        try {
+                                            if (_h && !_h.done && (_b = _g.return)) _b.call(_g);
+                                        }
+                                        finally { if (e_4) throw e_4.error; }
                                     }
                                     row.appendChild(mtd);
                                     if (i === 0) {
@@ -924,9 +1025,19 @@ export class AsciiMathParser {
                                         newFrag.removeFirstChild(); // remove <mrow>)</mrow>
                                         newFrag.removeFirstChild(); // remove <mo>,</mo>
                                     }
-                                    const mtr = this.configuration.create('mtr');
-                                    for (const child of row.childNodes) {
-                                        mtr.appendChild(child);
+                                    var mtr = this.configuration.create('mtr');
+                                    try {
+                                        for (var _j = (e_5 = void 0, __values(row.childNodes)), _k = _j.next(); !_k.done; _k = _j.next()) {
+                                            var child = _k.value;
+                                            mtr.appendChild(child);
+                                        }
+                                    }
+                                    catch (e_5_1) { e_5 = { error: e_5_1 }; }
+                                    finally {
+                                        try {
+                                            if (_k && !_k.done && (_c = _j.return)) _c.call(_j);
+                                        }
+                                        finally { if (e_5) throw e_5.error; }
                                     }
                                     table.appendChild(mtr);
                                 }
@@ -936,8 +1047,18 @@ export class AsciiMathParser {
                                     symbol.invisible) {
                                     node.setAttribute('columnalign', 'left');
                                 }
-                                for (const child of table.childNodes) {
-                                    node.appendChild(child);
+                                try {
+                                    for (var _l = __values(table.childNodes), _m = _l.next(); !_m.done; _m = _l.next()) {
+                                        var child = _m.value;
+                                        node.appendChild(child);
+                                    }
+                                }
+                                catch (e_6_1) { e_6 = { error: e_6_1 }; }
+                                finally {
+                                    try {
+                                        if (_m && !_m.done && (_d = _l.return)) _d.call(_l);
+                                    }
+                                    finally { if (e_6) throw e_6.error; }
                                 }
                                 newFrag.replaceChild(node, newFrag.childNodes[0]);
                             }
@@ -947,33 +1068,35 @@ export class AsciiMathParser {
             }
             str = this.removeCharsAndBlanks(str, symbol.input.length);
             if (!symbol.invisible) {
-                const mo = this.configuration.create('mo');
+                var mo = this.configuration.create('mo');
                 mo.appendChild(this.configuration.createText(symbol.output));
                 newFrag.appendChild(mo);
             }
         }
         return [newFrag, str];
-    }
+    };
     /**
      * Main parse method - returns the MML tree
      *
      * @returns {INodeAdapter} The parsed MML node
      */
-    mml(_string) {
+    AsciiMathParser.prototype.mml = function (_string) {
         this.nestingDepth = 0;
         // Cleanup
-        let str = _string.replace(/&nbsp;/g, '');
+        var str = _string.replace(/&nbsp;/g, '');
         str = str.replace(/&gt;/g, '>');
         str = str.replace(/&lt;/g, '<');
-        const frag = this.parseExpr(str.replace(/^\s+/g, ''), false)[0];
+        var frag = this.parseExpr(str.replace(/^\s+/g, ''), false)[0];
         if (frag === null) {
             return null;
         }
-        const node = this.configuration.create('mstyle');
+        var node = this.configuration.create('mstyle');
         this.appendUnwrap(frag, node);
         if (this.displaystyle) {
             node.setAttribute('displaystyle', 'true');
         }
         return node;
-    }
-}
+    };
+    return AsciiMathParser;
+}());
+export { AsciiMathParser };

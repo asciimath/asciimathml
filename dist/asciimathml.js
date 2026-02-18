@@ -406,32 +406,31 @@ var asciimath = (() => {
         TEXT: 10 /* TEXT */,
         UNARYUNDEROVER: 15 /* UNARYUNDEROVER */
       });
+      var _a;
       this.decimalsign = configuration.options.decimalsign;
       this.displaystyle = configuration.options.displaystyle;
-      this.initSymbols();
+      this.initSymbols((_a = configuration.options) == null ? void 0 : _a.additionalSymbols);
     }
     /**
      * Initialize the symbol table
      */
-    initSymbols() {
-      var _a, _b, _c;
+    initSymbols(additionalSymbols) {
+      var _a, _b;
       this.symbols = [...AMsymbols];
-      if (this.configuration.options.additionalSymbols) {
-        for (const sym of this.configuration.options.additionalSymbols) {
-          const ttypeUpper = (_a = sym.ttype) == null ? void 0 : _a.toUpperCase();
-          if (ttypeUpper && ttypeUpper in this.TokenTypeMap && sym.input && sym.tag && sym.output) {
-            this.symbols.push(__spreadProps(__spreadValues({}, sym), {
-              ttype: this.TokenTypeMap[ttypeUpper],
-              tex: (_b = sym.tex) != null ? _b : null
-            }));
-          }
+      for (const sym of additionalSymbols != null ? additionalSymbols : []) {
+        const ttypeUpper = sym.ttype.toUpperCase();
+        if (ttypeUpper && ttypeUpper in this.TokenTypeMap && sym.input && sym.tag && sym.output) {
+          this.symbols.push(__spreadProps(__spreadValues({}, sym), {
+            ttype: this.TokenTypeMap[ttypeUpper],
+            tex: (_a = sym.tex) != null ? _a : null
+          }));
         }
       }
       const symlen = this.symbols.length;
       for (let i = 0; i < symlen; i++) {
         if (this.symbols[i].tex) {
           this.symbols.push({
-            input: (_c = this.symbols[i].tex) != null ? _c : "",
+            input: (_b = this.symbols[i].tex) != null ? _b : "",
             tag: this.symbols[i].tag,
             output: this.symbols[i].output,
             tex: null,

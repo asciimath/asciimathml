@@ -2,7 +2,7 @@
  * AsciiMath Parser
  */
 
-import { INodeAdapter, IParseOptions } from './NodeAdapter.js';
+import { INodeAdapter, IParseOptions, AdditionalSymbol } from './NodeAdapter.js';
 import {
   Symbol,
   TokenType,
@@ -78,7 +78,7 @@ export class AsciiMathParser {
   ) {
     this.decimalsign = configuration.options.decimalsign;
     this.displaystyle = configuration.options.displaystyle;
-    this.initSymbols();
+    this.initSymbols(configuration.options?.additionalSymbols);
   }
 
   private TokenTypeMap: Record<string, TokenType> = {
@@ -99,22 +99,21 @@ export class AsciiMathParser {
   /**
    * Initialize the symbol table
    */
-  private initSymbols() {
+  private initSymbols(additionalSymbols: AdditionalSymbol[] | undefined) {
     // Copy base symbols
     this.symbols = [...AMsymbols];
 
-    if (this.configuration.options.additionalSymbols) {
-      for (const sym of this.configuration.options.additionalSymbols) {
-        const ttypeUpper = sym.ttype?.toUpperCase();
-        if (ttypeUpper && (ttypeUpper in this.TokenTypeMap) && sym.input && sym.tag && sym.output) {
-          this.symbols.push({
-            ...sym,
-            ttype: this.TokenTypeMap[ttypeUpper],
-            tex: sym.tex ?? null,
-          });
-        }
+    for (const sym of additionalSymbols ?? []) {
+      const ttypeUpper = sym.ttype.toUpperCase();
+      if (ttypeUpper && (ttypeUpper in this.TokenTypeMap) && sym.input && sym.tag && sym.output) {
+        this.symbols.push({
+          ...sym,
+          ttype: this.TokenTypeMap[ttypeUpper],
+          tex: sym.tex ?? null,
+        });
       }
     }
+    
 
     // Add TeX aliases
     const symlen = this.symbols.length;

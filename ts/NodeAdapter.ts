@@ -20,6 +20,22 @@ export interface IParseOptions<T extends INodeAdapter> {
   options: {
     decimalsign: string;
     displaystyle: boolean;
-    additionalSymbols?: any[];
+    additionalSymbols?: AdditionalSymbol[];
   };
+}
+
+export interface AdditionalSymbol {
+  input: string;
+  tag: string;
+  output: string;
+  tex: string | null;
+  ttype: string;
+  acc?: boolean;
+  func?: boolean;
+  codes?: number[];
+  invisible?: boolean;
+  rewriteleftright?: string[];
+  atname?: string;
+  atval?: string;
+  notexcopy?: boolean;
 }

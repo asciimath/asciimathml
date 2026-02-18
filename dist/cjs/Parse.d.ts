@@ -3,7 +3,7 @@ export declare class DOMNodeAdapter implements INodeAdapter {
     private element;
     constructor(element: Node);
     get kind(): string;
-    get text(): string;
+    get text(): string | null;
     get childNodes(): INodeAdapter[];
     removeFirstChild(): void;
     removeLastChild(): void;

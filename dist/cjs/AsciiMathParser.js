@@ -61,6 +61,7 @@ var AsciiMathParser = /** @class */ (function () {
      * @param {IParseOptions} configuration A parser configuration.
      */
     function AsciiMathParser(configuration) {
+        var _a;
         this.configuration = configuration;
         /**
          * Current nesting depth for tracking brackets
@@ -120,40 +121,38 @@ var AsciiMathParser = /** @class */ (function () {
         };
         this.decimalsign = configuration.options.decimalsign;
         this.displaystyle = configuration.options.displaystyle;
-        this.initSymbols();
+        this.initSymbols((_a = configuration.options) === null || _a === void 0 ? void 0 : _a.additionalSymbols);
     }
     /**
      * Initialize the symbol table
      */
-    AsciiMathParser.prototype.initSymbols = function () {
+    AsciiMathParser.prototype.initSymbols = function (additionalSymbols) {
         var e_1, _a;
-        var _b, _c, _d;
+        var _b, _c;
         // Copy base symbols
         this.symbols = __spreadArray([], __read(AsciiMathSymbols_js_1.AMsymbols), false);
-        if (this.configuration.options.additionalSymbols) {
+        try {
+            for (var _d = __values(additionalSymbols !== null && additionalSymbols !== void 0 ? additionalSymbols : []), _e = _d.next(); !_e.done; _e = _d.next()) {
+                var sym = _e.value;
+                var ttypeUpper = sym.ttype.toUpperCase();
+                if (ttypeUpper && (ttypeUpper in this.TokenTypeMap) && sym.input && sym.tag && sym.output) {
+                    this.symbols.push(__assign(__assign({}, sym), { ttype: this.TokenTypeMap[ttypeUpper], tex: (_b = sym.tex) !== null && _b !== void 0 ? _b : null }));
+                }
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
             try {
-                for (var _e = __values(this.configuration.options.additionalSymbols), _f = _e.next(); !_f.done; _f = _e.next()) {
-                    var sym = _f.value;
-                    var ttypeUpper = (_b = sym.ttype) === null || _b === void 0 ? void 0 : _b.toUpperCase();
-                    if (ttypeUpper && (ttypeUpper in this.TokenTypeMap) && sym.input && sym.tag && sym.output) {
-                        this.symbols.push(__assign(__assign({}, sym), { ttype: this.TokenTypeMap[ttypeUpper], tex: (_c = sym.tex) !== null && _c !== void 0 ? _c : null }));
-                    }
-                }
+                if (_e && !_e.done && (_a = _d.return)) _a.call(_d);
             }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
-            finally {
-                try {
-                    if (_f && !_f.done && (_a = _e.return)) _a.call(_e);
-                }
-                finally { if (e_1) throw e_1.error; }
-            }
+            finally { if (e_1) throw e_1.error; }
         }
         // Add TeX aliases
         var symlen = this.symbols.length;
         for (var i = 0; i < symlen; i++) {
             if (this.symbols[i].tex) {
                 this.symbols.push({
-                    input: (_d = this.symbols[i].tex) !== null && _d !== void 0 ? _d : '',
+                    input: (_c = this.symbols[i].tex) !== null && _c !== void 0 ? _c : '',
                     tag: this.symbols[i].tag,
                     output: this.symbols[i].output,
                     tex: null,
@@ -868,16 +867,14 @@ var AsciiMathParser = /** @class */ (function () {
         do {
             str = this.removeCharsAndBlanks(str, 0);
             result = this.parseIexpr(str);
-            if (result[0] === null) {
-                return [null, str];
-            }
             node = result[0];
             str = result[1];
             symbol = this.getSymbol(str);
-            if (symbol !== null && symbol.ttype === 3 /* TokenType.INFIX */ && symbol.input === '/') {
+            if (node !== null && symbol !== null &&
+                symbol.ttype === 3 /* TokenType.INFIX */ && symbol.input === '/') {
                 str = this.removeCharsAndBlanks(str, symbol.input.length);
                 result = this.parseIexpr(str);
-                if (result[0] == null) {
+                if (result[0] === null) {
                     var box = this.configuration.create('mo');
                     box.appendChild(this.configuration.createText('\u25A1'));
                     result[0] = box;
@@ -893,7 +890,7 @@ var AsciiMathParser = /** @class */ (function () {
                 newFrag.appendChild(frac);
                 symbol = this.getSymbol(str);
             }
-            else if (node != null) {
+            else if (node !== null) {
                 this.appendUnwrap(node, newFrag);
             }
         } while (symbol !== null &&
@@ -1070,6 +1067,7 @@ var AsciiMathParser = /** @class */ (function () {
                 }
             }
             str = this.removeCharsAndBlanks(str, symbol.input.length);
+            console.log(symbol);
             if (!symbol.invisible) {
                 var mo = this.configuration.create('mo');
                 mo.appendChild(this.configuration.createText(symbol.output));

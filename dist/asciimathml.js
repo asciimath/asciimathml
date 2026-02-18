@@ -1156,7 +1156,6 @@ var asciimath = (() => {
           }
         }
         str = this.removeCharsAndBlanks(str, symbol.input.length);
-        console.log(symbol);
         if (!symbol.invisible) {
           const mo = this.configuration.create("mo");
           mo.appendChild(this.configuration.createText(symbol.output));

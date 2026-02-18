@@ -1067,7 +1067,6 @@ var AsciiMathParser = /** @class */ (function () {
                 }
             }
             str = this.removeCharsAndBlanks(str, symbol.input.length);
-            console.log(symbol);
             if (!symbol.invisible) {
                 var mo = this.configuration.create('mo');
                 mo.appendChild(this.configuration.createText(symbol.output));

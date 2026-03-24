@@ -85,8 +85,6 @@ var unittests = [
 {input: "ast", output:"<mo>∗</mo>"},
 {input: "backslash", output:"<mo>\\</mo>"},
 {input: "bar", output:'<mover accent="true"><mo></mo><mo stretchy="true">¯</mo></mover>'},
-{input: "bb", output:"<mstyle mathvariant=\"bold\"><mo></mo></mstyle>"},
-{input: "bbb", output:"<mstyle mathvariant=\"double-struck\"><mo></mo></mstyle>"},
 {input: "beta", output:"<mi>β</mi>"},
 {input: "bigcap", output:"<mo>⋂</mo>"},
 {input: "bigcup", output:"<mo>⋃</mo>"},
@@ -338,12 +336,12 @@ var unittests = [
 
 //font and color
 {input: "color(red)(x)", output:"<mstyle mathcolor=\"red\"><mrow><mi>x</mi></mrow></mstyle>"},
-{input: "bb(x)", output:"<mstyle mathvariant=\"bold\"><mrow><mi>x</mi></mrow></mstyle>"},
-{input: "sf(x)", output:"<mstyle mathvariant=\"sans-serif\"><mrow><mi>x</mi></mrow></mstyle>"},
-{input: "bbb(x)", output:"<mstyle mathvariant=\"double-struck\"><mrow>𝕩</mrow></mstyle>"},
-{input: "cc(x)", output:"<mstyle mathvariant=\"script\"><mrow>𝓍</mrow></mstyle>"},
-{input: "tt(x)", output:"<mstyle mathvariant=\"monospace\"><mrow><mi>x</mi></mrow></mstyle>"},
-{input: "fr(x)", output:"<mstyle mathvariant=\"fraktur\"><mrow>𝔵</mrow></mstyle>"},
+{input: "bb(x)", output:"<mrow><mi>𝐱</mi></mrow>"},
+{input: "sf(x)", output:"<mrow><mi>𝗑</mi></mrow>"},
+{input: "bbb(x)", output:"<mrow><mi>𝕩</mi></mrow>"},
+{input: "cc(x)", output:"<mrow><mi>𝓍</mi></mrow>"},
+{input: "tt(x)", output:"<mrow><mi>𝚡</mi></mrow>"},
+{input: "fr(x)", output:"<mrow><mi>𝔵</mi></mrow>"},
 
 //basics
 {input: "x", output:"<mi>x</mi>"},

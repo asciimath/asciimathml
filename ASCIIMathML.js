@@ -102,7 +102,7 @@ function checkMathML(){
   container.style.visibility = "hidden";
   container.style.whiteSpace = "nowrap";
 
-  container.innerHTML = '<math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mi>a</mi><mi>b</mi></mfrac></math>';
+  container.innerHTML = '<math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mi>a</mi><mi>b</mi></mfrac><menclose notation="box"><mtext>X</mtext></menclose></math>';
   document.body.appendChild(container);
 
   var math = container.querySelector("math");
@@ -111,6 +111,15 @@ function checkMathML(){
     math.getBoundingClientRect().height > 0 &&
     math.getBoundingClientRect().width > 0;
 
+  var menclose = container.querySelector("menclose");
+  var mtext = container.querySelector("mtext");
+  var supportsMenclose = menclose && mtext &&
+    menclose.getBoundingClientRect().height > mtext.getBoundingClientRect().height;
+  if (!supportsMenclose) {
+    // fake support for cancel with some CSS
+    var stroke = mathcolor=="" ? "black" : mathcolor;
+    setStylesheet("menclose[notation=updiagonalstrike] {background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none' viewBox='0 0 100 100'%3E%3Cline x1='0' y1='100' x2='100' y2='0' stroke='"+stroke+"' stroke-width='1' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E\");}");
+  }
   document.body.removeChild(container);
   noMathML = !supported;
 
@@ -748,7 +757,19 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
           node.setAttribute("accentunder","true");
         }
         var accnode = createMmlNode("mo",document.createTextNode(symbol.output));
-        accnode.setAttribute("stretchy",true)
+        if (symbol.input=="vec" && (
+          (result[0].nodeName=="mrow" && result[0].childNodes.length==1
+            && result[0].firstChild.firstChild.nodeValue !== null
+            && result[0].firstChild.firstChild.nodeValue.length==1) ||
+          (result[0].firstChild && result[0].firstChild.nodeValue !== null
+            && result[0].firstChild.nodeValue.length==1) )
+        ) {
+          // special case of single character base for vector accent,
+          // where stretchy can make it look bad
+          accnode.setAttribute("stretchy",false);
+        }else{
+          accnode.setAttribute("stretchy",true);
+        }
         node.appendChild(accnode);
         return [node,result[1]];
       } else {                        // font change command
@@ -1204,41 +1225,12 @@ function AMprocessNode(n, linebreaks, spanclassAM) {
   }
 }
 
-function generic(){
+document.addEventListener('DOMContentLoaded', function () {
   if(!init()) return;
   if (translateOnLoad) {
       translate();
   }
-};
-//setup onload function
-if(typeof window.addEventListener != 'undefined'){
-  //.. gecko, safari, konqueror and standard
-  window.addEventListener('load', generic, false);
-}
-else if(typeof document.addEventListener != 'undefined'){
-  //.. opera 7
-  document.addEventListener('load', generic, false);
-}
-else if(typeof window.attachEvent != 'undefined'){
-  //.. win/ie
-  window.attachEvent('onload', generic);
-}else{
-  //.. mac/ie5 and anything else that gets this far
-  //if there's an existing onload function
-  if(typeof window.onload == 'function'){
-    //store it
-    var existing = onload;
-    //add new onload handler
-    window.onload = function(){
-      //call existing onload function
-      existing();
-      //call generic onload function
-      generic();
-    };
-  }else{
-    window.onload = generic;
-  }
-}
+});
 
 //expose some functions to outside
 asciimath.newcommand = newcommand;

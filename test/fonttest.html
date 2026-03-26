@@ -17,18 +17,32 @@ img     { border: 0; }
 
 <br\>
 <table>
-<tr><td>bb(bracket bold AaBbCc)<br/></td><td>` bb(bracket bold AaBbCc)<br/></td></tr>
-<tr><td>mathbf(bracket bold AaBbCc)	<br/></td><td>`mathbf(bracket bold AaBbCc)	<br/></td></tr>
-<tr><td>bb "literal bold AaBbCc"<br/></td><td>`bb "literal bold AaBbCc"<br/></td></tr>
-<tr><td>mathbf "literal bold AaBbCc"<br/></td><td>`mathbf "literal bold AaBbCc"<br/></td></tr>
-<tr><td>"AaBbCc literal"<br/></td><td>`"AaBbCc literal"<br/></td></tr>
-<tr><td>bb "AaBbCc bold"<br/></td><td>`bb "AaBbCc bold"<br/></td></tr>
-<tr><td>bbb "AaBbCc dbl-struck"<br/></td><td>`bbb "AaBbCc dbl-struck"<br/></td></tr>
-<tr><td>cc "AaBbCc script"<br/></td><td>`cc "AaBbCc script"<br/></td></tr>
-<tr><td>tt "AaBbCc mono"<br/></td><td>`tt "AaBbCc mono"<br/></td></tr>
-<tr><td>fr "AaBbCc frakur<br/></td><td>`fr "AaBbCc frakur<br/></td></tr>
-<tr><td>sf "AaBbCc sanserif"<br/></td><td>`sf "AaBbCc sanserif"<br/></td></tr>
-<tr><td>"Literal non-italic"<br/></td><td>`"Literal non-italic"<br/></td></tr>
+<tr><td>bb(bracket bold AaBbCc)</td><td>` bb (bracket bold AaBbCc)</td></tr>
+<tr><td>mathbf(bracket bold AaBbCc)	</td><td>`mathbf(bracket bold AaBbCc)	</td></tr>
+<tr><td>bb "literal bold AaBbCc"</td><td>`bb "literal bold AaBbCc"</td></tr>
+<tr><td>mathbf "literal bold AaBbCc"</td><td>`mathbf "literal bold AaBbCc"</td></tr>
+<tr><td>"AaBbCc literal"</td><td>`"AaBbCc literal"</td></tr>
+<tr><td>bb "AaBbCc bold"</td><td>`bb "AaBbCc bold"</td></tr>
+<tr><td>bbb "AaBbCc dbl-struck"</td><td>`bbb "AaBbCc dbl-struck"</td></tr>
+<tr><td>cc "AaBbCc script"</td><td>`cc "AaBbCc script"</td></tr>
+<tr><td>tt "AaBbCc mono"</td><td>`tt "AaBbCc mono"</td></tr>
+<tr><td>fr "AaBbCc frakur</td><td>`fr "AaBbCc frakur</td></tr>
+<tr><td>sf "AaBbCc sanserif"</td><td>`sf "AaBbCc sanserif"</td></tr>
+<tr><td>"Literal non-italic"</td><td>`"Literal non-italic"</td></tr>
+<tr><td>&nbsp;</td><td></tr>
+<tr><td>"abc 01239 $%*"`</td><td>`"abc 1239 $%*"`</tr>
+<tr><td>tt "abc 01239 $%*"</td><td>`tt "abc 01239 $%*"</tr>
+<tr><td>fr "abc 01239 $%*"</td><td>`fr "abc 01239 $%*"</tr>
+<tr><td>sf "abc 01239 $%*"</td><td>`tt "abc 01239 $%*"</tr>
+<tr><td>&nbsp;</td><td></tr>
+<tr><td>log(x)</td><td>` log(x)</td></tr>
+<tr><td>bb log(x)</td><td>`bb log(x)</td><td>fails in chrome, works in fox</td></tr>
+<tr><td>bb log x</td><td>`bb log x </td></tr>
+<tr><td>bb log bb " x"</td>td><td>`bb log bb " x"</td></tr>
+<tr><td>bb log bb "(x)"</td>td><td>`bb log bb "(x)"</td></tr>
+<tr><td>log(x) bb "log(x)"</td><td>`log(x) bb "log(x)"</td></tr>
+
+
 </tabletable>
 
 

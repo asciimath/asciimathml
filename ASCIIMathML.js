@@ -759,27 +759,15 @@ var asciimath = {};
                 } else {                        // font change command
                     if (typeof symbol.codes != "undefined") {
                         for (i = 0; i < result[0].childNodes.length; i++)
-                            if (result[0].childNodes[i].nodeName == "mi" || result[0].nodeName == "mi") {
-                                st = (result[0].nodeName == "mi" ? result[0].firstChild.textContent :
-                                    result[0].childNodes[i].firstChild.textContent);
-
-                                var newst = substituteGlyphs(st, symbol.codes);
-
-                                if (result[0].nodeName == "mi")
-                                    result[0].textContent = newst
-                                else
-                                    result[0].childNodes[i].textContent = newst
-
-
-                            } else if (result[0].childNodes[i].nodeName == "mtext") {  // mtext nodes
-                                let st = result[0].childNodes[i].textContent
-                                let newst = substituteGlyphs(st, symbol.codes)
-                                result[0].childNodes[i].textContent = newst
-                            }
+                            ['mrow', 'mi', 'mo', 'mtext'].map((tag) => {
+                                if (result[0].childNodes[i].nodeName === tag) {
+                                    result[0].childNodes[i].textContent = substituteGlyphs(result[0].childNodes[i].textContent, symbol.codes);
+                                }
+                            })
                     }
                     node = createMmlNode(symbol.tag, result[0]);
-                    node.setAttribute(symbol.atname, symbol.atval);
                     return [node, result[1]];
+
                 }
             case BINARY:
                 str = AMremoveCharsAndBlanks(str, symbol.input.length);
@@ -1035,7 +1023,7 @@ var asciimath = {};
         }
         if (mathfontfamily != "") {
             node.setAttribute("fontfamily", mathfontfamily);
-            node.setAttribute("mathvariant", mathfontfamily);
+            // node.setAttribute("mathvariant", mathfontfamily);
         }
 
         if (displaystyle) node.setAttribute("displaystyle", "true");
@@ -1190,7 +1178,7 @@ var asciimath = {};
         let glyphString = ''
         Array.from(str).forEach(char => {
             let glyphIndex = fonts["serif.normal"].indexOf(char);  // index of chars we can substitute
-            glyphString += (glyphIndex < 0) ? char : fonts[glyphFont][glyphIndex] // substitute if index found
+            glyphString += (glyphIndex >= 0 && fonts[glyphFont].length > glyphIndex) ? fonts[glyphFont][glyphIndex]:char // substitute if index found
         });
         return glyphString
     }

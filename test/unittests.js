@@ -336,12 +336,13 @@ var unittests = [
 
 //font and color
 {input: "color(red)(x)", output:"<mstyle mathcolor=\"red\"><mrow><mi>x</mi></mrow></mstyle>"},
-{input: "bb(x)", output:"<mrow><mi>𝐱</mi></mrow>"},
-{input: "sf(x)", output:"<mrow><mi>𝗑</mi></mrow>"},
-{input: "bbb(x)", output:"<mrow><mi>𝕩</mi></mrow>"},
-{input: "cc(x)", output:"<mrow><mi>𝓍</mi></mrow>"},
-{input: "tt(x)", output:"<mrow><mi>𝚡</mi></mrow>"},
-{input: "fr(x)", output:"<mrow><mi>𝔵</mi></mrow>"},
+{input: "bb(axAR12)", output:"<mrow><mi>𝐚</mi><mi>𝐱</mi><mi>𝐀</mi><mi>𝐑</mi><mn>𝟏𝟐</mn></mrow>"},
+{input: "sf(axAR12)", output:"<mrow><mi>𝖺</mi><mi>𝗑</mi><mi>𝖠</mi><mi>𝖱</mi><mn>𝟣𝟤</mn></mrow>"},
+{input: "bbb(axAR12)", output:"<mrow><mi>𝕒</mi><mi>𝕩</mi><mi>𝔸</mi><mi>ℝ</mi><mn>𝟙𝟚</mn></mrow>"},
+{input: "cc(axAR12)", output:"<mrow><mi>𝒶</mi><mi>𝓍</mi><mi>𝒜</mi><mi>ℛ</mi><mn>12</mn></mrow>"},
+{input: "tt(axAR12)", output:"<mrow><mi>𝚊</mi><mi>𝚡</mi><mi>𝙰</mi><mi>𝚁</mi><mn>𝟷𝟸</mn></mrow>"},
+{input: "fr(axAR12)", output:"<mrow><mi>𝔞</mi><mi>𝔵</mi><mi>𝔄</mi><mi>ℜ</mi><mn>12</mn></mrow>"},
+{input: "bbb \"abcABC123\"", output:"<mrow><mtext>𝕒𝕓𝕔𝔸𝔹ℂ𝟙𝟚𝟛</mtext></mrow>"},
 
 //basics
 {input: "x", output:"<mi>x</mi>"},

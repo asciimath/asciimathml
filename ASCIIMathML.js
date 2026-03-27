@@ -876,12 +876,14 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
 
 // walks a node, and maps characters according to codemap
 function AMmapChars(node, codemap) {
-  var tag = node.tagName.toUpperCase();
-  if (tag == "MI" || tag == "MO" || tag == "MN") {
+  var tag = '';
+  if (node.tagName) {
+    tag = node.tagName.toUpperCase();
+  }
+  if (tag == "MI" || tag == "MO" || tag == "MN" || tag == "MTEXT") {
     var st = node.firstChild.nodeValue.toString();
     var newst = "";
     for (var j=0; j<st.length; j++) {
-      console.log("Mapping "+st.charAt(j));
       if (st.charCodeAt(j)>64 && st.charCodeAt(j)<91) {
         if (codemap.length == 3) {
           newst += String.fromCodePoint(codemap[0] + st.charCodeAt(j) - 65);

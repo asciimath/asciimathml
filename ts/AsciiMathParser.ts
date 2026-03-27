@@ -707,7 +707,7 @@ export class AsciiMathParser {
   */
   private AMmapChars(node: INodeAdapter, codemap: number[]): void {
     const tag = node.kind;
-    if (tag == "mi" || tag == "mo" || tag == "mn") {
+    if (tag == "mi" || tag == "mo" || tag == "mn" || tag == "mtext") {
       const st = (node.childNodes[0] as any).text;
       let newst = "";
       for (let j=0; j < st.length; j++) {

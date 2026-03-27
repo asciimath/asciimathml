@@ -207,6 +207,10 @@ var AMbbb = ["\uD835\uDD38","\uD835\uDD39","\u2102","\uD835\uDD3B","\uD835\uDD3C
 var AMbb = [0x1D400, 0x1D41A, 0x1D7CE];  // Mathematical Bold
 var AMsf = [0x1D5A0, 0x1D5BA, 0x1D7E2];  // Mathematical Sans-Serif
 var AMtt = [0x1D670, 0x1D68A, 0x1D7F6];  // Mathematical Monospace
+var AMbbcal = [0x1D4D0, 0x1D4EA]; // Bold script
+var AMbbfr = [0x1D56C, 0x1D586]; // Bold frak
+var AMbbsf = [0x1D5D4, 0x1D5EE, 0x1D7EC]; //bold sans-serif
+var AMbbit = [0x1D468, 0x1D482]; //bold italic
 
 var CONST = 0, UNARY = 1, BINARY = 2, INFIX = 3, LEFTBRACKET = 4,
     RIGHTBRACKET = 5, SPACE = 6, UNDEROVER = 7, DEFINITION = 8,
@@ -498,18 +502,16 @@ var AMsymbols = [
 {input:"class", tag:"mrow", ttype:BINARY},
 {input:"cancel", tag:"menclose", output:"cancel", tex:null, ttype:UNARY},
 AMquote,
-{input:"bb", ttype:UNARY, codes:AMbb},
-{input:"mathbf", ttype:UNARY, codes:AMbb},
-{input:"sf", ttype:UNARY, codes:AMsf},
-{input:"mathsf", ttype:UNARY, codes:AMsf},
-{input:"bbb", ttype:UNARY, codes:AMbbb},
-{input:"mathbb", ttype:UNARY, codes:AMbbb},
-{input:"cc", ttype:UNARY, codes:AMcal},
-{input:"mathcal", ttype:UNARY, codes:AMcal},
-{input:"tt", ttype:UNARY, codes:AMtt},
-{input:"mathtt", ttype:UNARY, codes:AMtt},
-{input:"fr", ttype:UNARY, codes:AMfrk},
-{input:"mathfrak", ttype:UNARY, codes:AMfrk}
+{input:"bb", ttype:UNARY, tex:"mathbf", codes:AMbb},
+{input:"sf", ttype:UNARY, tex:"mathsf", codes:AMsf},
+{input:"bbsf", ttype:UNARY, codes:AMbbsf},
+{input:"bbb", ttype:UNARY, tex:"mathbb", codes:AMbbb},
+{input:"cc", ttype:UNARY, tex: "mathcal", codes:AMcal},
+{input:"bbcc", ttype:UNARY, codes:AMbbcal},
+{input:"tt", ttype:UNARY, tex:"mathtt", codes:AMtt},
+{input:"fr", ttype:UNARY, tex:"mathfrak", codes:AMfrk},
+{input:"bbfr", ttype:UNARY, codes:AMbbfr},
+{input:"bbit", ttype:UNARY, codes:AMbbit}
 ];
 
 function compareNames(s1,s2) {
@@ -526,7 +528,7 @@ function initSymbols() {
     if (AMsymbols[i].tex) {
       AMsymbols.push({input:AMsymbols[i].tex,
         tag:AMsymbols[i].tag, output:AMsymbols[i].output, ttype:AMsymbols[i].ttype,
-        acc:(AMsymbols[i].acc||false)});
+        acc:(AMsymbols[i].acc||false), codes:(AMsymbols[i].codes||false)});
     }
   }
   refreshSymbols();
@@ -773,7 +775,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
         node.appendChild(accnode);
         return [node,result[1]];
       } else {                        // font change command
-        if (typeof symbol.codes != "undefined") {
+        if (typeof symbol.codes === 'object') {
           AMmapChars(result[0], symbol.codes);
         }
         return [result[0],result[1]];
@@ -862,13 +864,13 @@ function AMmapChars(node, codemap) {
     var newst = "";
     for (var j=0; j<st.length; j++) {
       if (st.charCodeAt(j)>64 && st.charCodeAt(j)<91) {
-        if (codemap.length == 3) {
+        if (codemap.length < 4) {
           newst += String.fromCodePoint(codemap[0] + st.charCodeAt(j) - 65);
         } else {
           newst += codemap[st.charCodeAt(j)-65];
         }
       } else if (st.charCodeAt(j)>96 && st.charCodeAt(j)<123) {
-        if (codemap.length == 3) {
+        if (codemap.length < 4) {
           newst += String.fromCodePoint(codemap[1] + st.charCodeAt(j) - 97);
         } else {
           newst += codemap[st.charCodeAt(j)-71];

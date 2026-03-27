@@ -343,6 +343,9 @@ var unittests = [
 {input: "tt(axAR12)", output:"<mrow><mi>𝚊</mi><mi>𝚡</mi><mi>𝙰</mi><mi>𝚁</mi><mn>𝟷𝟸</mn></mrow>"},
 {input: "fr(axAR12)", output:"<mrow><mi>𝔞</mi><mi>𝔵</mi><mi>𝔄</mi><mi>ℜ</mi><mn>12</mn></mrow>"},
 {input: "bbb \"abcABC123\"", output:"<mrow><mtext>𝕒𝕓𝕔𝔸𝔹ℂ𝟙𝟚𝟛</mtext></mrow>"},
+{input: "bbcc(cR3)", output:"<mrow><mi>𝓬</mi><mi>𝓡</mi><mn>3</mn></mrow>"},
+{input: "bbfr(cR3)", output:"<mrow><mi>𝖈</mi><mi>𝕽</mi><mn>3</mn></mrow>"},
+{input: "bbsf(cR3)", output:"<mrow><mi>𝗰</mi><mi>𝗥</mi><mn>𝟯</mn></mrow>"},
 
 //basics
 {input: "x", output:"<mi>x</mi>"},

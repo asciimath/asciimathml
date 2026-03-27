@@ -498,18 +498,18 @@ var AMsymbols = [
 {input:"class", tag:"mrow", ttype:BINARY},
 {input:"cancel", tag:"menclose", output:"cancel", tex:null, ttype:UNARY},
 AMquote,
-{input:"bb", tag:"mstyle", atname:"mathvariant", atval:"bold", output:"bb", tex:null, ttype:UNARY, codes:AMbb},
-{input:"mathbf", tag:"mstyle", atname:"mathvariant", atval:"bold", output:"mathbf", tex:null, ttype:UNARY, codes:AMbb},
-{input:"sf", tag:"mstyle", atname:"mathvariant", atval:"sans-serif", output:"sf", tex:null, ttype:UNARY, codes:AMsf},
-{input:"mathsf", tag:"mstyle", atname:"mathvariant", atval:"sans-serif", output:"mathsf", tex:null, ttype:UNARY},
-{input:"bbb", tag:"mstyle", atname:"mathvariant", atval:"double-struck", output:"bbb", tex:null, ttype:UNARY, codes:AMbbb},
-{input:"mathbb", tag:"mstyle", atname:"mathvariant", atval:"double-struck", output:"mathbb", tex:null, ttype:UNARY, codes:AMbbb},
-{input:"cc",  tag:"mstyle", atname:"mathvariant", atval:"script", output:"cc", tex:null, ttype:UNARY, codes:AMcal},
-{input:"mathcal", tag:"mstyle", atname:"mathvariant", atval:"script", output:"mathcal", tex:null, ttype:UNARY, codes:AMcal},
-{input:"tt",  tag:"mstyle", atname:"mathvariant", atval:"monospace", output:"tt", tex:null, ttype:UNARY, codes:AMtt},
-{input:"mathtt", tag:"mstyle", atname:"mathvariant", atval:"monospace", output:"mathtt", tex:null, ttype:UNARY, codes:AMtt},
-{input:"fr",  tag:"mstyle", atname:"mathvariant", atval:"fraktur", output:"fr", tex:null, ttype:UNARY, codes:AMfrk},
-{input:"mathfrak",  tag:"mstyle", atname:"mathvariant", atval:"fraktur", output:"mathfrak", tex:null, ttype:UNARY, codes:AMfrk}
+{input:"bb", ttype:UNARY, codes:AMbb},
+{input:"mathbf", ttype:UNARY, codes:AMbb},
+{input:"sf", ttype:UNARY, codes:AMsf},
+{input:"mathsf", ttype:UNARY, codes:AMsf},
+{input:"bbb", ttype:UNARY, codes:AMbbb},
+{input:"mathbb", ttype:UNARY, codes:AMbbb},
+{input:"cc", ttype:UNARY, codes:AMcal},
+{input:"mathcal", ttype:UNARY, codes:AMcal},
+{input:"tt", ttype:UNARY, codes:AMtt},
+{input:"mathtt", ttype:UNARY, codes:AMtt},
+{input:"fr", ttype:UNARY, codes:AMfrk},
+{input:"mathfrak", ttype:UNARY, codes:AMfrk}
 ];
 
 function compareNames(s1,s2) {
@@ -773,29 +773,6 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
         node.appendChild(accnode);
         return [node,result[1]];
       } else {                        // font change command
-        /*if (typeof symbol.codes != "undefined") {
-          for (i=0; i<result[0].childNodes.length; i++)
-            if (result[0].childNodes[i].nodeName=="mi" || result[0].nodeName=="mi") {
-              st = (result[0].nodeName=="mi"?result[0].firstChild.nodeValue:
-                              result[0].childNodes[i].firstChild.nodeValue);
-              var newst = [];
-              for (var j=0; j<st.length; j++)
-		  if (st.charCodeAt(j)>64 && st.charCodeAt(j)<91)
-		  	newst = newst + symbol.codes[st.charCodeAt(j)-65];
-                else if (st.charCodeAt(j)>96 && st.charCodeAt(j)<123)
-                	newst = newst + symbol.codes[st.charCodeAt(j)-71];
-                else newst = newst + st.charAt(j);
-              if (result[0].nodeName=="mi")
-                result[0]=createMmlNode("mo").
-                          appendChild(document.createTextNode(newst));
-              else result[0].replaceChild(createMmlNode("mo").
-                               appendChild(document.createTextNode(newst)),
-                                           result[0].childNodes[i]);
-            }
-        }
-        node = createMmlNode(symbol.tag,result[0]);
-        node.setAttribute(symbol.atname,symbol.atval);
-        */
         if (typeof symbol.codes != "undefined") {
           AMmapChars(result[0], symbol.codes);
         }

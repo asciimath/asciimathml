@@ -1216,7 +1216,7 @@ document.addEventListener('DOMContentLoaded', function () {
 //expose some functions to outside
 asciimath.newcommand = newcommand;
 asciimath.newsymbol = newsymbol;
-asciimath.AMprocesssNode = AMprocessNode;
+asciimath.AMprocessNode = AMprocessNode;
 asciimath.parseMath = parseMath;
 asciimath.translate = translate;
 })();

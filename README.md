@@ -21,7 +21,7 @@ script in the `head` or `body` of your website like this:
 
 You can adjust the configuration in the script itself. By 
 default it will convert automatically on page load, grabbing
-any expressions between backticks, like ``Solve `x/2+3=5```
+any expressions between backticks, like ``Solve `x/2+3=5` ``
 
 #### API
 `asciimath.translate()`: converts all asciimath on the page.
@@ -46,13 +46,15 @@ includes equivalent `asciimath.AMprocessNode` and `asciimath.parseMath`
 functions as ASCIIMathML.js.
 
 ### asciimath-based/*
-See the README in the directory for more details.  This directly includes
-alternate implementations of AsciiMath parsers
+See the README in the directory for more details.  This directory includes
+alternate implementations of AsciiMath parsers.
 
 - ASCIIMath2TeX.js: A javascript script with functions to convert AsciiMath 
-  notation to TeX.  This can be used to 
+  notation to TeX.
 - ASCIIMath2TeX.php: A PHP port of the above, to convert AsciiMath notation
-  to TeX
+  to TeX.
+
+### Other Implementations
 
 There are also a number of implementation of AsciiMath parsers done
 by others. Here are a few (these have not been evaluated by this repo for 

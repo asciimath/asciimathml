@@ -201,16 +201,19 @@ function newsymbol(symbolobj) {
 }
 
 // unicode characters for math variants
-var AMcal = ["\uD835\uDC9C","\u212C","\uD835\uDC9E","\uD835\uDC9F","\u2130","\u2131","\uD835\uDCA2","\u210B","\u2110","\uD835\uDCA5","\uD835\uDCA6","\u2112","\u2133","\uD835\uDCA9","\uD835\uDCAA","\uD835\uDCAB","\uD835\uDCAC","\u211B","\uD835\uDCAE","\uD835\uDCAF","\uD835\uDCB0","\uD835\uDCB1","\uD835\uDCB2","\uD835\uDCB3","\uD835\uDCB4","\uD835\uDCB5","\uD835\uDCB6","\uD835\uDCB7","\uD835\uDCB8","\uD835\uDCB9","\u212F","\uD835\uDCBB","\u210A","\uD835\uDCBD","\uD835\uDCBE","\uD835\uDCBF","\uD835\uDCC0","\uD835\uDCC1","\uD835\uDCC2","\uD835\uDCC3","\u2134","\uD835\uDCC5","\uD835\uDCC6","\uD835\uDCC7","\uD835\uDCC8","\uD835\uDCC9","\uD835\uDCCA","\uD835\uDCCB","\uD835\uDCCC","\uD835\uDCCD","\uD835\uDCCE","\uD835\uDCCF"];
-var AMfrk = ["\uD835\uDD04","\uD835\uDD05","\u212D","\uD835\uDD07","\uD835\uDD08","\uD835\uDD09","\uD835\uDD0A","\u210C","\u2111","\uD835\uDD0D","\uD835\uDD0E","\uD835\uDD0F","\uD835\uDD10","\uD835\uDD11","\uD835\uDD12","\uD835\uDD13","\uD835\uDD14","\u211C","\uD835\uDD16","\uD835\uDD17","\uD835\uDD18","\uD835\uDD19","\uD835\uDD1A","\uD835\uDD1B","\uD835\uDD1C","\u2128","\uD835\uDD1E","\uD835\uDD1F","\uD835\uDD20","\uD835\uDD21","\uD835\uDD22","\uD835\uDD23","\uD835\uDD24","\uD835\uDD25","\uD835\uDD26","\uD835\uDD27","\uD835\uDD28","\uD835\uDD29","\uD835\uDD2A","\uD835\uDD2B","\uD835\uDD2C","\uD835\uDD2D","\uD835\uDD2E","\uD835\uDD2F","\uD835\uDD30","\uD835\uDD31","\uD835\uDD32","\uD835\uDD33","\uD835\uDD34","\uD835\uDD35","\uD835\uDD36","\uD835\uDD37"];
-var AMbbb = ["\uD835\uDD38","\uD835\uDD39","\u2102","\uD835\uDD3B","\uD835\uDD3C","\uD835\uDD3D","\uD835\uDD3E","\u210D","\uD835\uDD40","\uD835\uDD41","\uD835\uDD42","\uD835\uDD43","\uD835\uDD44","\u2115","\uD835\uDD46","\u2119","\u211A","\u211D","\uD835\uDD4A","\uD835\uDD4B","\uD835\uDD4C","\uD835\uDD4D","\uD835\uDD4E","\uD835\uDD4F","\uD835\uDD50","\u2124","\uD835\uDD52","\uD835\uDD53","\uD835\uDD54","\uD835\uDD55","\uD835\uDD56","\uD835\uDD57","\uD835\uDD58","\uD835\uDD59","\uD835\uDD5A","\uD835\uDD5B","\uD835\uDD5C","\uD835\uDD5D","\uD835\uDD5E","\uD835\uDD5F","\uD835\uDD60","\uD835\uDD61","\uD835\uDD62","\uD835\uDD63","\uD835\uDD64","\uD835\uDD65","\uD835\uDD66","\uD835\uDD67","\uD835\uDD68","\uD835\uDD69","\uD835\uDD6A","\uD835\uDD6B", 0x1D7D8];
-var AMbb = [0x1D400, 0x1D41A, 0x1D7CE];  // Mathematical Bold
+var AMcal = [["\uD835\uDC9C","\u212C","\uD835\uDC9E","\uD835\uDC9F","\u2130","\u2131","\uD835\uDCA2","\u210B","\u2110","\uD835\uDCA5","\uD835\uDCA6","\u2112","\u2133","\uD835\uDCA9","\uD835\uDCAA","\uD835\uDCAB","\uD835\uDCAC","\u211B","\uD835\uDCAE","\uD835\uDCAF","\uD835\uDCB0","\uD835\uDCB1","\uD835\uDCB2","\uD835\uDCB3","\uD835\uDCB4","\uD835\uDCB5"],
+             ["\uD835\uDCB6","\uD835\uDCB7","\uD835\uDCB8","\uD835\uDCB9","\u212F","\uD835\uDCBB","\u210A","\uD835\uDCBD","\uD835\uDCBE","\uD835\uDCBF","\uD835\uDCC0","\uD835\uDCC1","\uD835\uDCC2","\uD835\uDCC3","\u2134","\uD835\uDCC5","\uD835\uDCC6","\uD835\uDCC7","\uD835\uDCC8","\uD835\uDCC9","\uD835\uDCCA","\uD835\uDCCB","\uD835\uDCCC","\uD835\uDCCD","\uD835\uDCCE","\uD835\uDCCF"]];
+var AMfrk = [["\uD835\uDD04","\uD835\uDD05","\u212D","\uD835\uDD07","\uD835\uDD08","\uD835\uDD09","\uD835\uDD0A","\u210C","\u2111","\uD835\uDD0D","\uD835\uDD0E","\uD835\uDD0F","\uD835\uDD10","\uD835\uDD11","\uD835\uDD12","\uD835\uDD13","\uD835\uDD14","\u211C","\uD835\uDD16","\uD835\uDD17","\uD835\uDD18","\uD835\uDD19","\uD835\uDD1A","\uD835\uDD1B","\uD835\uDD1C","\u2128"],
+             ["\uD835\uDD1E","\uD835\uDD1F","\uD835\uDD20","\uD835\uDD21","\uD835\uDD22","\uD835\uDD23","\uD835\uDD24","\uD835\uDD25","\uD835\uDD26","\uD835\uDD27","\uD835\uDD28","\uD835\uDD29","\uD835\uDD2A","\uD835\uDD2B","\uD835\uDD2C","\uD835\uDD2D","\uD835\uDD2E","\uD835\uDD2F","\uD835\uDD30","\uD835\uDD31","\uD835\uDD32","\uD835\uDD33","\uD835\uDD34","\uD835\uDD35","\uD835\uDD36","\uD835\uDD37"]];
+var AMbbb = [["\uD835\uDD38","\uD835\uDD39","\u2102","\uD835\uDD3B","\uD835\uDD3C","\uD835\uDD3D","\uD835\uDD3E","\u210D","\uD835\uDD40","\uD835\uDD41","\uD835\uDD42","\uD835\uDD43","\uD835\uDD44","\u2115","\uD835\uDD46","\u2119","\u211A","\u211D","\uD835\uDD4A","\uD835\uDD4B","\uD835\uDD4C","\uD835\uDD4D","\uD835\uDD4E","\uD835\uDD4F","\uD835\uDD50","\u2124"],
+             ["\uD835\uDD52","\uD835\uDD53","\uD835\uDD54","\uD835\uDD55","\uD835\uDD56","\uD835\uDD57","\uD835\uDD58","\uD835\uDD59","\uD835\uDD5A","\uD835\uDD5B","\uD835\uDD5C","\uD835\uDD5D","\uD835\uDD5E","\uD835\uDD5F","\uD835\uDD60","\uD835\uDD61","\uD835\uDD62","\uD835\uDD63","\uD835\uDD64","\uD835\uDD65","\uD835\uDD66","\uD835\uDD67","\uD835\uDD68","\uD835\uDD69","\uD835\uDD6A","\uD835\uDD6B"], 0x1D7D8];
+var AMbb = [0x1D400, 0x1D41A, 0x1D7CE, 0x1D6A8, 0x1D6C2, {981:0x1D6DF}];  // Mathematical Bold
 var AMsf = [0x1D5A0, 0x1D5BA, 0x1D7E2];  // Mathematical Sans-Serif
 var AMtt = [0x1D670, 0x1D68A, 0x1D7F6];  // Mathematical Monospace
 var AMbbcal = [0x1D4D0, 0x1D4EA]; // Bold script
 var AMbbfr = [0x1D56C, 0x1D586]; // Bold frak
 var AMbbsf = [0x1D5D4, 0x1D5EE, 0x1D7EC]; //bold sans-serif
-var AMbbit = [0x1D468, 0x1D482]; //bold italic
+var AMbbit = [0x1D468, 0x1D482, null, 0x1D71C, 0x1D736, {981:0x1D753}]; //bold italic
 
 var CONST = 0, UNARY = 1, BINARY = 2, INFIX = 3, LEFTBRACKET = 4,
     RIGHTBRACKET = 5, SPACE = 6, UNDEROVER = 7, DEFINITION = 8,
@@ -867,25 +870,34 @@ function AMmapChars(node, codemap, inputsym) {
       codemap = (tag == "MI" ? AMbbit : AMbb);
     }
     for (var j=0; j<st.length; j++) {
-      if (st.charCodeAt(j)>64 && st.charCodeAt(j)<91) { // A-Z
-        if (codemap.length < 4) {
-          newst += String.fromCodePoint(codemap[0] + st.charCodeAt(j) - 65);
+      var charcode = st.charCodeAt(j);
+      if (charcode>64 && charcode<91) { // A-Z
+        if (typeof codemap[0] == 'number') {
+          newst += String.fromCodePoint(codemap[0] + charcode - 65);
         } else {
-          newst += codemap[st.charCodeAt(j)-65];
+          newst += codemap[0][charcode-65];
         }
-      } else if (st.charCodeAt(j)>96 && st.charCodeAt(j)<123) { // a-z
-        if (codemap.length < 4) {
-          newst += String.fromCodePoint(codemap[1] + st.charCodeAt(j) - 97);
+      } else if (charcode>96 && charcode<123) { // a-z
+        if (typeof codemap[1] == 'number') {
+          newst += String.fromCodePoint(codemap[1] + charcode - 97);
         } else {
-          newst += codemap[st.charCodeAt(j)-71];
+          newst += codemap[1][charcode-97];
         }
-      } else if (st.charCodeAt(j)>47 && st.charCodeAt(j)<58) { // 0-9
-        if (codemap.length == 3 || codemap.length == 53) {
-          newst += String.fromCodePoint((codemap.length==3?codemap[2]:codemap[52]) + st.charCodeAt(j) - 48);
-        } else if (inputsym.substring(0,2) == 'bb') { 
+      } else if (charcode>47 && charcode<58) { // 0-9
+        if (codemap[2] != null) {
+          newst += String.fromCodePoint(codemap[2] + charcode - 48);
+        } else if (inputsym.substring(0,2) == 'bb' || inputsym === 'bold') { 
           // bold but variant doesn't have symbol; use codepoint from bb codemap instead
-          newst += String.fromCodePoint(AMbb[2] + st.charCodeAt(j) - 48);
+          newst += String.fromCodePoint(AMbb[2] + charcode - 48);
+        } else {
+          newst += st.charAt(j);
         }
+      } else if (charcode>944 && charcode<970 && codemap[4] != null) { // lower case greek
+        newst += String.fromCodePoint(codemap[4] + charcode - 945);
+      } else if (charcode>912 && charcode<938 && codemap[3] != null) { // upper case greek
+        newst += String.fromCodePoint(codemap[3] + charcode - 913);
+      } else if (codemap[5] != null && charcode in codemap[5]) {
+        newst += String.fromCodePoint(codemap[5][charcode]);
       } else {
         newst += st.charAt(j);
       }

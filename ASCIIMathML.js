@@ -209,10 +209,12 @@ var AMbbb = [["\uD835\uDD38","\uD835\uDD39","\u2102","\uD835\uDD3B","\uD835\uDD3
              ["\uD835\uDD52","\uD835\uDD53","\uD835\uDD54","\uD835\uDD55","\uD835\uDD56","\uD835\uDD57","\uD835\uDD58","\uD835\uDD59","\uD835\uDD5A","\uD835\uDD5B","\uD835\uDD5C","\uD835\uDD5D","\uD835\uDD5E","\uD835\uDD5F","\uD835\uDD60","\uD835\uDD61","\uD835\uDD62","\uD835\uDD63","\uD835\uDD64","\uD835\uDD65","\uD835\uDD66","\uD835\uDD67","\uD835\uDD68","\uD835\uDD69","\uD835\uDD6A","\uD835\uDD6B"], 0x1D7D8];
 var AMbb = [0x1D400, 0x1D41A, 0x1D7CE, 0x1D6A8, 0x1D6C2, {981:0x1D6DF}];  // Mathematical Bold
 var AMsf = [0x1D5A0, 0x1D5BA, 0x1D7E2];  // Mathematical Sans-Serif
+var AMsfit = [0x1D608, 0x1D622, 0x1D7E2];  // Mathematical Sans-Serif italic
 var AMtt = [0x1D670, 0x1D68A, 0x1D7F6];  // Mathematical Monospace
 var AMbbcal = [0x1D4D0, 0x1D4EA]; // Bold script
 var AMbbfr = [0x1D56C, 0x1D586]; // Bold frak
-var AMbbsf = [0x1D5D4, 0x1D5EE, 0x1D7EC]; //bold sans-serif
+var AMbbsf = [0x1D5D4, 0x1D5EE, 0x1D7EC, 0x1D756, 0x1D770]; //bold sans-serif
+var AMbbsfit = [0x1D63C, 0x1D656, 0x1D7EC, 0x1D790, 0x1D7AA]; //bold italic sans-serif
 var AMbbit = [0x1D468, 0x1D482, null, 0x1D71C, 0x1D736, {981:0x1D753}]; //bold italic
 
 var CONST = 0, UNARY = 1, BINARY = 2, INFIX = 3, LEFTBRACKET = 4,
@@ -507,6 +509,7 @@ var AMsymbols = [
 AMquote,
 {input:"bb", ttype:UNARY, tex:"mathbf", codes:AMbb},
 {input:"sf", ttype:UNARY, tex:"mathsf", codes:AMsf},
+{input:"sfit", ttype:UNARY, codes:AMsfit},
 {input:"bbsf", ttype:UNARY, codes:AMbbsf},
 {input:"bbb", ttype:UNARY, tex:"mathbb", codes:AMbbb},
 {input:"cc", ttype:UNARY, tex: "mathcal", codes:AMcal},
@@ -515,6 +518,7 @@ AMquote,
 {input:"fr", ttype:UNARY, tex:"mathfrak", codes:AMfrk},
 {input:"bbfr", ttype:UNARY, codes:AMbbfr},
 {input:"bbit", ttype:UNARY, codes:AMbbit},
+{input:"bbsfit", ttype:UNARY, codes:AMbbsfit},
 {input:"bold", ttype:UNARY, codes:AMbbit}
 ];
 

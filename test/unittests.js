@@ -336,16 +336,19 @@ var unittests = [
 
 //font and color
 {input: "color(red)(x)", output:"<mstyle mathcolor=\"red\"><mrow><mi>x</mi></mrow></mstyle>"},
-{input: "bb(axAR12)", output:"<mrow><mi>𝐚</mi><mi>𝐱</mi><mi>𝐀</mi><mi>𝐑</mi><mn>𝟏𝟐</mn></mrow>"},
+{input: "bb(axAR12 phi varphi Delta)", output:"<mrow><mi>𝐚</mi><mi>𝐱</mi><mi>𝐀</mi><mi>𝐑</mi><mn>𝟏𝟐</mn><mi>𝛟</mi><mi>𝛗</mi><mo>𝚫</mo></mrow>"},
 {input: "sf(axAR12)", output:"<mrow><mi>𝖺</mi><mi>𝗑</mi><mi>𝖠</mi><mi>𝖱</mi><mn>𝟣𝟤</mn></mrow>"},
 {input: "bbb(axAR12)", output:"<mrow><mi>𝕒</mi><mi>𝕩</mi><mi>𝔸</mi><mi>ℝ</mi><mn>𝟙𝟚</mn></mrow>"},
 {input: "cc(axAR12)", output:"<mrow><mi>𝒶</mi><mi>𝓍</mi><mi>𝒜</mi><mi>ℛ</mi><mn>12</mn></mrow>"},
 {input: "tt(axAR12)", output:"<mrow><mi>𝚊</mi><mi>𝚡</mi><mi>𝙰</mi><mi>𝚁</mi><mn>𝟷𝟸</mn></mrow>"},
 {input: "fr(axAR12)", output:"<mrow><mi>𝔞</mi><mi>𝔵</mi><mi>𝔄</mi><mi>ℜ</mi><mn>12</mn></mrow>"},
 {input: "bbb \"abcABC123\"", output:"<mrow><mtext>𝕒𝕓𝕔𝔸𝔹ℂ𝟙𝟚𝟛</mtext></mrow>"},
-{input: "bbcc(cR3)", output:"<mrow><mi>𝓬</mi><mi>𝓡</mi><mn>3</mn></mrow>"},
-{input: "bbfr(cR3)", output:"<mrow><mi>𝖈</mi><mi>𝕽</mi><mn>3</mn></mrow>"},
+{input: "bbcc(cR3)", output:"<mrow><mi>𝓬</mi><mi>𝓡</mi><mn>𝟑</mn></mrow>"},
+{input: "bbfr(cR3)", output:"<mrow><mi>𝖈</mi><mi>𝕽</mi><mn>𝟑</mn></mrow>"},
 {input: "bbsf(cR3)", output:"<mrow><mi>𝗰</mi><mi>𝗥</mi><mn>𝟯</mn></mrow>"},
+{input: "bbit(axAR12 phi varphi Delta)", output:"<mrow><mi>𝒂</mi><mi>𝒙</mi><mi>𝑨</mi><mi>𝑹</mi><mn>𝟏𝟐</mn><mi>𝝓</mi><mi>𝝋</mi><mo>𝜟</mo></mrow>"},
+{input: "bold(3sin(x))", output:"<mrow><mn>𝟑</mn><mrow><mo>𝐬𝐢𝐧</mo><mrow><mo>(</mo><mi>𝒙</mi><mo>)</mo></mrow></mrow></mrow>"},
+
 
 //basics
 {input: "x", output:"<mi>x</mi>"},

@@ -348,7 +348,8 @@ var unittests = [
 {input: "bbsf(cR3)", output:"<mrow><mi>𝗰</mi><mi>𝗥</mi><mn>𝟯</mn></mrow>"},
 {input: "bbit(axAR12 phi varphi Delta)", output:"<mrow><mi>𝒂</mi><mi>𝒙</mi><mi>𝑨</mi><mi>𝑹</mi><mn>𝟏𝟐</mn><mi>𝝓</mi><mi>𝝋</mi><mo>𝜟</mo></mrow>"},
 {input: "bold(3sin(x))", output:"<mrow><mn>𝟑</mn><mrow><mo>𝐬𝐢𝐧</mo><mrow><mo>(</mo><mi>𝒙</mi><mo>)</mo></mrow></mrow></mrow>"},
-
+{input: "sfit(axAR12 phi varphi Delta)", output:"<mrow><mi>𝘢</mi><mi>𝘹</mi><mi>𝘈</mi><mi>𝘙</mi><mn>𝟣𝟤</mn><mi>ϕ</mi><mi>φ</mi><mo>Δ</mo></mrow>"},
+{input: "bbsfit(axAR12 phi varphi Delta)", output:"<mrow><mi>𝙖</mi><mi>𝙭</mi><mi>𝘼</mi><mi>𝙍</mi><mn>𝟭𝟮</mn><mi>𝟇</mi><mi>𝞿</mi><mo>𝞓</mo></mrow>"},
 
 //basics
 {input: "x", output:"<mi>x</mi>"},

@@ -511,7 +511,8 @@ AMquote,
 {input:"tt", ttype:UNARY, tex:"mathtt", codes:AMtt},
 {input:"fr", ttype:UNARY, tex:"mathfrak", codes:AMfrk},
 {input:"bbfr", ttype:UNARY, codes:AMbbfr},
-{input:"bbit", ttype:UNARY, codes:AMbbit}
+{input:"bbit", ttype:UNARY, codes:AMbbit},
+{input:"bold", ttype:UNARY, codes:AMbbit}
 ];
 
 function compareNames(s1,s2) {
@@ -776,7 +777,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
         return [node,result[1]];
       } else {                        // font change command
         if (typeof symbol.codes === 'object') {
-          AMmapChars(result[0], symbol.codes);
+          AMmapChars(result[0], symbol.codes, symbol.input);
         }
         return [result[0],result[1]];
       }
@@ -854,7 +855,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
 }
 
 // walks a node, and maps characters according to codemap
-function AMmapChars(node, codemap) {
+function AMmapChars(node, codemap, inputsym) {
   var tag = '';
   if (node.tagName) {
     tag = node.tagName.toUpperCase();
@@ -862,21 +863,29 @@ function AMmapChars(node, codemap) {
   if (tag == "MI" || tag == "MO" || tag == "MN" || tag == "MTEXT") {
     var st = node.firstChild.nodeValue.toString();
     var newst = "";
+    if (inputsym === 'bold') { // adjust codemap between bb and bbit based on tag type
+      codemap = (tag == "MI" ? AMbbit : AMbb);
+    }
     for (var j=0; j<st.length; j++) {
-      if (st.charCodeAt(j)>64 && st.charCodeAt(j)<91) {
+      if (st.charCodeAt(j)>64 && st.charCodeAt(j)<91) { // A-Z
         if (codemap.length < 4) {
           newst += String.fromCodePoint(codemap[0] + st.charCodeAt(j) - 65);
         } else {
           newst += codemap[st.charCodeAt(j)-65];
         }
-      } else if (st.charCodeAt(j)>96 && st.charCodeAt(j)<123) {
+      } else if (st.charCodeAt(j)>96 && st.charCodeAt(j)<123) { // a-z
         if (codemap.length < 4) {
           newst += String.fromCodePoint(codemap[1] + st.charCodeAt(j) - 97);
         } else {
           newst += codemap[st.charCodeAt(j)-71];
         }
-      } else if (st.charCodeAt(j)>47 && st.charCodeAt(j)<58 && (codemap.length == 3 || codemap.length == 53)) {
-        newst += String.fromCodePoint((codemap.length==3?codemap[2]:codemap[52]) + st.charCodeAt(j) - 48);
+      } else if (st.charCodeAt(j)>47 && st.charCodeAt(j)<58) { // 0-9
+        if (codemap.length == 3 || codemap.length == 53) {
+          newst += String.fromCodePoint((codemap.length==3?codemap[2]:codemap[52]) + st.charCodeAt(j) - 48);
+        } else if (inputsym.substring(0,2) == 'bb') { 
+          // bold but variant doesn't have symbol; use codepoint from bb codemap instead
+          newst += String.fromCodePoint(AMbb[2] + st.charCodeAt(j) - 48);
+        }
       } else {
         newst += st.charAt(j);
       }
@@ -884,7 +893,7 @@ function AMmapChars(node, codemap) {
     node.replaceChild(document.createTextNode(newst), node.firstChild);
   } else {
     for (var i=0; i<node.childNodes.length; i++) {
-      AMmapChars(node.childNodes[i], codemap);
+      AMmapChars(node.childNodes[i], codemap, inputsym);
     }
   }
 }

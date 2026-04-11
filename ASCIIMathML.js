@@ -54,6 +54,8 @@ var decimalsign = ".";        // if "," then when writing lists or matrices put
 var AMdelimiter1 = "`", AMescape1 = "\\\\`"; // can use other characters
 var AMdocumentId = "wikitext" // PmWiki element containing math (default=body)
 var fixphi = true;  		//false to return to legacy phi/varphi mapping
+var addmathvariant = false;  // true to add mathvariant on font changes. 
+                             // not used in MathML core, but is in MathML4
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
@@ -789,7 +791,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
         return [result[0],result[1]];
       } else {                        // font change command
         if (typeof symbol.codes === 'string') {
-          AMmapChars(result[0], codemaps[symbol.codes], symbol.input);
+          AMmapChars(result[0], symbol.codes, symbol.input);
         }
         return [result[0],result[1]];
       }
@@ -867,12 +869,16 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
 }
 
 // walks a node, and maps characters according to codemap
-function AMmapChars(node, codemap, inputsym) {
+function AMmapChars(node, variant, inputsym) {
   var tag = '';
+  var codemap = codemaps[variant];
   if (node.tagName) {
     tag = node.tagName.toUpperCase();
   }
   if (tag == "MI" || tag == "MO" || tag == "MN" || tag == "MTEXT") {
+    if (addmathvariant) {
+      node.setAttribute("mathvariant", variant);
+    }
     var st = node.firstChild.nodeValue.toString();
     var newst = "";
     for (var j=0; j<st.length; j++) {
@@ -911,7 +917,7 @@ function AMmapChars(node, codemap, inputsym) {
     node.replaceChild(document.createTextNode(newst), node.firstChild);
   } else {
     for (var i=0; i<node.childNodes.length; i++) {
-      AMmapChars(node.childNodes[i], codemap, inputsym);
+      AMmapChars(node.childNodes[i], variant, inputsym);
     }
   }
 }

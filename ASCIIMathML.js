@@ -521,7 +521,7 @@ AMquote,
 {input:"bbfr", ttype:UNARY, codes:'fraktur-bold'},
 {input:"bbit", ttype:UNARY, codes:'bold-italic'},
 {input:"bbsfit", ttype:UNARY, codes:'sans-serif-bold-italic'},
-{input:"bold", ttype:UNARY, codes:'bold-italic'}
+{input:"bold", ttype:UNARY}
 ];
 
 function compareNames(s1,s2) {
@@ -784,6 +784,9 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
         }
         node.appendChild(accnode);
         return [node,result[1]];
+      } else if (symbol.input == "bold") {
+        result[0].style.fontWeight = "bold";
+        return [result[0],result[1]];
       } else {                        // font change command
         if (typeof symbol.codes === 'string') {
           AMmapChars(result[0], codemaps[symbol.codes], symbol.input);
@@ -872,9 +875,6 @@ function AMmapChars(node, codemap, inputsym) {
   if (tag == "MI" || tag == "MO" || tag == "MN" || tag == "MTEXT") {
     var st = node.firstChild.nodeValue.toString();
     var newst = "";
-    if (inputsym === 'bold') { // adjust codemap between bb and bbit based on tag type
-      codemap = (tag == "MI" ? codemaps["bold-italic"] : codemaps["bold"]);
-    }
     for (var j=0; j<st.length; j++) {
       var charcode = st.charCodeAt(j);
       if (charcode>64 && charcode<91) { // A-Z
@@ -892,7 +892,7 @@ function AMmapChars(node, codemap, inputsym) {
       } else if (charcode>47 && charcode<58) { // 0-9
         if (codemap[2] != null) {
           newst += String.fromCodePoint(codemap[2] + charcode - 48);
-        } else if (inputsym.substring(0,2) == 'bb' || inputsym === 'bold') { 
+        } else if (inputsym.substring(0,2) == 'bb') {
           // bold but variant doesn't have symbol; use codepoint from bb codemap instead
           newst += String.fromCodePoint(codemaps.bold[2] + charcode - 48);
         } else {

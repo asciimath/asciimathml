@@ -202,7 +202,7 @@ function newsymbol(symbolobj) {
   refreshSymbols();
 }
 
-// unicode characters for math variants
+// unicode characters for math variants. Alpha, alpha, numbers, Greek, greek, special mappings
 var codemaps = {
   'script': [0x1D49C, 0x1D4B6, null, null, null, {0x42: 0x212C, 0x45: 0x2130, 0x46: 0x2131, 
     0x48: 0x210B, 0x49: 0x2110, 0x4C: 0x2112, 0x4D: 0x2133, 0x52: 0x211B, 0x65: 0x212F, 
@@ -217,14 +217,24 @@ var codemaps = {
           0x43: 0x2102, 0x48: 0x210D, 0x4E: 0x2115, 0x50: 0x2119, 0x51: 0x211A, 0x52: 0x211D, 
           0x5A: 0x2124, 0x393: 0x213E, 0x3A0: 0x213F, 0x3B3: 0x213D, 0x3C0: 0x213C,
         }],
-  'bold': [0x1D400, 0x1D41A, 0x1D7CE, 0x1D6A8, 0x1D6C2, {0x3D5:0x1D6DF}],  
-  'bold-italic': [0x1D468, 0x1D482, null, 0x1D71C, 0x1D736, {0x3D5:0x1D753}],
+  'bold': [0x1D400, 0x1D41A, 0x1D7CE, 0x1D6A8, 0x1D6C2],  
+  'bold-italic': [0x1D468, 0x1D482, null, 0x1D71C, 0x1D736],
   'sans-serif': [0x1D5A0, 0x1D5BA, 0x1D7E2],  
   'sans-serif-italic': [0x1D608, 0x1D622, 0x1D7E2],
-  'bold-sans-serif': [0x1D5D4, 0x1D5EE, 0x1D7EC, 0x1D756, 0x1D770, {0x3D5:0x1D78D}],
-  'sans-serif-bold-italic': [0x1D63C, 0x1D656, 0x1D7EC, 0x1D790, 0x1D7AA, {0x3D5:0x1D7C7}],
+  'bold-sans-serif': [0x1D5D4, 0x1D5EE, 0x1D7EC, 0x1D756, 0x1D770],
+  'sans-serif-bold-italic': [0x1D63C, 0x1D656, 0x1D7EC, 0x1D790, 0x1D7AA],
   'monospace': [0x1D670, 0x1D68A, 0x1D7F6]
 };
+
+// based on https://docs.mathjax.org/en/latest/advanced/synchronize/filters.html#converting-full-width-characters-to-ascii-equivalents
+var codemapranges = [
+  [0x41, 0x5A],
+  [0x61, 0x7A],
+  [0x30, 0x39],
+  [0x391, 0x3A9, {0x3F4: 0x3A2, 0x2207: 0x3AA}],
+  [0x3B1, 0x3C9, {0x2202: 0x3CA, 0x3F5: 0x3CB, 0x3D1: 0x3CC,
+                  0x3F0: 0x3CD, 0x3D5: 0x3CE, 0x3F1: 0x3CF, 0x3D6: 0x3D0}],
+];
 
 var CONST = 0, UNARY = 1, BINARY = 2, INFIX = 3, LEFTBRACKET = 4,
     RIGHTBRACKET = 5, SPACE = 6, UNDEROVER = 7, DEFINITION = 8,
@@ -877,6 +887,11 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
 function AMmapChars(node, variant, inputsym) {
   var tag = '';
   var codemap = codemaps[variant];
+  if (!codemap[2] && inputsym.substring(0,2) == 'bb') {
+    // bold but variant doesn't have symbol; use codepoint from bb codemap instead
+    codemap[2] = codemaps['bold'][2];
+  }
+  var remap = codemap[5] || {};
   if (node.tagName) {
     tag = node.tagName.toUpperCase();
   }
@@ -886,40 +901,24 @@ function AMmapChars(node, variant, inputsym) {
     }
     var st = node.firstChild.nodeValue.toString();
     var newst = "";
+    var didmap, charcode, map;
     for (var j=0; j<st.length; j++) {
-      var charcode = st.charCodeAt(j);
-      if (codemap[5]?.[charcode]) {
-        newst += String.fromCodePoint(codemap[5][charcode]);
-      } else if (charcode>64 && charcode<91) { // A-Z
-        /*(if (typeof codemap[0] == 'number') {
-          newst += String.fromCodePoint(codemap[0] + charcode - 65);
-        } else {
-          newst += codemap[0][charcode-65];
-        }*/
-        newst += String.fromCodePoint(codemap[0] + charcode - 65);
-      } else if (charcode>96 && charcode<123) { // a-z
-        /*if (typeof codemap[1] == 'number') {
-          newst += String.fromCodePoint(codemap[1] + charcode - 97);
-        } else {
-          newst += codemap[1][charcode-97];
-        }*/
-        newst += String.fromCodePoint(codemap[1] + charcode - 97);
-      } else if (charcode>47 && charcode<58) { // 0-9
-        if (codemap[2] != null) {
-          newst += String.fromCodePoint(codemap[2] + charcode - 48);
-        } else if (inputsym.substring(0,2) == 'bb') {
-          // bold but variant doesn't have symbol; use codepoint from bb codemap instead
-          newst += String.fromCodePoint(codemaps.bold[2] + charcode - 48);
-        } else {
-          newst += st.charAt(j);
+      didmap = false;
+      charcode = st.charCodeAt(j);
+      for (var k=0; k<5; k++) {
+        if (!codemap[k]) { continue; }
+        map = codemapranges[k][2] || {};
+        if (map[charcode]) {
+          newst += String.fromCodePoint(map[charcode] - codemapranges[k][0] + codemap[k]);
+          didmap = true;
+          break;
+        } else if (charcode >= codemapranges[k][0] && charcode <= codemapranges[k][1]) {
+          newst += String.fromCodePoint(remap[charcode] || charcode - codemapranges[k][0] + codemap[k]);
+          didmap = true;
+          break;
         }
-      } else if (charcode>944 && charcode<970 && codemap[4] != null) { // lower case greek
-        newst += String.fromCodePoint(codemap[4] + charcode - 945);
-      } else if (charcode>912 && charcode<938 && codemap[3] != null) { // upper case greek
-        newst += String.fromCodePoint(codemap[3] + charcode - 913);
-      } else if (codemap[5] != null && charcode in codemap[5]) {
-        newst += String.fromCodePoint(codemap[5][charcode]);
-      } else {
+      }
+      if (!didmap) {
         newst += st.charAt(j);
       }
     }

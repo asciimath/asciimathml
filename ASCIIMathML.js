@@ -10,7 +10,7 @@ Just add the next line to your HTML page with this file in the same folder:
 
 <script type="text/javascript" src="ASCIIMathML.js"></script>
 
-Version 2.3 April 13 2026.
+Version 2.4 April 13 2026.
 Latest version at https://github.com/asciimath/asciimathml
 If you use it on a webpage, please send the URL to jipsen@chapman.edu
 
@@ -51,6 +51,9 @@ var displaystyle = true;      // puts limits above and below large operators
 var showasciiformulaonhover = true; // helps students learn ASCIIMath
 var decimalsign = ".";        // if "," then when writing lists or matrices put
 			      //a space after the "," like `(1, 2)` not `(1,2)`
+var listseparator = ",";      // when decimalsign="," you can opt to use ";" as listseparator
+            //which will eliminate the need to a space after the "," in lists and matrices
+            //and will allow "3," to be interpreted as a single number.
 var AMdelimiter1 = "`", AMescape1 = "\\\\`"; // can use other characters
 var AMdocumentId = "wikitext" // PmWiki element containing math (default=body)
 var fixphi = true;  		//false to return to legacy phi/varphi mapping
@@ -121,7 +124,7 @@ function checkMathML(){
     // fake support for cancel with some CSS
     var stroke = mathcolor=="" ? "black" : mathcolor;
     setStylesheet("menclose[notation=updiagonalstrike] {background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none' viewBox='0 0 100 100'%3E%3Cline x1='0' y1='100' x2='100' y2='0' stroke='"+stroke+"' stroke-width='1' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E\");}");
-  }
+    }
   document.body.removeChild(container);
   noMathML = !supported;
 
@@ -628,6 +631,7 @@ function AMgetSymbol(str) {
 // if str[0] is a digit or - return maxsubstring of digits.digits
   AMcurrentSymbol=CONST;
   k = 1;
+  var useddecimal = false;
   st = str.slice(0,1);
   var integ = true;
   while ("0"<=st && st<="9" && k<=str.length) {
@@ -636,9 +640,15 @@ function AMgetSymbol(str) {
   }
   if (st == decimalsign) {
     st = str.slice(k,k+1);
+    if (k > 1 && (decimalsign != listseparator || st != " ") && k<str.length) {
+      k++;
+      useddecimal = true;
+    }
     if ("0"<=st && st<="9") {
       integ = false;
-      k++;
+      if (!useddecimal) {
+        k++;
+      }
       while ("0"<=st && st<="9" && k<=str.length) {
         st = str.slice(k,k+1);
         k++;
@@ -755,7 +765,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
       }
       if (typeof symbol.func == "boolean" && symbol.func) { // functions hack
         st = str.charAt(0);
-          if (st=="^" || st=="_" || st=="/" || st=="|" || st=="," ||
+          if (st=="^" || st=="_" || st=="/" || st=="|" || st==listseparator ||
              (symbol.input.length==1 && symbol.input.match(/\w/) && st!="(")) {
           return [createMmlNode(symbol.tag,
                     document.createTextNode(symbol.output)),str];
@@ -787,15 +797,15 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
         }
         var accnode = createMmlNode("mo",document.createTextNode(symbol.output));
         if (symbol.input=="vec" && (
-          (result[0].nodeName=="mrow" && result[0].childNodes.length==1
-            && result[0].firstChild.firstChild.nodeValue !== null
-            && result[0].firstChild.firstChild.nodeValue.length==1) ||
-          (result[0].firstChild && result[0].firstChild.nodeValue !== null
+		(result[0].nodeName=="mrow" && result[0].childNodes.length==1
+			&& result[0].firstChild.firstChild.nodeValue !== null
+			&& result[0].firstChild.firstChild.nodeValue.length==1) ||
+		(result[0].firstChild && result[0].firstChild.nodeValue !== null
             && result[0].firstChild.nodeValue.length==1) )
         ) {
           // special case of single character base for vector accent,
           // where stretchy can make it look bad
-          accnode.setAttribute("stretchy",false);
+			accnode.setAttribute("stretchy",false);
         }else{
           accnode.setAttribute("stretchy",true);
         }
@@ -807,9 +817,9 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
       } else {                        // font change command
         if (typeof symbol.codes === 'string') {
           AMmapChars(result[0], symbol.codes, symbol.input);
-        }
+            }
         return [result[0],result[1]];
-      }
+        }
   case BINARY:
     str = AMremoveCharsAndBlanks(str,symbol.input.length);
     result = AMparseSexpr(str);
@@ -865,7 +875,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
     st = "";
     if (result[0].lastChild!=null)
       st = result[0].lastChild.firstChild.nodeValue;
-    if (st == "|" && str.charAt(0)!==",") { // its an absolute value subterm
+    if (st == "|" && str.charAt(0)!==listseparator) { // its an absolute value subterm
       node = createMmlNode("mo",document.createTextNode(symbol.output));
       node = createMmlNode("mrow",node);
       node.appendChild(result[0]);
@@ -1032,14 +1042,14 @@ function AMparseExpr(str,rightbracket) {
           node = newFrag.childNodes[i];
           if (matrix) matrix = node.nodeName=="mrow" &&
             (i==m-1 || node.nextSibling.nodeName=="mo" &&
-            node.nextSibling.firstChild.nodeValue==",")&&
+            node.nextSibling.firstChild.nodeValue==listseparator)&&
             node.firstChild.firstChild &&
             node.firstChild.firstChild.nodeValue==left &&
             node.lastChild.firstChild &&
             node.lastChild.firstChild.nodeValue==right;
           if (matrix)
             for (var j=0; j<node.childNodes.length; j++)
-              if (node.childNodes[j].firstChild.nodeValue==",")
+              if (node.childNodes[j].firstChild.nodeValue==listseparator)
                 pos[i][pos[i].length]=j;
           if (matrix && i>1) matrix = pos[i].length == pos[i-2].length;
         }
@@ -1260,4 +1270,6 @@ asciimath.newsymbol = newsymbol;
 asciimath.AMprocessNode = AMprocessNode;
 asciimath.parseMath = parseMath;
 asciimath.translate = translate;
+asciimath.setdecimal = function (ds) { decimalsign = ds;}
+asciimath.setlistseparator = function (ls) { listseparator = ls;}
 })();

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ASCIIMathML test suite</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script type="text/javascript" src="../ASCIIMathML.js"></script>
+<style type="text/css">
+#menu, #title, #subtitle, #author, .display { text-align: center; }
+body    { font-family: Arial; margin:10%; }
+p,table { font-family: Times; }
+table   { border-collapse:collapse; }
+td, th  { border:1px solid black; padding:5px; text-align:center; }
+img     { border: 0; }
+</style>
+</head>
+<body>
+
+<br>
+<table>
+<tr><td>bb(AaBbCc123)</td><td>` bb (AaBbCc123)`</td></tr>
+<tr><td>mathbf(AaBbCc123)	</td><td>`mathbf(AaBbCc123)`	</td></tr>
+<tr><td>bb "AaBbCc123"</td><td>`bb "AaBbCc123"`</td></tr>
+<tr><td>mathbf "AaBbCc123"</td><td>`mathbf "AaBbCc123"`</td></tr>
+<tr><td>"AaBbCc123 literal"</td><td>`"AaBbCc123 literal"`</td></tr>
+<tr><td>bb "AaBbCc123 bold"</td><td>`bb "AaBbCc123 bold"`</td></tr>
+<tr><td>bbb "AaBbCc123 dbl-struck"</td><td>`bbb "AaBbCc123 dbl-struck"`</td></tr>
+<tr><td>cc "AaBbCc123 script"</td><td>`cc "AaBbCc123 script"`</td></tr>
+<tr><td>tt "AaBbCc123 mono"</td><td>`tt "AaBbCc123 mono"`</td></tr>
+<tr><td>fr "AaBbCc123 frakur</td><td>`fr "AaBbCc123 frakur"`</td></tr>
+<tr><td>sf "AaBbCc123 sanserif"</td><td>`sf "AaBbCc123 sanserif"`</td></tr>
+<tr><td>"Literal non-italic"</td><td>`"Literal non-italic"`</td></tr>
+<tr><td>&nbsp;</td><td></td></tr>
+<tr><td>"abc 01239 $%*"`</td><td>`"abc 1239 $%*"`</tr>
+<tr><td>bold "abc 01239 $%*"</td><td>`bold "abc 01239 $%*"`</tr>
+<tr><td>tt "abc 01239 $%*"</td><td>`tt "abc 01239 $%*"`</tr>
+<tr><td>fr "abc 01239 $%*"</td><td>`fr "abc 01239 $%*"`</tr>
+<tr><td>sf "abc 01239 $%*"</td><td>`tt "abc 01239 $%*"`</tr>
+<tr><td>bb "abc 01239 $%*"</td><td>`bb "abc 01239 $%*"`</tr>
+<tr><td>&nbsp;</td><td></td></tr>
+<tr><td>log(x)</td><td>` log(x)`</td></tr>
+<tr><td>bb log(x)</td><td>`bb log(x)`</td></tr>
+<tr><td>bb log x</td><td>`bb log x` </td></tr>
+<tr><td>bb log bb " x"</td><td>`bb log bb " x"`</td></tr>
+<tr><td>bb log bb "(x)"</td><td>`bb log bb "(x)"`</td></tr>
+<tr><td>log(x) bb "log(x)"</td><td>`log(x) bb "log(x)"`</td></tr>
+<tr><td>log(x) bold (log(x))</td><td>`log(x) bold (log(x))`</td></tr>
+
+</table>
+
+
+
+</body>
+</html>

@@ -10,7 +10,7 @@ Just add the next line to your HTML page with this file in the same folder:
 
 <script type="text/javascript" src="ASCIIMathML.js"></script>
 
-Version 2.3 April 13 2026.
+Version 2.4 April 13 2026.
 Latest version at https://github.com/asciimath/asciimathml
 If you use it on a webpage, please send the URL to jipsen@chapman.edu
 

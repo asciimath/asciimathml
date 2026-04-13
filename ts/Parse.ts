@@ -87,10 +87,24 @@ export class AsciiMath {
                 const textNode = document.createTextNode(text);
                 return new DOMNodeAdapter(textNode);
             },
-            options: { decimalsign: '.', displaystyle: true }
+            options: { 
+                decimalsign: '.', 
+                listseparator: ',',
+                displaystyle: true, 
+                addmathvariant: false 
+            }
         };
         this.parser = new AsciiMathParser(this.domConfig);
     }
+    public setdecimal(input: string) {
+        this.domConfig.options.decimalsign = input;
+        this.parser = new AsciiMathParser(this.domConfig);
+    }
+    public setlistseparator(input: string) {
+        this.domConfig.options.listseparator = input;
+        this.parser = new AsciiMathParser(this.domConfig);
+    }
+
     public parseMath(input: string) {
         const result = this.parser.mml(input);
         const domElement = (result as DOMNodeAdapter).underlyingNode; // Get the actual DOM element
@@ -201,4 +215,5 @@ export default asciimath;
 // Convenience top-level exports (call into the singleton)
 export const parseMath = (input: string) => asciimath.parseMath(input);
 export const AMprocessNode = (n: Element, linebreaks: boolean, spanclassAM: boolean) => asciimath.AMprocessNode(n, linebreaks, spanclassAM);
-
+export const setdecimal = (input: string) => asciimath.setdecimal(input);
+export const setlistseparator = (input: string) => asciimath.setlistseparator(input);

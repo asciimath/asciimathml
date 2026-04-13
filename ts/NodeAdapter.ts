@@ -18,8 +18,10 @@ export interface IParseOptions<T extends INodeAdapter> {
   create(tag: string, children?: T[]): T;
   createText(text: string): T;
   options: {
-    decimalsign: string;
-    displaystyle: boolean;
+    decimalsign?: string;
+    listseparator?: string;
+    displaystyle?: boolean;
+    addmathvariant?: boolean;
     additionalSymbols?: AdditionalSymbol[];
   };
 }
@@ -32,7 +34,7 @@ export interface AdditionalSymbol {
   ttype: string;
   acc?: boolean;
   func?: boolean;
-  codes?: number[];
+  codes?: string;
   invisible?: boolean;
   rewriteleftright?: string[];
   atname?: string;

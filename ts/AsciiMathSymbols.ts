@@ -30,7 +30,7 @@ export interface Symbol {
   ttype: TokenType;
   acc?: boolean;
   func?: boolean;
-  codes?: number[];
+  codes?: string;
   invisible?: boolean;
   rewriteleftright?: string[];
   atname?: string;
@@ -38,13 +38,42 @@ export interface Symbol {
   notexcopy?: boolean;
 }
 
-// Character lists for special fonts
-export const AMcal = [0x1D49C,0x212C,0x1D49E,0x1D49F,0x2130,0x2131,0x1D4A2,0x210B,0x2110,0x1D4A5,0x1D4A6,0x2112,0x2133,0x1D4A9,0x1D4AA,0x1D4AB,0x1D4AC,0x211B,0x1D4AE,0x1D4AF,0x1D4B0,0x1D4B1,0x1D4B2,0x1D4B3,0x1D4B4,0x1D4B5,0x1D4B6,0x1D4B7,0x1D4B8,0x1D4B9,0x212F,0x1D4BB,0x210A,0x1D4BD,0x1D4BE,0x1D4BF,0x1D4C0,0x1D4C1,0x1D4C2,0x1D4C3,0x2134,0x1D4C5,0x1D4C6,0x1D4C7,0x1D4C8,0x1D4C9,0x1D4CA,0x1D4CB,0x1D4CC,0x1D4CD,0x1D4CE,0x1D4CF];
-export const AMfrk = [0x1D504,0x1D505,0x212D,0x1D507,0x1D508,0x1D509,0x1D50A,0x210C,0x2111,0x1D50D,0x1D50E,0x1D50F,0x1D510,0x1D511,0x1D512,0x1D513,0x1D514,0x211C,0x1D516,0x1D517,0x1D518,0x1D519,0x1D51A,0x1D51B,0x1D51C,0x2128,0x1D51E,0x1D51F,0x1D520,0x1D521,0x1D522,0x1D523,0x1D524,0x1D525,0x1D526,0x1D527,0x1D528,0x1D529,0x1D52A,0x1D52B,0x1D52C,0x1D52D,0x1D52E,0x1D52F,0x1D530,0x1D531,0x1D532,0x1D533,0x1D534,0x1D535,0x1D536,0x1D537];
-export const AMbbb = [0x1D538,0x1D539,0x2102,0x1D53B,0x1D53C,0x1D53D,0x1D53E,0x210D,0x1D540,0x1D541,0x1D542,0x1D543,0x1D544,0x2115,0x1D546,0x2119,0x211A,0x211D,0x1D54A,0x1D54B,0x1D54C,0x1D54D,0x1D54E,0x1D54F,0x1D550,0x2124,0x1D552,0x1D553,0x1D554,0x1D555,0x1D556,0x1D557,0x1D558,0x1D559,0x1D55A,0x1D55B,0x1D55C,0x1D55D,0x1D55E,0x1D55F,0x1D560,0x1D561,0x1D562,0x1D563,0x1D564,0x1D565,0x1D566,0x1D567,0x1D568,0x1D569,0x1D56A,0x1D56B,0x1D7D8];
-export const AMbb = [0x1D400, 0x1D41A, 0x1D7CE];  // Mathematical Bold
-export const AMsf = [0x1D5A0, 0x1D5BA, 0x1D7E2];  // Mathematical Sans-Serif
-export const AMtt = [0x1D670, 0x1D68A, 0x1D7F6];  // Mathematical Monospace
+// unicode characters for math variants. Alpha, alpha, numbers, Greek, greek, special mappings
+type CodeMapEntry = [number, number, (number | null)?, (number | null)?, (number | null)?, Record<number, number>?];
+export const codemaps: Record<string, CodeMapEntry> = {
+  'script': [0x1D49C, 0x1D4B6, null, null, null, {[0x42]: 0x212C, [0x45]: 0x2130, [0x46]: 0x2131, 
+    [0x48]: 0x210B, [0x49]: 0x2110, [0x4C]: 0x2112, [0x4D]: 0x2133, [0x52]: 0x211B, [0x65]: 0x212F, 
+    [0x67]: 0x210A, [0x6F]: 0x2134
+        }],
+  'bold-script': [0x1D4D0, 0x1D4EA],
+  'fraktur': [0x1D504, 0x1D51E, null, null, null, {
+          [0x43]: 0x212D, [0x48]: 0x210C, [0x49]: 0x2111, [0x52]: 0x211C, [0x5A]: 0x2128,
+        }],
+  'bold-fraktur': [0x1D56C, 0x1D586],
+  'double-struck': [0x1D538, 0x1D552, 0x1D7D8, null, null, {
+          [0x43]: 0x2102, [0x48]: 0x210D, [0x4E]: 0x2115, [0x50]: 0x2119, [0x51]: 0x211A, [0x52]: 0x211D, 
+          [0x5A]: 0x2124, [0x393]: 0x213E, [0x3A0]: 0x213F, [0x3B3]: 0x213D, [0x3C0]: 0x213C,
+        }],
+  'bold': [0x1D400, 0x1D41A, 0x1D7CE, 0x1D6A8, 0x1D6C2],  
+  'bold-italic': [0x1D468, 0x1D482, null, 0x1D71C, 0x1D736],
+  'sans-serif': [0x1D5A0, 0x1D5BA, 0x1D7E2],  
+  'sans-serif-italic': [0x1D608, 0x1D622, 0x1D7E2],
+  'bold-sans-serif': [0x1D5D4, 0x1D5EE, 0x1D7EC, 0x1D756, 0x1D770],
+  'sans-serif-bold-italic': [0x1D63C, 0x1D656, 0x1D7EC, 0x1D790, 0x1D7AA],
+  'monospace': [0x1D670, 0x1D68A, 0x1D7F6]
+};
+
+// based on https://docs.mathjax.org/en/latest/advanced/synchronize/filters.html#converting-full-width-characters-to-ascii-equivalents
+export const codemapranges: [number, number, Record<number, number>?][] = [
+  [0x41, 0x5A],
+  [0x61, 0x7A],
+  [0x30, 0x39],
+  [0x391, 0x3A9, {[0x3F4]: 0x3A2, [0x2207]: 0x3AA}],
+  [0x3B1, 0x3C9, {[0x2202]: 0x3CA, [0x3F5]: 0x3CB, [0x3D1]: 0x3CC,
+                  [0x3F0]: 0x3CD, [0x3D5]: 0x3CE, [0x3F1]: 0x3CF, [0x3D6]: 0x3D0}],
+];
+
+
 // Quote symbol
 export const AMquote: Symbol = {input:"\"", tag:"mtext", output:"mbox", tex:null, ttype:TokenType.TEXT};
 
@@ -316,7 +345,7 @@ export const AMsymbols: Symbol[] = [
   {input:"underset", tag:"munder", output:"stackrel", tex:null, ttype:TokenType.BINARY},
   {input:"_",    tag:"msub",  output:"_",    tex:null, ttype:TokenType.INFIX},
   {input:"^",    tag:"msup",  output:"^",    tex:null, ttype:TokenType.INFIX},
-  {input:"hat", tag:"mover", output:"\u005E", tex:null, ttype:TokenType.UNARY, acc:true},
+  {input:"hat", tag:"mover", output:"\u0302", tex:null, ttype:TokenType.UNARY, acc:true},
   {input:"bar", tag:"mover", output:"\u00AF", tex:"overline", ttype:TokenType.UNARY, acc:true},
   {input:"vec", tag:"mover", output:"\u2192", tex:null, ttype:TokenType.UNARY, acc:true},
   {input:"dot", tag:"mover", output:".",      tex:null, ttype:TokenType.UNARY, acc:true},
@@ -332,16 +361,16 @@ export const AMsymbols: Symbol[] = [
   {input:"class", tag:"mrow", output:"class", tex:null, ttype:TokenType.BINARY},
   {input:"cancel", tag:"menclose", output:"cancel", tex:null, ttype:TokenType.UNARY},
   AMquote,
-  {input:"bb", tag:"mstyle", atname:"mathvariant", atval:"bold", output:"bb", tex:null, ttype:TokenType.UNARY, codes:AMbb},
-  {input:"mathbf", tag:"mstyle", atname:"mathvariant", atval:"bold", output:"mathbf", tex:null, ttype:TokenType.UNARY, codes:AMbb},
-  {input:"sf", tag:"mstyle", atname:"mathvariant", atval:"sans-serif", output:"sf", tex:null, ttype:TokenType.UNARY, codes:AMsf},
-  {input:"mathsf", tag:"mstyle", atname:"mathvariant", atval:"sans-serif", output:"mathsf", tex:null, ttype:TokenType.UNARY, codes:AMsf},
-  {input:"bbb", tag:"mstyle", atname:"mathvariant", atval:"double-struck", output:"bbb", tex:null, ttype:TokenType.UNARY, codes:AMbbb},
-  {input:"mathbb", tag:"mstyle", atname:"mathvariant", atval:"double-struck", output:"mathbb", tex:null, ttype:TokenType.UNARY, codes:AMbbb},
-  {input:"cc",  tag:"mstyle", atname:"mathvariant", atval:"script", output:"cc", tex:null, ttype:TokenType.UNARY, codes:AMcal},
-  {input:"mathcal", tag:"mstyle", atname:"mathvariant", atval:"script", output:"mathcal", tex:null, ttype:TokenType.UNARY, codes:AMcal},
-  {input:"tt",  tag:"mstyle", atname:"mathvariant", atval:"monospace", output:"tt", tex:null, ttype:TokenType.UNARY, codes:AMtt},
-  {input:"mathtt", tag:"mstyle", atname:"mathvariant", atval:"monospace", output:"mathtt", tex:null, ttype:TokenType.UNARY, codes:AMtt},
-  {input:"fr",  tag:"mstyle", atname:"mathvariant", atval:"fraktur", output:"fr", tex:null, ttype:TokenType.UNARY, codes:AMfrk},
-  {input:"mathfrak",  tag:"mstyle", atname:"mathvariant", atval:"fraktur", output:"mathfrak", tex:null, ttype:TokenType.UNARY, codes:AMfrk}
-];
+  {input:"bb", ttype:TokenType.UNARY, tex:"mathbf", codes:'bold', tag:"", output:""},
+  {input:"sf", ttype:TokenType.UNARY, tex:"mathsf", codes:'sans-serif', tag:"", output:""},
+  {input:"sfit", ttype:TokenType.UNARY, tex:null, codes:'sans-serif-italic', tag:"", output:""},
+  {input:"bbsf", ttype:TokenType.UNARY, tex:null, codes:'bold-sans-serif', tag:"", output:""},
+  {input:"bbb", ttype:TokenType.UNARY, tex:"mathbb", codes:'double-struck', tag:"", output:""},
+  {input:"cc", ttype:TokenType.UNARY, tex: "mathcal", codes:'script', tag:"", output:""},
+  {input:"bbcc", ttype:TokenType.UNARY, tex:null, codes:'bold-script', tag:"", output:""},
+  {input:"tt", ttype:TokenType.UNARY, tex:"mathtt", codes:'monospace', tag:"", output:""},
+  {input:"fr", ttype:TokenType.UNARY, tex:"mathfrak", codes:'fraktur', tag:"", output:""},
+  {input:"bbfr", ttype:TokenType.UNARY, tex:null, codes:'bold-fraktur', tag:"", output:""},
+  {input:"bbit", ttype:TokenType.UNARY, tex:null, codes:'bold-italic', tag:"", output:""},
+  {input:"bbsfit", ttype:TokenType.UNARY, tex:null, codes:'sans-serif-bold-italic', tag:"", output:""},
+  {input:"bold", tex:null, ttype:TokenType.UNARY, tag:"", output:""}];

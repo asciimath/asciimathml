@@ -8,6 +8,8 @@ import {
   TokenType,
   AMsymbols,
   AMquote,
+  codemaps,
+  codemapranges
 } from './AsciiMathSymbols.js';
 
 /**
@@ -62,11 +64,25 @@ export class AsciiMathParser {
   private decimalsign: string = '.';
 
   /**
+   * list separator character
+   *
+   * @type {string}
+   */
+  private listseparator: string = ',';
+
+  /**
    * Display style (for limits)
    *
    * @type {boolean}
    */
   private displaystyle: boolean = true;
+
+  /**
+   * Whether to add mathvariant to tags for font changes
+   *
+   * @type {boolean}
+   */
+  private addmathvariant: boolean = false;
 
 
   /**
@@ -76,8 +92,10 @@ export class AsciiMathParser {
   constructor(
     public configuration: IParseOptions<INodeAdapter>
   ) {
-    this.decimalsign = configuration.options.decimalsign;
-    this.displaystyle = configuration.options.displaystyle;
+    this.decimalsign = configuration.options.decimalsign || '.';
+    this.listseparator = configuration.options.listseparator || ',';
+    this.displaystyle = configuration.options.displaystyle || true;
+    this.addmathvariant = configuration.options.addmathvariant || false;
     this.initSymbols(configuration.options?.additionalSymbols);
   }
 
@@ -233,6 +251,7 @@ export class AsciiMathParser {
     // Check for number
     this.currentSymbol = TokenType.CONST;
     k = 1;
+    let useddecimal = false;
     st = str.slice(0, 1);
     let integ = true;
     while ('0' <= st && st <= '9' && k <= str.length) {
@@ -241,9 +260,15 @@ export class AsciiMathParser {
     }
     if (st === this.decimalsign) {
       st = str.slice(k, k + 1);
+      if (k > 1 && (this.decimalsign != this.listseparator || st != " ") && k < str.length) {
+        k++;
+        useddecimal = true;
+      }
       if ('0' <= st && st <= '9') {
         integ = false;
-        k++;
+        if (!useddecimal) {
+          k++;
+        }
         while ('0' <= st && st <= '9' && k <= str.length) {
           st = str.slice(k, k + 1);
           k++;
@@ -266,10 +291,10 @@ export class AsciiMathParser {
       this.previousSymbol === TokenType.INFIX
     ) {
       this.currentSymbol = TokenType.INFIX;
-      return { input: st, tag: tagst, output: st, tex: null, ttype: TokenType.UNARY, func: true };
+      return { input: st, tag: tagst, output: st=="-"?"\u2212":st, tex: null, ttype: TokenType.UNARY, func: true };
     }
 
-    return { input: st, tag: tagst, output: st, tex: null, ttype: TokenType.CONST };
+    return { input: st, tag: tagst, output: st=="-"?"\u2212":st, tex: null, ttype: TokenType.CONST };
   }
 
   /**
@@ -442,7 +467,7 @@ export class AsciiMathParser {
             st === '_' ||
             st === '/' ||
             st === '|' ||
-            st === ',' ||
+            st === this.listseparator ||
             (symbol.input.length === 1 &&
               symbol.input.match(/\w/) &&
               st !== '(')
@@ -491,9 +516,9 @@ export class AsciiMathParser {
           const accnode = this.configuration.create('mo');
           accnode.appendChild(this.configuration.createText(symbol.output));
           if (symbol.tag == 'mover' && symbol.ttype === TokenType.UNARY) {
-            accnode.setAttribute('accent', 'true');
+            node.setAttribute('accent', 'true');
           } else if (symbol.tag == 'munder' && symbol.ttype === TokenType.UNARY) {
-            accnode.setAttribute('accentunder', 'true');
+            node.setAttribute('accentunder', 'true');
           }
           accnode.setAttribute('stretchy', 'true');
           // Special handling for vec with single character base
@@ -502,9 +527,9 @@ export class AsciiMathParser {
             if (
               (r0.kind === 'mrow' &&
                 r0.childNodes.length === 1 &&
-                r0.childNodes[0].childNodes[0] &&
+                r0.childNodes[0].childNodes[0]?.kind === 'textnode' &&
                 (r0.childNodes[0].childNodes[0] as any).text?.length === 1) ||
-              (r0.childNodes[0] &&
+              (r0.childNodes[0]?.kind === 'textnode' &&
                 (r0.childNodes[0] as any).text?.length === 1)
             ) {
               accnode.setAttribute('stretchy', 'false');
@@ -512,51 +537,13 @@ export class AsciiMathParser {
           }
           node.appendChild(accnode);
           return [node, result[1]];
+        } else if (symbol.input == "bold") {
+          // TODO
+          return [result[0], result[1]];
         } else {
-          /*
-          // old Font change command
-          if (symbol.codes) {
-            for (i = 0; i < result[0].childNodes.length; i++) {
-              const child = result[0].childNodes[i];
-              if (child.kind === 'mi' || result[0].kind === 'mi') {
-                const textNode =
-                  result[0].kind === 'mi'
-                    ? result[0].childNodes[0]
-                    : child.childNodes[0];
-                if (textNode && (textNode as any).text) {
-                  st = (textNode as any).text;
-                  let newst = '';
-                  for (let j = 0; j < st.length; j++) {
-                    const code = st.charCodeAt(j);
-                    if (code > 64 && code < 91) {
-                      newst += String.fromCodePoint(symbol.codes[code - 65]);
-                    } else if (code > 96 && code < 123) {
-                      newst += String.fromCodePoint(symbol.codes[code - 71]);
-                    } else {
-                      newst += st.charAt(j);
-                    }
-                  }
-                  const newNode = this.configuration.create('mo');
-                  newNode.appendChild(this.configuration.createText(newst));
-                  if (result[0].kind === 'mi') {
-                    result[0] = newNode;
-                  } else {
-                    result[0].childNodes[i] = newNode;
-                  }
-                }
-              }
-            }
-          }
-          node = this.configuration.create(symbol.tag);
-          this.appendUnwrap(result[0], node);
-          if (symbol.atname && symbol.atval) {
-            node.setAttribute(symbol.atname, symbol.atval);
-          }
-          return [node, result[1]];
-          */
           // New Font change method
           if (symbol.codes) {
-            this.AMmapChars(result[0], symbol.codes);
+            this.AMmapChars(result[0], symbol.codes, symbol.input);
           }
           return [result[0], result[1]];
         }
@@ -663,7 +650,7 @@ export class AsciiMathParser {
           }
         }
 
-        if (st === '|' && str.charAt(0) !== ',' && result[0]) { // its an absolute value subterm
+        if (st === '|' && str.charAt(0) !== this.listseparator && result[0]) { // its an absolute value subterm
           const mo = this.configuration.create('mo');
           mo.appendChild(this.configuration.createText(symbol.output));
           node = this.configuration.create('mrow');
@@ -703,36 +690,52 @@ export class AsciiMathParser {
   * for font changes like double-struck, bold, etc.
   *
   * @param {INodeAdapter} node The node to process
-  * @param {number[]} codemap The code mapping array
+  * @param {string} variant name
+  * @param {string} input symbol
   */
-  private AMmapChars(node: INodeAdapter, codemap: number[]): void {
+  private AMmapChars(node: INodeAdapter, variant: string, inputsym: string): void {
     const tag = node.kind;
+    const codemap = codemaps[variant];
+    if (!codemap[2] && inputsym.substring(0,2) === 'bb') {
+      // bold but variant doesn't have symbol; use codepoint from bb codemap instead
+      codemap[2] = codemaps['bold'][2];
+    }
+    const remap = codemap[5] || {};
     if (tag == "mi" || tag == "mo" || tag == "mn" || tag == "mtext") {
+      if (this.addmathvariant) {
+        node.setAttribute("mathvariant", variant);
+      }
       const st = (node.childNodes[0] as any).text;
       let newst = "";
+      let didmap, charcode, map;
       for (let j=0; j < st.length; j++) {
-        if (st.charCodeAt(j)>64 && st.charCodeAt(j)<91) {
-          if (codemap.length == 3) {
-            newst += this.fromCodePoint(codemap[0] + st.charCodeAt(j) - 65);
-          } else {
-            newst += this.fromCodePoint(codemap[st.charCodeAt(j)-65]);
+        didmap = false;
+        charcode = st.charCodeAt(j);
+        for (let k=0; k<5; k++) {
+          if (!codemap[k]) { continue; }
+          map = codemapranges[k][2] || {};
+          if (map[charcode]) {
+            const offset = codemap[k];
+            if (typeof offset !== 'number') { continue; }
+            newst += this.fromCodePoint(map[charcode] - codemapranges[k][0] + offset);
+            didmap = true;
+            break;
+          } else if (charcode >= codemapranges[k][0] && charcode <= codemapranges[k][1]) {
+            const offset = codemap[k];
+            if (typeof offset !== 'number') { continue; }
+            newst += this.fromCodePoint(remap[charcode] || charcode - codemapranges[k][0] + offset);
+            didmap = true;
+            break;
           }
-        } else if (st.charCodeAt(j)>96 && st.charCodeAt(j)<123) {
-          if (codemap.length == 3) {
-            newst += this.fromCodePoint(codemap[1] + st.charCodeAt(j) - 97);
-          } else {
-            newst += this.fromCodePoint(codemap[st.charCodeAt(j)-71]);
-          }
-        } else if (st.charCodeAt(j)>47 && st.charCodeAt(j)<58 && (codemap.length == 3 || codemap.length == 53)) {
-          newst += this.fromCodePoint((codemap.length==3?codemap[2]:codemap[52]) + st.charCodeAt(j) - 48);
-        } else {
+        }
+        if (!didmap) {
           newst += st.charAt(j);
         }
       }
       node.replaceChild(this.configuration.createText(newst), node.childNodes[0]);
     } else {
       for (let i=0; i<node.childNodes.length; i++) {
-        this.AMmapChars(node.childNodes[i], codemap);
+        this.AMmapChars(node.childNodes[i], variant, inputsym);
       }
     }
   }
@@ -938,7 +941,7 @@ export class AsciiMathParser {
                     (i === m - 1 ||  // last row, or next el is comma
                       (newFrag.childNodes[i + 1] &&
                         newFrag.childNodes[i + 1].kind === 'mo' &&
-                        (newFrag.childNodes[i + 1].childNodes[0] as any).text === ','
+                        (newFrag.childNodes[i + 1].childNodes[0] as any).text === this.listseparator
                       )
                     ) && // row starts and ends with left/right brackets
                     (node.childNodes[0].childNodes[0] as any).text === left &&
@@ -949,7 +952,7 @@ export class AsciiMathParser {
                   for (j = 0; j < node.childNodes.length; j++) {
                     if (
                       node.childNodes[j].childNodes.length > 0 &&
-                      (node.childNodes[j].childNodes[0] as any).text === ','
+                      (node.childNodes[j].childNodes[0] as any).text === this.listseparator
                     ) {
                       pos[i][pos[i].length] = j;
                     }

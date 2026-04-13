@@ -44,16 +44,71 @@ var asciimath = (() => {
     DOMNodeAdapter: () => DOMNodeAdapter,
     asciimath: () => asciimath,
     default: () => Parse_default,
-    parseMath: () => parseMath
+    parseMath: () => parseMath,
+    setdecimal: () => setdecimal,
+    setlistseparator: () => setlistseparator
   });
 
   // ts/AsciiMathSymbols.ts
-  var AMcal = [119964, 8492, 119966, 119967, 8496, 8497, 119970, 8459, 8464, 119973, 119974, 8466, 8499, 119977, 119978, 119979, 119980, 8475, 119982, 119983, 119984, 119985, 119986, 119987, 119988, 119989, 119990, 119991, 119992, 119993, 8495, 119995, 8458, 119997, 119998, 119999, 12e4, 120001, 120002, 120003, 8500, 120005, 120006, 120007, 120008, 120009, 120010, 120011, 120012, 120013, 120014, 120015];
-  var AMfrk = [120068, 120069, 8493, 120071, 120072, 120073, 120074, 8460, 8465, 120077, 120078, 120079, 120080, 120081, 120082, 120083, 120084, 8476, 120086, 120087, 120088, 120089, 120090, 120091, 120092, 8488, 120094, 120095, 120096, 120097, 120098, 120099, 120100, 120101, 120102, 120103, 120104, 120105, 120106, 120107, 120108, 120109, 120110, 120111, 120112, 120113, 120114, 120115, 120116, 120117, 120118, 120119];
-  var AMbbb = [120120, 120121, 8450, 120123, 120124, 120125, 120126, 8461, 120128, 120129, 120130, 120131, 120132, 8469, 120134, 8473, 8474, 8477, 120138, 120139, 120140, 120141, 120142, 120143, 120144, 8484, 120146, 120147, 120148, 120149, 120150, 120151, 120152, 120153, 120154, 120155, 120156, 120157, 120158, 120159, 120160, 120161, 120162, 120163, 120164, 120165, 120166, 120167, 120168, 120169, 120170, 120171, 120792];
-  var AMbb = [119808, 119834, 120782];
-  var AMsf = [120224, 120250, 120802];
-  var AMtt = [120432, 120458, 120822];
+  var codemaps = {
+    "script": [119964, 119990, null, null, null, {
+      [66]: 8492,
+      [69]: 8496,
+      [70]: 8497,
+      [72]: 8459,
+      [73]: 8464,
+      [76]: 8466,
+      [77]: 8499,
+      [82]: 8475,
+      [101]: 8495,
+      [103]: 8458,
+      [111]: 8500
+    }],
+    "bold-script": [120016, 120042],
+    "fraktur": [120068, 120094, null, null, null, {
+      [67]: 8493,
+      [72]: 8460,
+      [73]: 8465,
+      [82]: 8476,
+      [90]: 8488
+    }],
+    "bold-fraktur": [120172, 120198],
+    "double-struck": [120120, 120146, 120792, null, null, {
+      [67]: 8450,
+      [72]: 8461,
+      [78]: 8469,
+      [80]: 8473,
+      [81]: 8474,
+      [82]: 8477,
+      [90]: 8484,
+      [915]: 8510,
+      [928]: 8511,
+      [947]: 8509,
+      [960]: 8508
+    }],
+    "bold": [119808, 119834, 120782, 120488, 120514],
+    "bold-italic": [119912, 119938, null, 120604, 120630],
+    "sans-serif": [120224, 120250, 120802],
+    "sans-serif-italic": [120328, 120354, 120802],
+    "bold-sans-serif": [120276, 120302, 120812, 120662, 120688],
+    "sans-serif-bold-italic": [120380, 120406, 120812, 120720, 120746],
+    "monospace": [120432, 120458, 120822]
+  };
+  var codemapranges = [
+    [65, 90],
+    [97, 122],
+    [48, 57],
+    [913, 937, { [1012]: 930, [8711]: 938 }],
+    [945, 969, {
+      [8706]: 970,
+      [1013]: 971,
+      [977]: 972,
+      [1008]: 973,
+      [981]: 974,
+      [1009]: 975,
+      [982]: 976
+    }]
+  ];
   var AMquote = { input: '"', tag: "mtext", output: "mbox", tex: null, ttype: 10 /* TEXT */ };
   var AMsymbols = [
     // Greek symbols
@@ -312,7 +367,7 @@ var asciimath = (() => {
     { input: "underset", tag: "munder", output: "stackrel", tex: null, ttype: 2 /* BINARY */ },
     { input: "_", tag: "msub", output: "_", tex: null, ttype: 3 /* INFIX */ },
     { input: "^", tag: "msup", output: "^", tex: null, ttype: 3 /* INFIX */ },
-    { input: "hat", tag: "mover", output: "^", tex: null, ttype: 1 /* UNARY */, acc: true },
+    { input: "hat", tag: "mover", output: "\u0302", tex: null, ttype: 1 /* UNARY */, acc: true },
     { input: "bar", tag: "mover", output: "\xAF", tex: "overline", ttype: 1 /* UNARY */, acc: true },
     { input: "vec", tag: "mover", output: "\u2192", tex: null, ttype: 1 /* UNARY */, acc: true },
     { input: "dot", tag: "mover", output: ".", tex: null, ttype: 1 /* UNARY */, acc: true },
@@ -328,18 +383,19 @@ var asciimath = (() => {
     { input: "class", tag: "mrow", output: "class", tex: null, ttype: 2 /* BINARY */ },
     { input: "cancel", tag: "menclose", output: "cancel", tex: null, ttype: 1 /* UNARY */ },
     AMquote,
-    { input: "bb", tag: "mstyle", atname: "mathvariant", atval: "bold", output: "bb", tex: null, ttype: 1 /* UNARY */, codes: AMbb },
-    { input: "mathbf", tag: "mstyle", atname: "mathvariant", atval: "bold", output: "mathbf", tex: null, ttype: 1 /* UNARY */, codes: AMbb },
-    { input: "sf", tag: "mstyle", atname: "mathvariant", atval: "sans-serif", output: "sf", tex: null, ttype: 1 /* UNARY */, codes: AMsf },
-    { input: "mathsf", tag: "mstyle", atname: "mathvariant", atval: "sans-serif", output: "mathsf", tex: null, ttype: 1 /* UNARY */, codes: AMsf },
-    { input: "bbb", tag: "mstyle", atname: "mathvariant", atval: "double-struck", output: "bbb", tex: null, ttype: 1 /* UNARY */, codes: AMbbb },
-    { input: "mathbb", tag: "mstyle", atname: "mathvariant", atval: "double-struck", output: "mathbb", tex: null, ttype: 1 /* UNARY */, codes: AMbbb },
-    { input: "cc", tag: "mstyle", atname: "mathvariant", atval: "script", output: "cc", tex: null, ttype: 1 /* UNARY */, codes: AMcal },
-    { input: "mathcal", tag: "mstyle", atname: "mathvariant", atval: "script", output: "mathcal", tex: null, ttype: 1 /* UNARY */, codes: AMcal },
-    { input: "tt", tag: "mstyle", atname: "mathvariant", atval: "monospace", output: "tt", tex: null, ttype: 1 /* UNARY */, codes: AMtt },
-    { input: "mathtt", tag: "mstyle", atname: "mathvariant", atval: "monospace", output: "mathtt", tex: null, ttype: 1 /* UNARY */, codes: AMtt },
-    { input: "fr", tag: "mstyle", atname: "mathvariant", atval: "fraktur", output: "fr", tex: null, ttype: 1 /* UNARY */, codes: AMfrk },
-    { input: "mathfrak", tag: "mstyle", atname: "mathvariant", atval: "fraktur", output: "mathfrak", tex: null, ttype: 1 /* UNARY */, codes: AMfrk }
+    { input: "bb", ttype: 1 /* UNARY */, tex: "mathbf", codes: "bold", tag: "", output: "" },
+    { input: "sf", ttype: 1 /* UNARY */, tex: "mathsf", codes: "sans-serif", tag: "", output: "" },
+    { input: "sfit", ttype: 1 /* UNARY */, tex: null, codes: "sans-serif-italic", tag: "", output: "" },
+    { input: "bbsf", ttype: 1 /* UNARY */, tex: null, codes: "bold-sans-serif", tag: "", output: "" },
+    { input: "bbb", ttype: 1 /* UNARY */, tex: "mathbb", codes: "double-struck", tag: "", output: "" },
+    { input: "cc", ttype: 1 /* UNARY */, tex: "mathcal", codes: "script", tag: "", output: "" },
+    { input: "bbcc", ttype: 1 /* UNARY */, tex: null, codes: "bold-script", tag: "", output: "" },
+    { input: "tt", ttype: 1 /* UNARY */, tex: "mathtt", codes: "monospace", tag: "", output: "" },
+    { input: "fr", ttype: 1 /* UNARY */, tex: "mathfrak", codes: "fraktur", tag: "", output: "" },
+    { input: "bbfr", ttype: 1 /* UNARY */, tex: null, codes: "bold-fraktur", tag: "", output: "" },
+    { input: "bbit", ttype: 1 /* UNARY */, tex: null, codes: "bold-italic", tag: "", output: "" },
+    { input: "bbsfit", ttype: 1 /* UNARY */, tex: null, codes: "sans-serif-bold-italic", tag: "", output: "" },
+    { input: "bold", tex: null, ttype: 1 /* UNARY */, tag: "", output: "" }
   ];
 
   // ts/AsciiMathParser.ts
@@ -387,11 +443,23 @@ var asciimath = (() => {
        */
       __publicField(this, "decimalsign", ".");
       /**
+       * list separator character
+       *
+       * @type {string}
+       */
+      __publicField(this, "listseparator", ",");
+      /**
        * Display style (for limits)
        *
        * @type {boolean}
        */
       __publicField(this, "displaystyle", true);
+      /**
+       * Whether to add mathvariant to tags for font changes
+       *
+       * @type {boolean}
+       */
+      __publicField(this, "addmathvariant", false);
       __publicField(this, "TokenTypeMap", {
         CONST: 0 /* CONST */,
         UNARY: 1 /* UNARY */,
@@ -407,8 +475,10 @@ var asciimath = (() => {
         UNARYUNDEROVER: 15 /* UNARYUNDEROVER */
       });
       var _a;
-      this.decimalsign = configuration.options.decimalsign;
-      this.displaystyle = configuration.options.displaystyle;
+      this.decimalsign = configuration.options.decimalsign || ".";
+      this.listseparator = configuration.options.listseparator || ",";
+      this.displaystyle = configuration.options.displaystyle || true;
+      this.addmathvariant = configuration.options.addmathvariant || false;
       this.initSymbols((_a = configuration.options) == null ? void 0 : _a.additionalSymbols);
     }
     /**
@@ -529,6 +599,7 @@ var asciimath = (() => {
       }
       this.currentSymbol = 0 /* CONST */;
       k = 1;
+      let useddecimal = false;
       st = str.slice(0, 1);
       let integ = true;
       while ("0" <= st && st <= "9" && k <= str.length) {
@@ -537,9 +608,15 @@ var asciimath = (() => {
       }
       if (st === this.decimalsign) {
         st = str.slice(k, k + 1);
+        if (k > 1 && (this.decimalsign != this.listseparator || st != " ") && k < str.length) {
+          k++;
+          useddecimal = true;
+        }
         if ("0" <= st && st <= "9") {
           integ = false;
-          k++;
+          if (!useddecimal) {
+            k++;
+          }
           while ("0" <= st && st <= "9" && k <= str.length) {
             st = str.slice(k, k + 1);
             k++;
@@ -556,9 +633,9 @@ var asciimath = (() => {
       }
       if (st === "-" && str.charAt(1) !== " " && this.previousSymbol === 3 /* INFIX */) {
         this.currentSymbol = 3 /* INFIX */;
-        return { input: st, tag: tagst, output: st, tex: null, ttype: 1 /* UNARY */, func: true };
+        return { input: st, tag: tagst, output: st == "-" ? "\u2212" : st, tex: null, ttype: 1 /* UNARY */, func: true };
       }
-      return { input: st, tag: tagst, output: st, tex: null, ttype: 0 /* CONST */ };
+      return { input: st, tag: tagst, output: st == "-" ? "\u2212" : st, tex: null, ttype: 0 /* CONST */ };
     }
     /**
      * Append, unwrapping if needed
@@ -614,7 +691,7 @@ var asciimath = (() => {
      * @returns {ParseResult} [node, remaining string]
      */
     parseSexpr(str) {
-      var _a, _b;
+      var _a, _b, _c, _d;
       let symbol;
       let node;
       let result;
@@ -711,7 +788,7 @@ var asciimath = (() => {
           }
           if (symbol.func) {
             st = str.charAt(0);
-            if (st === "^" || st === "_" || st === "/" || st === "|" || st === "," || symbol.input.length === 1 && symbol.input.match(/\w/) && st !== "(") {
+            if (st === "^" || st === "_" || st === "/" || st === "|" || st === this.listseparator || symbol.input.length === 1 && symbol.input.match(/\w/) && st !== "(") {
               node = this.configuration.create(symbol.tag);
               node.appendChild(this.configuration.createText(symbol.output));
               return [node, str];
@@ -754,22 +831,24 @@ var asciimath = (() => {
             const accnode = this.configuration.create("mo");
             accnode.appendChild(this.configuration.createText(symbol.output));
             if (symbol.tag == "mover" && symbol.ttype === 1 /* UNARY */) {
-              accnode.setAttribute("accent", "true");
+              node.setAttribute("accent", "true");
             } else if (symbol.tag == "munder" && symbol.ttype === 1 /* UNARY */) {
-              accnode.setAttribute("accentunder", "true");
+              node.setAttribute("accentunder", "true");
             }
             accnode.setAttribute("stretchy", "true");
             if (symbol.input === "vec") {
               const r0 = result[0];
-              if (r0.kind === "mrow" && r0.childNodes.length === 1 && r0.childNodes[0].childNodes[0] && ((_a = r0.childNodes[0].childNodes[0].text) == null ? void 0 : _a.length) === 1 || r0.childNodes[0] && ((_b = r0.childNodes[0].text) == null ? void 0 : _b.length) === 1) {
+              if (r0.kind === "mrow" && r0.childNodes.length === 1 && ((_a = r0.childNodes[0].childNodes[0]) == null ? void 0 : _a.kind) === "textnode" && ((_b = r0.childNodes[0].childNodes[0].text) == null ? void 0 : _b.length) === 1 || ((_c = r0.childNodes[0]) == null ? void 0 : _c.kind) === "textnode" && ((_d = r0.childNodes[0].text) == null ? void 0 : _d.length) === 1) {
                 accnode.setAttribute("stretchy", "false");
               }
             }
             node.appendChild(accnode);
             return [node, result[1]];
+          } else if (symbol.input == "bold") {
+            return [result[0], result[1]];
           } else {
             if (symbol.codes) {
-              this.AMmapChars(result[0], symbol.codes);
+              this.AMmapChars(result[0], symbol.codes, symbol.input);
             }
             return [result[0], result[1]];
           }
@@ -852,7 +931,7 @@ var asciimath = (() => {
               st = lastChild.childNodes[0].text;
             }
           }
-          if (st === "|" && str.charAt(0) !== "," && result[0]) {
+          if (st === "|" && str.charAt(0) !== this.listseparator && result[0]) {
             const mo = this.configuration.create("mo");
             mo.appendChild(this.configuration.createText(symbol.output));
             node = this.configuration.create("mrow");
@@ -887,36 +966,57 @@ var asciimath = (() => {
     * for font changes like double-struck, bold, etc.
     *
     * @param {INodeAdapter} node The node to process
-    * @param {number[]} codemap The code mapping array
+    * @param {string} variant name
+    * @param {string} input symbol
     */
-    AMmapChars(node, codemap) {
+    AMmapChars(node, variant, inputsym) {
       const tag = node.kind;
-      if (tag == "mi" || tag == "mo" || tag == "mn") {
+      const codemap = codemaps[variant];
+      if (!codemap[2] && inputsym.substring(0, 2) === "bb") {
+        codemap[2] = codemaps["bold"][2];
+      }
+      const remap = codemap[5] || {};
+      if (tag == "mi" || tag == "mo" || tag == "mn" || tag == "mtext") {
+        if (this.addmathvariant) {
+          node.setAttribute("mathvariant", variant);
+        }
         const st = node.childNodes[0].text;
         let newst = "";
+        let didmap, charcode, map;
         for (let j = 0; j < st.length; j++) {
-          if (st.charCodeAt(j) > 64 && st.charCodeAt(j) < 91) {
-            if (codemap.length == 3) {
-              newst += this.fromCodePoint(codemap[0] + st.charCodeAt(j) - 65);
-            } else {
-              newst += this.fromCodePoint(codemap[st.charCodeAt(j) - 65]);
+          didmap = false;
+          charcode = st.charCodeAt(j);
+          for (let k = 0; k < 5; k++) {
+            if (!codemap[k]) {
+              continue;
             }
-          } else if (st.charCodeAt(j) > 96 && st.charCodeAt(j) < 123) {
-            if (codemap.length == 3) {
-              newst += this.fromCodePoint(codemap[1] + st.charCodeAt(j) - 97);
-            } else {
-              newst += this.fromCodePoint(codemap[st.charCodeAt(j) - 71]);
+            map = codemapranges[k][2] || {};
+            if (map[charcode]) {
+              const offset = codemap[k];
+              if (typeof offset !== "number") {
+                continue;
+              }
+              newst += this.fromCodePoint(map[charcode] - codemapranges[k][0] + offset);
+              didmap = true;
+              break;
+            } else if (charcode >= codemapranges[k][0] && charcode <= codemapranges[k][1]) {
+              const offset = codemap[k];
+              if (typeof offset !== "number") {
+                continue;
+              }
+              newst += this.fromCodePoint(remap[charcode] || charcode - codemapranges[k][0] + offset);
+              didmap = true;
+              break;
             }
-          } else if (st.charCodeAt(j) > 47 && st.charCodeAt(j) < 58 && (codemap.length == 3 || codemap.length == 53)) {
-            newst += this.fromCodePoint((codemap.length == 3 ? codemap[2] : codemap[52]) + st.charCodeAt(j) - 48);
-          } else {
+          }
+          if (!didmap) {
             newst += st.charAt(j);
           }
         }
         node.replaceChild(this.configuration.createText(newst), node.childNodes[0]);
       } else {
         for (let i = 0; i < node.childNodes.length; i++) {
-          this.AMmapChars(node.childNodes[i], codemap);
+          this.AMmapChars(node.childNodes[i], variant, inputsym);
         }
       }
     }
@@ -1073,12 +1173,12 @@ var asciimath = (() => {
                   if (matrix) {
                     matrix = node.kind === "mrow" && // current el is row
                     node.childNodes.length > 0 && (i === m - 1 || // last row, or next el is comma
-                    newFrag.childNodes[i + 1] && newFrag.childNodes[i + 1].kind === "mo" && newFrag.childNodes[i + 1].childNodes[0].text === ",") && // row starts and ends with left/right brackets
+                    newFrag.childNodes[i + 1] && newFrag.childNodes[i + 1].kind === "mo" && newFrag.childNodes[i + 1].childNodes[0].text === this.listseparator) && // row starts and ends with left/right brackets
                     node.childNodes[0].childNodes[0].text === left && node.childNodes[node.childNodes.length - 1].childNodes[0].text === right;
                   }
                   if (matrix) {
                     for (j = 0; j < node.childNodes.length; j++) {
-                      if (node.childNodes[j].childNodes.length > 0 && node.childNodes[j].childNodes[0].text === ",") {
+                      if (node.childNodes[j].childNodes.length > 0 && node.childNodes[j].childNodes[0].text === this.listseparator) {
                         pos[i][pos[i].length] = j;
                       }
                     }
@@ -1263,8 +1363,21 @@ var asciimath = (() => {
           const textNode = document.createTextNode(text);
           return new DOMNodeAdapter(textNode);
         },
-        options: { decimalsign: ".", displaystyle: true }
+        options: {
+          decimalsign: ".",
+          listseparator: ",",
+          displaystyle: true,
+          addmathvariant: false
+        }
       };
+      this.parser = new AsciiMathParser(this.domConfig);
+    }
+    setdecimal(input) {
+      this.domConfig.options.decimalsign = input;
+      this.parser = new AsciiMathParser(this.domConfig);
+    }
+    setlistseparator(input) {
+      this.domConfig.options.listseparator = input;
       this.parser = new AsciiMathParser(this.domConfig);
     }
     parseMath(input) {
@@ -1361,5 +1474,7 @@ var asciimath = (() => {
   var Parse_default = asciimath;
   var parseMath = (input) => asciimath.parseMath(input);
   var AMprocessNode = (n, linebreaks, spanclassAM) => asciimath.AMprocessNode(n, linebreaks, spanclassAM);
+  var setdecimal = (input) => asciimath.setdecimal(input);
+  var setlistseparator = (input) => asciimath.setlistseparator(input);
   return __toCommonJS(Parse_exports);
 })();

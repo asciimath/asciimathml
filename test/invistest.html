@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ASCIIMathML test suite</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script type="text/javascript" src="../dist/asciimathml.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    asciimath.AMprocessNode(document.getElementsByTagName('body')[0]);
+});
+</script>
+</head>
+<body>
+`{::}_(31)^34U`<br/>
+`( :}`<br/>
+`{:3/4)`<br/>
+`[(1,2),(3,4):}`<br/>
+</body>
+</html>

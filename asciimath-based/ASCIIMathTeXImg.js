@@ -517,7 +517,7 @@ function AMTremoveBrackets(node) {
     	    //st = node.charAt(node.length-7);
     	    st = node.substring(node.length-8);
     	    if (st=="\\right)}" || st=="\\right]}" || st=='\\right.}') {
-    	    	    node = '{'+node.substing(leftchop);
+    	    	    node = '{'+node.substring(leftchop);
     	    	    node = node.substring(0,node.length-8)+'}';
     	    } else if (st=='\\rbrace}') {
     	    	    node = '{'+node.substring(leftchop);
@@ -1055,6 +1055,6 @@ document.addEventListener('DOMContentLoaded', function () {
   if (config.translateOnLoad) {
       translate();
   }
-}
+});
 
 })();

@@ -539,11 +539,12 @@ export class AsciiMathParser {
           
           node.appendChild(accnode);
           return [node, result[1]];
-        } else if (symbol.input == "bold") {
-          // TODO
-          return [result[0], result[1]];
         } else {
           // New Font change method
+          // This handles "bold" differently than AsciiMathML.js - this
+          //   maps symbols using the bold or bold-italic codes based
+          //   on tag type, rather than using CSS for the bolding. This 
+          //   means non-alphanumeric characters may not be bolded the same
           if (symbol.codes) {
             this.AMmapChars(result[0], symbol.codes, symbol.input);
           }
@@ -697,13 +698,16 @@ export class AsciiMathParser {
   */
   private AMmapChars(node: INodeAdapter, variant: string, inputsym: string): void {
     const tag = node.kind;
-    const codemap = codemaps[variant];
-    if (!codemap[2] && inputsym.substring(0,2) === 'bb') {
-      // bold but variant doesn't have symbol; use codepoint from bb codemap instead
-      codemap[2] = codemaps['bold'][2];
-    }
-    const remap = codemap[5] || {};
     if (tag == "mi" || tag == "mo" || tag == "mn" || tag == "mtext") {
+      if (inputsym === "bold") {
+        variant = (tag == "mi") ? 'bold-italic' : 'bold';
+      }
+      const codemap = codemaps[variant];
+      if (!codemap[2] && inputsym.substring(0,2) === 'bb') {
+        // bold but variant doesn't have symbol; use codepoint from bb codemap instead
+        codemap[2] = codemaps['bold'][2];
+      }
+      const remap = codemap[5] || {};
       if (this.addmathvariant) {
         node.setAttribute("mathvariant", variant);
       }

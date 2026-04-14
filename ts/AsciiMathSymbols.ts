@@ -373,4 +373,4 @@ export const AMsymbols: Symbol[] = [
   {input:"bbfr", ttype:TokenType.UNARY, tex:null, codes:'bold-fraktur', tag:"", output:""},
   {input:"bbit", ttype:TokenType.UNARY, tex:null, codes:'bold-italic', tag:"", output:""},
   {input:"bbsfit", ttype:TokenType.UNARY, tex:null, codes:'sans-serif-bold-italic', tag:"", output:""},
-  {input:"bold", tex:null, ttype:TokenType.UNARY, tag:"", output:""}];
+  {input:"bold", tex:null, ttype:TokenType.UNARY, codes:'bold', tag:"", output:""}];

@@ -335,5 +335,5 @@ exports.AMsymbols = [
     { input: "bbfr", ttype: 1 /* TokenType.UNARY */, tex: null, codes: 'bold-fraktur', tag: "", output: "" },
     { input: "bbit", ttype: 1 /* TokenType.UNARY */, tex: null, codes: 'bold-italic', tag: "", output: "" },
     { input: "bbsfit", ttype: 1 /* TokenType.UNARY */, tex: null, codes: 'sans-serif-bold-italic', tag: "", output: "" },
-    { input: "bold", tex: null, ttype: 1 /* TokenType.UNARY */, tag: "", output: "" }
+    { input: "bold", tex: null, ttype: 1 /* TokenType.UNARY */, codes: 'bold', tag: "", output: "" }
 ];

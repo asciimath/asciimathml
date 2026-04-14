@@ -395,7 +395,7 @@ var asciimath = (() => {
     { input: "bbfr", ttype: 1 /* UNARY */, tex: null, codes: "bold-fraktur", tag: "", output: "" },
     { input: "bbit", ttype: 1 /* UNARY */, tex: null, codes: "bold-italic", tag: "", output: "" },
     { input: "bbsfit", ttype: 1 /* UNARY */, tex: null, codes: "sans-serif-bold-italic", tag: "", output: "" },
-    { input: "bold", tex: null, ttype: 1 /* UNARY */, tag: "", output: "" }
+    { input: "bold", tex: null, ttype: 1 /* UNARY */, codes: "bold", tag: "", output: "" }
   ];
 
   // ts/AsciiMathParser.ts
@@ -845,8 +845,6 @@ var asciimath = (() => {
             accnode.setAttribute("stretchy", accstretchy);
             node.appendChild(accnode);
             return [node, result[1]];
-          } else if (symbol.input == "bold") {
-            return [result[0], result[1]];
           } else {
             if (symbol.codes) {
               this.AMmapChars(result[0], symbol.codes, symbol.input);
@@ -972,12 +970,15 @@ var asciimath = (() => {
     */
     AMmapChars(node, variant, inputsym) {
       const tag = node.kind;
-      const codemap = codemaps[variant];
-      if (!codemap[2] && inputsym.substring(0, 2) === "bb") {
-        codemap[2] = codemaps["bold"][2];
-      }
-      const remap = codemap[5] || {};
       if (tag == "mi" || tag == "mo" || tag == "mn" || tag == "mtext") {
+        if (inputsym === "bold") {
+          variant = tag == "mi" ? "bold-italic" : "bold";
+        }
+        const codemap = codemaps[variant];
+        if (!codemap[2] && inputsym.substring(0, 2) === "bb") {
+          codemap[2] = codemaps["bold"][2];
+        }
+        const remap = codemap[5] || {};
         if (this.addmathvariant) {
           node.setAttribute("mathvariant", variant);
         }

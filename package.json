@@ -1,0 +1,30 @@
+{
+  "name": "asciimathml",
+  "version": "2.4.3",
+  "private": false,
+  "description": "ASCIIMathML scripts with typescript implementation",
+  "homepage": "https://github.com/asciimath/asciimathml#readme",
+  "bugs": {
+    "url": "https://github.com/asciimath/asciimathml/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/asciimath/asciimathml.git"
+  },
+  "license": "MIT",
+  "author": "",
+  "type": "module",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "build": "esbuild ts/Parse.ts --bundle --format=iife --global-name=asciimath --target=es6 --outfile=dist/asciimathml.js",
+    "watch": "esbuild ts/Parse.ts --bundle --format=iife --global-name=asciimath --target=es6 --outfile=dist/asciimathml.js --watch",
+    "compile": "tsc -p tsconfig.json && tsc -p tsconfig-esm.json",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "esbuild": "^0.27.3",
+    "typescript": "^5.4.0"
+  }
+}

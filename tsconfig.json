@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "downlevelIteration": true,
+    "moduleResolution": "Node",
+    "rootDir": "ts",
+    "outDir": "dist/cjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "noEmitOnError": false
+  },
+  "include": ["ts/**/*"]
+}

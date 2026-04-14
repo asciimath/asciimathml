@@ -15,7 +15,7 @@ var DOMNodeAdapter = /** @class */ (function () {
                 return this.element.localName || this.element.nodeName.toLowerCase();
             }
             else {
-                return 'textnode';
+                return 'text';
             }
         },
         enumerable: false,

@@ -529,6 +529,19 @@ var AsciiMathParser = /** @class */ (function () {
                 }
                 else if (symbol.acc) {
                     node = this.configuration.create(symbol.tag);
+                    var accstretchy = 'true';
+                    // Special handling for vec with single character base
+                    if (symbol.input === 'vec') {
+                        var r0 = result[0];
+                        if ((r0.kind === 'mrow' &&
+                            r0.childNodes.length === 1 &&
+                            ((_a = r0.childNodes[0].childNodes[0]) === null || _a === void 0 ? void 0 : _a.kind) === 'text' &&
+                            ((_b = r0.childNodes[0].childNodes[0].text) === null || _b === void 0 ? void 0 : _b.length) === 1) ||
+                            (((_c = r0.childNodes[0]) === null || _c === void 0 ? void 0 : _c.kind) === 'text' &&
+                                ((_d = r0.childNodes[0].text) === null || _d === void 0 ? void 0 : _d.length) === 1)) {
+                            accstretchy = 'false';
+                        }
+                    }
                     this.appendUnwrap(result[0], node);
                     var accnode = this.configuration.create('mo');
                     accnode.appendChild(this.configuration.createText(symbol.output));
@@ -538,19 +551,7 @@ var AsciiMathParser = /** @class */ (function () {
                     else if (symbol.tag == 'munder' && symbol.ttype === 1 /* TokenType.UNARY */) {
                         node.setAttribute('accentunder', 'true');
                     }
-                    accnode.setAttribute('stretchy', 'true');
-                    // Special handling for vec with single character base
-                    if (symbol.input === 'vec') {
-                        var r0 = result[0];
-                        if ((r0.kind === 'mrow' &&
-                            r0.childNodes.length === 1 &&
-                            ((_a = r0.childNodes[0].childNodes[0]) === null || _a === void 0 ? void 0 : _a.kind) === 'textnode' &&
-                            ((_b = r0.childNodes[0].childNodes[0].text) === null || _b === void 0 ? void 0 : _b.length) === 1) ||
-                            (((_c = r0.childNodes[0]) === null || _c === void 0 ? void 0 : _c.kind) === 'textnode' &&
-                                ((_d = r0.childNodes[0].text) === null || _d === void 0 ? void 0 : _d.length) === 1)) {
-                            accnode.setAttribute('stretchy', 'false');
-                        }
-                    }
+                    accnode.setAttribute('stretchy', accstretchy);
                     node.appendChild(accnode);
                     return [node, result[1]];
                 }

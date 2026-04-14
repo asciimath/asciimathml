@@ -512,6 +512,21 @@ export class AsciiMathParser {
           return [node, result[1]];
         } else if (symbol.acc) {
           node = this.configuration.create(symbol.tag);
+          let accstretchy = 'true';
+          // Special handling for vec with single character base
+          if (symbol.input === 'vec') {
+            const r0 = result[0];
+            if (
+              (r0.kind === 'mrow' &&
+                r0.childNodes.length === 1 &&
+                r0.childNodes[0].childNodes[0]?.kind === 'text' &&
+                (r0.childNodes[0].childNodes[0] as any).text?.length === 1) ||
+              (r0.childNodes[0]?.kind === 'text' &&
+                (r0.childNodes[0] as any).text?.length === 1)
+            ) {
+              accstretchy = 'false';
+            }
+          }
           this.appendUnwrap(result[0], node);
           const accnode = this.configuration.create('mo');
           accnode.appendChild(this.configuration.createText(symbol.output));
@@ -520,21 +535,8 @@ export class AsciiMathParser {
           } else if (symbol.tag == 'munder' && symbol.ttype === TokenType.UNARY) {
             node.setAttribute('accentunder', 'true');
           }
-          accnode.setAttribute('stretchy', 'true');
-          // Special handling for vec with single character base
-          if (symbol.input === 'vec') {
-            const r0 = result[0];
-            if (
-              (r0.kind === 'mrow' &&
-                r0.childNodes.length === 1 &&
-                r0.childNodes[0].childNodes[0]?.kind === 'textnode' &&
-                (r0.childNodes[0].childNodes[0] as any).text?.length === 1) ||
-              (r0.childNodes[0]?.kind === 'textnode' &&
-                (r0.childNodes[0] as any).text?.length === 1)
-            ) {
-              accnode.setAttribute('stretchy', 'false');
-            }
-          }
+          accnode.setAttribute('stretchy', accstretchy);
+          
           node.appendChild(accnode);
           return [node, result[1]];
         } else if (symbol.input == "bold") {

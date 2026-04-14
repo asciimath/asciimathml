@@ -827,6 +827,13 @@ var asciimath = (() => {
             return [node, result[1]];
           } else if (symbol.acc) {
             node = this.configuration.create(symbol.tag);
+            let accstretchy = "true";
+            if (symbol.input === "vec") {
+              const r0 = result[0];
+              if (r0.kind === "mrow" && r0.childNodes.length === 1 && ((_a = r0.childNodes[0].childNodes[0]) == null ? void 0 : _a.kind) === "text" && ((_b = r0.childNodes[0].childNodes[0].text) == null ? void 0 : _b.length) === 1 || ((_c = r0.childNodes[0]) == null ? void 0 : _c.kind) === "text" && ((_d = r0.childNodes[0].text) == null ? void 0 : _d.length) === 1) {
+                accstretchy = "false";
+              }
+            }
             this.appendUnwrap(result[0], node);
             const accnode = this.configuration.create("mo");
             accnode.appendChild(this.configuration.createText(symbol.output));
@@ -835,13 +842,7 @@ var asciimath = (() => {
             } else if (symbol.tag == "munder" && symbol.ttype === 1 /* UNARY */) {
               node.setAttribute("accentunder", "true");
             }
-            accnode.setAttribute("stretchy", "true");
-            if (symbol.input === "vec") {
-              const r0 = result[0];
-              if (r0.kind === "mrow" && r0.childNodes.length === 1 && ((_a = r0.childNodes[0].childNodes[0]) == null ? void 0 : _a.kind) === "textnode" && ((_b = r0.childNodes[0].childNodes[0].text) == null ? void 0 : _b.length) === 1 || ((_c = r0.childNodes[0]) == null ? void 0 : _c.kind) === "textnode" && ((_d = r0.childNodes[0].text) == null ? void 0 : _d.length) === 1) {
-                accnode.setAttribute("stretchy", "false");
-              }
-            }
+            accnode.setAttribute("stretchy", accstretchy);
             node.appendChild(accnode);
             return [node, result[1]];
           } else if (symbol.input == "bold") {
@@ -1296,7 +1297,7 @@ var asciimath = (() => {
       if (this.element instanceof Element) {
         return this.element.localName || this.element.nodeName.toLowerCase();
       } else {
-        return "textnode";
+        return "text";
       }
     }
     get text() {

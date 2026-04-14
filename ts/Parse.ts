@@ -12,7 +12,7 @@ export class DOMNodeAdapter implements INodeAdapter {
     if (this.element instanceof Element) {
         return this.element.localName || this.element.nodeName.toLowerCase(); 
     } else {
-        return 'textnode';
+        return 'text';
     }
   }
   get text() {

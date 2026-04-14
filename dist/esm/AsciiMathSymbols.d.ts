@@ -24,21 +24,19 @@ export interface Symbol {
     ttype: TokenType;
     acc?: boolean;
     func?: boolean;
-    codes?: number[];
+    codes?: string;
     invisible?: boolean;
     rewriteleftright?: string[];
     atname?: string;
     atval?: string;
     notexcopy?: boolean;
 }
-export declare const AMcal: number[];
-export declare const AMfrk: number[];
-export declare const AMbbb: number[];
-export declare const AMbb: number[];
-export declare const AMsf: number[];
-export declare const AMtt: number[];
+type CodeMapEntry = [number, number, (number | null)?, (number | null)?, (number | null)?, Record<number, number>?];
+export declare const codemaps: Record<string, CodeMapEntry>;
+export declare const codemapranges: [number, number, Record<number, number>?][];
 export declare const AMquote: Symbol;
 /**
  * Main symbol table for AsciiMath
  */
 export declare const AMsymbols: Symbol[];
+export {};

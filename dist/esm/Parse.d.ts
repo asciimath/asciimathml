@@ -19,6 +19,8 @@ export declare class AsciiMath {
     private AMdelimiter1;
     private AMescape1;
     constructor();
+    setdecimal(input: string): void;
+    setlistseparator(input: string): void;
     parseMath(input: string): MathMLElement;
     AMprocessNode(n: Element, linebreaks: boolean, spanclassAM: boolean): void;
     processNodeR(n: Node, linebreaks: boolean, latex: boolean): number;
@@ -28,3 +30,5 @@ export declare const asciimath: AsciiMath;
 export default asciimath;
 export declare const parseMath: (input: string) => MathMLElement;
 export declare const AMprocessNode: (n: Element, linebreaks: boolean, spanclassAM: boolean) => void;
+export declare const setdecimal: (input: string) => void;
+export declare const setlistseparator: (input: string) => void;

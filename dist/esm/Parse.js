@@ -89,10 +89,23 @@ var AsciiMath = /** @class */ (function () {
                 var textNode = document.createTextNode(text);
                 return new DOMNodeAdapter(textNode);
             },
-            options: { decimalsign: '.', displaystyle: true }
+            options: {
+                decimalsign: '.',
+                listseparator: ',',
+                displaystyle: true,
+                addmathvariant: false
+            }
         };
         this.parser = new AsciiMathParser(this.domConfig);
     }
+    AsciiMath.prototype.setdecimal = function (input) {
+        this.domConfig.options.decimalsign = input;
+        this.parser = new AsciiMathParser(this.domConfig);
+    };
+    AsciiMath.prototype.setlistseparator = function (input) {
+        this.domConfig.options.listseparator = input;
+        this.parser = new AsciiMathParser(this.domConfig);
+    };
     AsciiMath.prototype.parseMath = function (input) {
         var result = this.parser.mml(input);
         var domElement = result.underlyingNode; // Get the actual DOM element
@@ -208,3 +221,5 @@ export default asciimath;
 // Convenience top-level exports (call into the singleton)
 export var parseMath = function (input) { return asciimath.parseMath(input); };
 export var AMprocessNode = function (n, linebreaks, spanclassAM) { return asciimath.AMprocessNode(n, linebreaks, spanclassAM); };
+export var setdecimal = function (input) { return asciimath.setdecimal(input); };
+export var setlistseparator = function (input) { return asciimath.setlistseparator(input); };

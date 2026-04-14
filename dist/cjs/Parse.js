@@ -3,7 +3,7 @@
  * AsciiMath DOM Parser
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AMprocessNode = exports.parseMath = exports.asciimath = exports.AsciiMath = exports.DOMNodeAdapter = void 0;
+exports.setlistseparator = exports.setdecimal = exports.AMprocessNode = exports.parseMath = exports.asciimath = exports.AsciiMath = exports.DOMNodeAdapter = void 0;
 var AsciiMathParser_js_1 = require("./AsciiMathParser.js");
 var DOMNodeAdapter = /** @class */ (function () {
     function DOMNodeAdapter(element) {
@@ -92,10 +92,23 @@ var AsciiMath = /** @class */ (function () {
                 var textNode = document.createTextNode(text);
                 return new DOMNodeAdapter(textNode);
             },
-            options: { decimalsign: '.', displaystyle: true }
+            options: {
+                decimalsign: '.',
+                listseparator: ',',
+                displaystyle: true,
+                addmathvariant: false
+            }
         };
         this.parser = new AsciiMathParser_js_1.AsciiMathParser(this.domConfig);
     }
+    AsciiMath.prototype.setdecimal = function (input) {
+        this.domConfig.options.decimalsign = input;
+        this.parser = new AsciiMathParser_js_1.AsciiMathParser(this.domConfig);
+    };
+    AsciiMath.prototype.setlistseparator = function (input) {
+        this.domConfig.options.listseparator = input;
+        this.parser = new AsciiMathParser_js_1.AsciiMathParser(this.domConfig);
+    };
     AsciiMath.prototype.parseMath = function (input) {
         var result = this.parser.mml(input);
         var domElement = result.underlyingNode; // Get the actual DOM element
@@ -213,3 +226,7 @@ var parseMath = function (input) { return exports.asciimath.parseMath(input); };
 exports.parseMath = parseMath;
 var AMprocessNode = function (n, linebreaks, spanclassAM) { return exports.asciimath.AMprocessNode(n, linebreaks, spanclassAM); };
 exports.AMprocessNode = AMprocessNode;
+var setdecimal = function (input) { return exports.asciimath.setdecimal(input); };
+exports.setdecimal = setdecimal;
+var setlistseparator = function (input) { return exports.asciimath.setlistseparator(input); };
+exports.setlistseparator = setlistseparator;

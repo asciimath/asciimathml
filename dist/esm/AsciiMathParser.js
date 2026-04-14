@@ -48,7 +48,7 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
-import { AMsymbols, AMquote, } from './AsciiMathSymbols.js';
+import { AMsymbols, AMquote, codemaps, codemapranges } from './AsciiMathSymbols.js';
 /**
  * The main AsciiMath Parser class.
  */
@@ -97,11 +97,23 @@ var AsciiMathParser = /** @class */ (function () {
          */
         this.decimalsign = '.';
         /**
+         * list separator character
+         *
+         * @type {string}
+         */
+        this.listseparator = ',';
+        /**
          * Display style (for limits)
          *
          * @type {boolean}
          */
         this.displaystyle = true;
+        /**
+         * Whether to add mathvariant to tags for font changes
+         *
+         * @type {boolean}
+         */
+        this.addmathvariant = false;
         this.TokenTypeMap = {
             CONST: 0 /* TokenType.CONST */,
             UNARY: 1 /* TokenType.UNARY */,
@@ -116,8 +128,10 @@ var AsciiMathParser = /** @class */ (function () {
             TEXT: 10 /* TokenType.TEXT */,
             UNARYUNDEROVER: 15 /* TokenType.UNARYUNDEROVER */
         };
-        this.decimalsign = configuration.options.decimalsign;
-        this.displaystyle = configuration.options.displaystyle;
+        this.decimalsign = configuration.options.decimalsign || '.';
+        this.listseparator = configuration.options.listseparator || ',';
+        this.displaystyle = configuration.options.displaystyle || true;
+        this.addmathvariant = configuration.options.addmathvariant || false;
         this.initSymbols((_a = configuration.options) === null || _a === void 0 ? void 0 : _a.additionalSymbols);
     }
     /**
@@ -256,6 +270,7 @@ var AsciiMathParser = /** @class */ (function () {
         // Check for number
         this.currentSymbol = 0 /* TokenType.CONST */;
         k = 1;
+        var useddecimal = false;
         st = str.slice(0, 1);
         var integ = true;
         while ('0' <= st && st <= '9' && k <= str.length) {
@@ -264,9 +279,15 @@ var AsciiMathParser = /** @class */ (function () {
         }
         if (st === this.decimalsign) {
             st = str.slice(k, k + 1);
+            if (k > 1 && (this.decimalsign != this.listseparator || st != " ") && k < str.length) {
+                k++;
+                useddecimal = true;
+            }
             if ('0' <= st && st <= '9') {
                 integ = false;
-                k++;
+                if (!useddecimal) {
+                    k++;
+                }
                 while ('0' <= st && st <= '9' && k <= str.length) {
                     st = str.slice(k, k + 1);
                     k++;
@@ -287,9 +308,9 @@ var AsciiMathParser = /** @class */ (function () {
             str.charAt(1) !== ' ' &&
             this.previousSymbol === 3 /* TokenType.INFIX */) {
             this.currentSymbol = 3 /* TokenType.INFIX */;
-            return { input: st, tag: tagst, output: st, tex: null, ttype: 1 /* TokenType.UNARY */, func: true };
+            return { input: st, tag: tagst, output: st == "-" ? "\u2212" : st, tex: null, ttype: 1 /* TokenType.UNARY */, func: true };
         }
-        return { input: st, tag: tagst, output: st, tex: null, ttype: 0 /* TokenType.CONST */ };
+        return { input: st, tag: tagst, output: st == "-" ? "\u2212" : st, tex: null, ttype: 0 /* TokenType.CONST */ };
     };
     /**
      * Append, unwrapping if needed
@@ -357,7 +378,7 @@ var AsciiMathParser = /** @class */ (function () {
      * @returns {ParseResult} [node, remaining string]
      */
     AsciiMathParser.prototype.parseSexpr = function (str) {
-        var _a, _b;
+        var _a, _b, _c, _d;
         var symbol;
         var node;
         var result;
@@ -466,7 +487,7 @@ var AsciiMathParser = /** @class */ (function () {
                         st === '_' ||
                         st === '/' ||
                         st === '|' ||
-                        st === ',' ||
+                        st === this.listseparator ||
                         (symbol.input.length === 1 &&
                             symbol.input.match(/\w/) &&
                             st !== '(')) {
@@ -512,10 +533,10 @@ var AsciiMathParser = /** @class */ (function () {
                     var accnode = this.configuration.create('mo');
                     accnode.appendChild(this.configuration.createText(symbol.output));
                     if (symbol.tag == 'mover' && symbol.ttype === 1 /* TokenType.UNARY */) {
-                        accnode.setAttribute('accent', 'true');
+                        node.setAttribute('accent', 'true');
                     }
                     else if (symbol.tag == 'munder' && symbol.ttype === 1 /* TokenType.UNARY */) {
-                        accnode.setAttribute('accentunder', 'true');
+                        node.setAttribute('accentunder', 'true');
                     }
                     accnode.setAttribute('stretchy', 'true');
                     // Special handling for vec with single character base
@@ -523,61 +544,24 @@ var AsciiMathParser = /** @class */ (function () {
                         var r0 = result[0];
                         if ((r0.kind === 'mrow' &&
                             r0.childNodes.length === 1 &&
-                            r0.childNodes[0].childNodes[0] &&
-                            ((_a = r0.childNodes[0].childNodes[0].text) === null || _a === void 0 ? void 0 : _a.length) === 1) ||
-                            (r0.childNodes[0] &&
-                                ((_b = r0.childNodes[0].text) === null || _b === void 0 ? void 0 : _b.length) === 1)) {
+                            ((_a = r0.childNodes[0].childNodes[0]) === null || _a === void 0 ? void 0 : _a.kind) === 'textnode' &&
+                            ((_b = r0.childNodes[0].childNodes[0].text) === null || _b === void 0 ? void 0 : _b.length) === 1) ||
+                            (((_c = r0.childNodes[0]) === null || _c === void 0 ? void 0 : _c.kind) === 'textnode' &&
+                                ((_d = r0.childNodes[0].text) === null || _d === void 0 ? void 0 : _d.length) === 1)) {
                             accnode.setAttribute('stretchy', 'false');
                         }
                     }
                     node.appendChild(accnode);
                     return [node, result[1]];
                 }
+                else if (symbol.input == "bold") {
+                    // TODO
+                    return [result[0], result[1]];
+                }
                 else {
-                    /*
-                    // old Font change command
-                    if (symbol.codes) {
-                      for (i = 0; i < result[0].childNodes.length; i++) {
-                        const child = result[0].childNodes[i];
-                        if (child.kind === 'mi' || result[0].kind === 'mi') {
-                          const textNode =
-                            result[0].kind === 'mi'
-                              ? result[0].childNodes[0]
-                              : child.childNodes[0];
-                          if (textNode && (textNode as any).text) {
-                            st = (textNode as any).text;
-                            let newst = '';
-                            for (let j = 0; j < st.length; j++) {
-                              const code = st.charCodeAt(j);
-                              if (code > 64 && code < 91) {
-                                newst += String.fromCodePoint(symbol.codes[code - 65]);
-                              } else if (code > 96 && code < 123) {
-                                newst += String.fromCodePoint(symbol.codes[code - 71]);
-                              } else {
-                                newst += st.charAt(j);
-                              }
-                            }
-                            const newNode = this.configuration.create('mo');
-                            newNode.appendChild(this.configuration.createText(newst));
-                            if (result[0].kind === 'mi') {
-                              result[0] = newNode;
-                            } else {
-                              result[0].childNodes[i] = newNode;
-                            }
-                          }
-                        }
-                      }
-                    }
-                    node = this.configuration.create(symbol.tag);
-                    this.appendUnwrap(result[0], node);
-                    if (symbol.atname && symbol.atval) {
-                      node.setAttribute(symbol.atname, symbol.atval);
-                    }
-                    return [node, result[1]];
-                    */
                     // New Font change method
                     if (symbol.codes) {
-                        this.AMmapChars(result[0], symbol.codes);
+                        this.AMmapChars(result[0], symbol.codes, symbol.input);
                     }
                     return [result[0], result[1]];
                 }
@@ -669,7 +653,7 @@ var AsciiMathParser = /** @class */ (function () {
                         st = lastChild.childNodes[0].text;
                     }
                 }
-                if (st === '|' && str.charAt(0) !== ',' && result[0]) { // its an absolute value subterm
+                if (st === '|' && str.charAt(0) !== this.listseparator && result[0]) { // its an absolute value subterm
                     var mo = this.configuration.create('mo');
                     mo.appendChild(this.configuration.createText(symbol.output));
                     node = this.configuration.create('mrow');
@@ -707,34 +691,52 @@ var AsciiMathParser = /** @class */ (function () {
     * for font changes like double-struck, bold, etc.
     *
     * @param {INodeAdapter} node The node to process
-    * @param {number[]} codemap The code mapping array
+    * @param {string} variant name
+    * @param {string} input symbol
     */
-    AsciiMathParser.prototype.AMmapChars = function (node, codemap) {
+    AsciiMathParser.prototype.AMmapChars = function (node, variant, inputsym) {
         var tag = node.kind;
-        if (tag == "mi" || tag == "mo" || tag == "mn") {
+        var codemap = codemaps[variant];
+        if (!codemap[2] && inputsym.substring(0, 2) === 'bb') {
+            // bold but variant doesn't have symbol; use codepoint from bb codemap instead
+            codemap[2] = codemaps['bold'][2];
+        }
+        var remap = codemap[5] || {};
+        if (tag == "mi" || tag == "mo" || tag == "mn" || tag == "mtext") {
+            if (this.addmathvariant) {
+                node.setAttribute("mathvariant", variant);
+            }
             var st = node.childNodes[0].text;
             var newst = "";
+            var didmap = void 0, charcode = void 0, map = void 0;
             for (var j = 0; j < st.length; j++) {
-                if (st.charCodeAt(j) > 64 && st.charCodeAt(j) < 91) {
-                    if (codemap.length == 3) {
-                        newst += this.fromCodePoint(codemap[0] + st.charCodeAt(j) - 65);
+                didmap = false;
+                charcode = st.charCodeAt(j);
+                for (var k = 0; k < 5; k++) {
+                    if (!codemap[k]) {
+                        continue;
                     }
-                    else {
-                        newst += this.fromCodePoint(codemap[st.charCodeAt(j) - 65]);
+                    map = codemapranges[k][2] || {};
+                    if (map[charcode]) {
+                        var offset = codemap[k];
+                        if (typeof offset !== 'number') {
+                            continue;
+                        }
+                        newst += this.fromCodePoint(map[charcode] - codemapranges[k][0] + offset);
+                        didmap = true;
+                        break;
+                    }
+                    else if (charcode >= codemapranges[k][0] && charcode <= codemapranges[k][1]) {
+                        var offset = codemap[k];
+                        if (typeof offset !== 'number') {
+                            continue;
+                        }
+                        newst += this.fromCodePoint(remap[charcode] || charcode - codemapranges[k][0] + offset);
+                        didmap = true;
+                        break;
                     }
                 }
-                else if (st.charCodeAt(j) > 96 && st.charCodeAt(j) < 123) {
-                    if (codemap.length == 3) {
-                        newst += this.fromCodePoint(codemap[1] + st.charCodeAt(j) - 97);
-                    }
-                    else {
-                        newst += this.fromCodePoint(codemap[st.charCodeAt(j) - 71]);
-                    }
-                }
-                else if (st.charCodeAt(j) > 47 && st.charCodeAt(j) < 58 && (codemap.length == 3 || codemap.length == 53)) {
-                    newst += this.fromCodePoint((codemap.length == 3 ? codemap[2] : codemap[52]) + st.charCodeAt(j) - 48);
-                }
-                else {
+                if (!didmap) {
                     newst += st.charAt(j);
                 }
             }
@@ -742,7 +744,7 @@ var AsciiMathParser = /** @class */ (function () {
         }
         else {
             for (var i = 0; i < node.childNodes.length; i++) {
-                this.AMmapChars(node.childNodes[i], codemap);
+                this.AMmapChars(node.childNodes[i], variant, inputsym);
             }
         }
     };
@@ -928,7 +930,7 @@ var AsciiMathParser = /** @class */ (function () {
                                             (i === m - 1 || // last row, or next el is comma
                                                 (newFrag.childNodes[i + 1] &&
                                                     newFrag.childNodes[i + 1].kind === 'mo' &&
-                                                    newFrag.childNodes[i + 1].childNodes[0].text === ',')) && // row starts and ends with left/right brackets
+                                                    newFrag.childNodes[i + 1].childNodes[0].text === this.listseparator)) && // row starts and ends with left/right brackets
                                             node.childNodes[0].childNodes[0].text === left &&
                                             node.childNodes[node.childNodes.length - 1].childNodes[0].text === right;
                                 }
@@ -936,7 +938,7 @@ var AsciiMathParser = /** @class */ (function () {
                                     // record positions of commas
                                     for (j = 0; j < node.childNodes.length; j++) {
                                         if (node.childNodes[j].childNodes.length > 0 &&
-                                            node.childNodes[j].childNodes[0].text === ',') {
+                                            node.childNodes[j].childNodes[0].text === this.listseparator) {
                                             pos[i][pos[i].length] = j;
                                         }
                                     }

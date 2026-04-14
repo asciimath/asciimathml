@@ -41,11 +41,23 @@ export declare class AsciiMathParser {
      */
     private decimalsign;
     /**
+     * list separator character
+     *
+     * @type {string}
+     */
+    private listseparator;
+    /**
      * Display style (for limits)
      *
      * @type {boolean}
      */
     private displaystyle;
+    /**
+     * Whether to add mathvariant to tags for font changes
+     *
+     * @type {boolean}
+     */
+    private addmathvariant;
     /**
      * @constructor
      * @param {IParseOptions} configuration A parser configuration.

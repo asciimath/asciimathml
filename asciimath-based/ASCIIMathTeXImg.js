@@ -29,7 +29,7 @@ var noMathRender = false;
 
 (function() {
 var config = {
-  translateOnLoad: true,		  //true to autotranslate
+  translateOnLoad: (typeof AMTcgiloc === 'string'),		  //true to autotranslate
   mathcolor: "",       	      // defaults to back, or specify any other color
   displaystyle: true,         // puts limits above and below large operators
   showasciiformulaonhover: true, // helps students learn ASCIIMath

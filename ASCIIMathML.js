@@ -220,7 +220,8 @@ var codemaps = {
           0x43: 0x2102, 0x48: 0x210D, 0x4E: 0x2115, 0x50: 0x2119, 0x51: 0x211A, 0x52: 0x211D, 
           0x5A: 0x2124, 0x393: 0x213E, 0x3A0: 0x213F, 0x3B3: 0x213D, 0x3C0: 0x213C,
         }],
-  'bold': [0x1D400, 0x1D41A, 0x1D7CE, 0x1D6A8, 0x1D6C2],  
+  'bold': [0x1D400, 0x1D41A, 0x1D7CE, 0x1D6A8, 0x1D6C2],
+  'italic': [0x1D434, 0x1D44E, null, 0x1D6E2, 0x1D6FC, {0x68: 0x210E}],
   'bold-italic': [0x1D468, 0x1D482, null, 0x1D71C, 0x1D736],
   'sans-serif': [0x1D5A0, 0x1D5BA, 0x1D7E2],  
   'sans-serif-italic': [0x1D608, 0x1D622, 0x1D7E2],
@@ -541,7 +542,8 @@ AMquote,
 {input:"bbfr", ttype:UNARY, codes:'bold-fraktur'},
 {input:"bbit", ttype:UNARY, codes:'bold-italic'},
 {input:"bbsfit", ttype:UNARY, codes:'sans-serif-bold-italic'},
-{input:"bold", ttype:UNARY}
+{input:"bold", ttype:UNARY},
+{input:"italic", ttype:UNARY, tex:"mathit", codes:'italic'}
 ];
 
 function compareNames(s1,s2) {
@@ -813,6 +815,9 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
         return [node,result[1]];
       } else if (symbol.input == "bold") {
         result[0].style.fontWeight = "bold";
+        return [result[0],result[1]];
+      } else if (symbol.input == "italic") {
+        result[0].style.fontStyle = "italic";
         return [result[0],result[1]];
       } else {                        // font change command
         if (typeof symbol.codes === 'string') {

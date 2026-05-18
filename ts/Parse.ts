@@ -88,6 +88,12 @@ export class DOMNodeAdapter implements INodeAdapter {
         return this.element.getAttribute(name) || undefined;
     }
   }
+
+  setStyle(prop: string, value: string): void {
+    if (this.element instanceof MathMLElement) {
+        this.element.style[(prop as any)] = value;
+    }
+  }
   
   get underlyingNode() { 
     return this.element; 

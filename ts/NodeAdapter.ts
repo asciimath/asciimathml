@@ -25,6 +25,7 @@ export interface IParseOptions<T extends INodeAdapter> {
     listseparator?: string;
     displaystyle?: boolean;
     addmathvariant?: boolean;
+    useCSS?: boolean;
     additionalSymbols?: AdditionalSymbol[];
   };
 }

@@ -460,6 +460,12 @@ var asciimath = (() => {
        * @type {boolean}
        */
       __publicField(this, "addmathvariant", false);
+      /**
+       * Whether to use CSS for bold() vs character mapping
+       *
+       * @type {boolean}
+       */
+      __publicField(this, "useCSS", true);
       __publicField(this, "TokenTypeMap", {
         CONST: 0 /* CONST */,
         UNARY: 1 /* UNARY */,
@@ -479,6 +485,7 @@ var asciimath = (() => {
       this.listseparator = configuration.options.listseparator || ",";
       this.displaystyle = configuration.options.displaystyle || true;
       this.addmathvariant = configuration.options.addmathvariant || false;
+      this.useCSS = configuration.options.useCSS || true;
       this.initSymbols((_a = configuration.options) == null ? void 0 : _a.additionalSymbols);
     }
     /**
@@ -845,6 +852,9 @@ var asciimath = (() => {
             accnode.setAttribute("stretchy", accstretchy);
             node.appendChild(accnode);
             return [node, result[1]];
+          } else if (symbol.input === "bold" && this.useCSS) {
+            result[0].setStyle("fontWeight", "bold");
+            return [result[0], result[1]];
           } else {
             if (symbol.codes) {
               this.AMmapChars(result[0], symbol.codes, symbol.input);
@@ -1368,6 +1378,11 @@ var asciimath = (() => {
     getAttribute(name) {
       if (this.element instanceof Element) {
         return this.element.getAttribute(name) || void 0;
+      }
+    }
+    setStyle(prop, value) {
+      if (this.element instanceof MathMLElement) {
+        this.element.style[prop] = value;
       }
     }
     get underlyingNode() {

@@ -84,6 +84,12 @@ export class AsciiMathParser {
    */
   private addmathvariant: boolean = false;
 
+  /**
+   * Whether to use CSS for bold() vs character mapping
+   *
+   * @type {boolean}
+   */
+  private useCSS: boolean = true;
 
   /**
    * @constructor
@@ -96,6 +102,8 @@ export class AsciiMathParser {
     this.listseparator = configuration.options.listseparator || ',';
     this.displaystyle = configuration.options.displaystyle || true;
     this.addmathvariant = configuration.options.addmathvariant || false;
+    this.useCSS = configuration.options.useCSS || true;
+
     this.initSymbols(configuration.options?.additionalSymbols);
   }
 
@@ -539,10 +547,13 @@ export class AsciiMathParser {
           
           node.appendChild(accnode);
           return [node, result[1]];
+        } else if (symbol.input === "bold" && this.useCSS) {
+          result[0].setStyle("fontWeight", "bold");
+          return [result[0],result[1]];
         } else {
           // New Font change method
-          // This handles "bold" differently than AsciiMathML.js - this
-          //   maps symbols using the bold or bold-italic codes based
+          // if useCSS is not enabled, this handles "bold" differently than AsciiMathML.js
+          //   this maps symbols using the bold or bold-italic codes based
           //   on tag type, rather than using CSS for the bolding. This 
           //   means non-alphanumeric characters may not be bolded the same
           if (symbol.codes) {

@@ -5,6 +5,7 @@
 import { INodeAdapter, IParseOptions } from './NodeAdapter.js';
 import { AsciiMathParser } from './AsciiMathParser.js';
 
+// AMNode Adapted from contribution by Tom Berend in https://github.com/asciimath/asciimathml/pull/164
 export class AMNode {
     nodeName: string
     nodeValue: string = ''  // DOM allows NULL, but not important
@@ -54,21 +55,6 @@ export class AMNode {
         throw new Error('No lastChild available')
     }
 
-    get tagName(): string {
-        return this.nodeName
-    }
-
-    get nextSibling(): AMNode | null {
-        if (this.parent !== null) {
-            for (let i = 0; i < this.parent.childNodes.length - 1; i++) {   // don't check the last one, it has no siblings
-                if (this.parent.childNodes[i].unique == this.unique) {
-                    return this.parent.childNodes[i + 1]
-                }
-            }
-        }
-        return null
-    }
-
     hasChildNodes(): boolean {
         return this.childNodes.length > 0
     }
@@ -105,7 +91,7 @@ export class AMNode {
         if (this.nodeName !== '#text' && this.nodeName !== '') {
             let style = ''
             if (this.style.fontWeight !== '' || this.style.fontStyle !== '')
-                style = ` style = "${(this.style.fontWeight !== '') ? 'font-weight:' + this.style.fontWeight + ';' : ''} ${(this.style.fontStyle !== '') ? 'font-style:' + this.style.fontStyle + ';' : ''}"`
+                style = ` style = "${(this.style.fontWeight !== '') ? 'font-weight: ' + this.style.fontWeight + ';' : ''}${(this.style.fontStyle !== '') ? ' font-style: ' + this.style.fontStyle + ';' : ''}"`
 
             let attributes = ''
             for (let [key, value] of Object.entries(this.attributes))
@@ -187,6 +173,10 @@ export class AMNodeAdapter implements INodeAdapter {
   
     getAttribute(name: string): string | undefined {
         return this.element.getAttribute(name) || undefined;
+    }
+
+    setStyle(prop: string, value: string): void {
+        this.element.style[prop] = value;
     }
   
     get underlyingNode() { 

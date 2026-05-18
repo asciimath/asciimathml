@@ -38,12 +38,14 @@ latex would convert.
 
 ### ts/* and dist/asciimathml.js
 A typescript implementation AsciiMathML, which builds 
-`dist/asciimathmljs`.  See the readme in the
+`dist/asciimathml.js` and `dist/asciimathml-server.js`.  See the readme in the
 directory for more details. This an alternate implementation 
 of the core AsciiMath parsing from ASCIIMathML.js, but does not
-implement the autotranslation and autodetecting features. It 
+implement the autotranslation and autodetecting features. The `asciimathml.js` version 
 includes equivalent `asciimath.AMprocessNode` and `asciimath.parseMath`
-functions as ASCIIMathML.js.
+functions as ASCIIMathML.js, and is intended to operate in the browser.
+The `asciimathml-server.js` version has a `parseMath` function that generates 
+a MathML string rather than a DOM node, and is designed to operate serverside in node.
 
 ### asciimath-based/*
 See the README in the directory for more details.  This directory includes

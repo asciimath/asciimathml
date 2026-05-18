@@ -5,8 +5,14 @@
 - Use in a project by adding the npm `asciimathml` package.
 - To build your own, run `npm install` then `npm run build` to produce `dist/asciimathml.js`. 
   This is an alternate implementation of ASCIIMathML.js, but doesn't auto-convert the page.
-- Run `tsc` to build the `.ts` files to `dist/*.js`
+- Run `npm run compile` to build the `.ts` files to `dist/*.js`
 - The bundle exposes the runtime on `window.asciimath` (use `asciimath.parseMath(...)` or `asciimath.AMprocessNode(...)`).
+- Alternatively you can use imports:
+```
+import { AsciiMath } from 'asciimathml/dist/asciimathml.js';
+const am = new AsciiMath();
+am.parseMath('a^b+c'); // produces a node you can append somewhere
+```
 
 ### For node
 
@@ -15,8 +21,8 @@
 - Example use:  This produces a string of the MathML:
 
 ```
-import { AsciiMath } from './asciimathml-server.js';
-let am = new AsciiMath();
+import { AsciiMath } from 'asciimathml/dist/asciimathml-server.js';
+const am = new AsciiMath();
 console.log(am.parseMath('a^b+c'));
 ```
 

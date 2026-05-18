@@ -268,10 +268,12 @@ var asciimath = (() => {
     { input: "/_\\", tag: "mo", output: "\u25B3", tex: "triangle", ttype: 0 /* CONST */ },
     { input: "'", tag: "mo", output: "\u2032", tex: "prime", ttype: 0 /* CONST */ },
     { input: "tilde", tag: "mover", output: "~", tex: null, ttype: 1 /* UNARY */, acc: true },
-    { input: "\\ ", tag: "mo", output: "\xA0", tex: null, ttype: 0 /* CONST */ },
+    { input: "\\ ", tag: "mtext", output: "\xA0", tex: null, ttype: 0 /* CONST */ },
     { input: "frown", tag: "mo", output: "\u2322", tex: null, ttype: 0 /* CONST */ },
-    { input: "quad", tag: "mo", output: "\xA0\xA0", tex: null, ttype: 0 /* CONST */ },
-    { input: "qquad", tag: "mo", output: "\xA0\xA0\xA0\xA0", tex: null, ttype: 0 /* CONST */ },
+    { input: "quad", tag: "mspace", output: "1", tex: null, ttype: 0 /* CONST */ },
+    { input: "qquad", tag: "mspace", output: "2", tex: null, ttype: 0 /* CONST */ },
+    { input: "enspace", tag: "mspace", output: "0.5", tex: null, ttype: 0 /* CONST */ },
+    { input: "thinspace", tag: "mspace", output: "0.17", tex: null, ttype: 0 /* CONST */ },
     { input: "cdots", tag: "mo", output: "\u22EF", tex: null, ttype: 0 /* CONST */ },
     { input: "vdots", tag: "mo", output: "\u22EE", tex: null, ttype: 0 /* CONST */ },
     { input: "ddots", tag: "mo", output: "\u22F1", tex: null, ttype: 0 /* CONST */ },
@@ -725,7 +727,11 @@ var asciimath = (() => {
         case 0 /* CONST */:
           str = this.removeCharsAndBlanks(str, symbol.input.length);
           node = this.configuration.create(symbol.tag);
-          node.appendChild(this.configuration.createText(symbol.output));
+          if (symbol.tag === "mspace") {
+            node.setAttribute("width", symbol.output + "em");
+          } else {
+            node.appendChild(this.configuration.createText(symbol.output));
+          }
           return [node, str];
         case 4 /* LEFTBRACKET */:
           this.nestingDepth++;

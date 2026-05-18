@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ASCIIMathML test suite</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script type="text/javascript" src="../ASCIIMathML.js"></script>
+<style type="text/css">
+#menu, #title, #subtitle, #author, .display { text-align: center; }
+body    { font-family: Arial; margin:10%; }
+p,table { font-family: Times; }
+table   { border-collapse:collapse; }
+td, th  { border:1px solid black; padding:5px; text-align:center; }
+img     { border: 0; } 
+mrow > mo:first-child.neg { color: #0a0;}
+</style>
+<script type="text/javascript">
+window.addEventListener('load', function() {
+var mos = document.getElementsByTagName("mo");
+for (i=0;i<mos.length;i++) {
+	if (mos[i].textContent=="-") {
+		mos[i].className = "neg";
+	}
+}
+});
+</script>
+</head>
+<body>
+<p>What we'd ideally like is to get <code>&lt;mrow&gt;&lt;mo&gt;-&lt;/mo&gt;&lt;mn&gt;4&lt;/mn&gt;&lt;/mrow&gt;</code>
+  on negation.</p>
+<p>When do we get negation?  When the negative is <ul>
+    <li>At the start of the whole expression, or start of expression inside brackets</li>
+    <li>after list separator</li>
+    <li>after equality, comparison, or other operators like cup, oplus, etc</li>
+    <li>in something like sin -3 or vec -3 (probably? currently func and mover only applies to -)</li>
+    <li>after * or /, maybe after - (like 3 - -4)</li>
+    <li>at the start sup/sub after ^ or _</li>
+</ul></p>
+<p>This doesn't seem to fit well with the parsing grammar, since expression-breaking operators like
+    list, equality, etc. aren't parsed specially.  To hack it on, we'd have to track "start of expression"
+    somehow. Nothing in the current symbol records is sufficient for that.  
+</p>
+<p>Could maybe treat all negatives as negation except those that follow mn, mi, mtext, msqrt, or mrow tags. 
+    Could maybe do inside Sexpr, if called with previous term tag type. 
+</p>
+`-3`<br/>
+`4-5` <br/>
+`4--3` <br/>
+`4*-4` <br/>
+`-3/2` <br/>
+`3/-2` <br/>
+`(-3)/2` <br/>
+`4-3/2` <br/>
+`3/2-4` <br/>
+`4/5-3/2` <br/>
+`-4/5-3/2` <br/>
+`(-3^2,4)` <br/>
+`(-3/2,4)` <br/>
+`(4,-3/2)` <br/>
+`-3/2,4` <br/>
+`3/2,-4` <br/>
+`5^-2` <br/>
+`5^-(x+4)+2-5` <br/>
+`5^-sqrt(4)` <br/>
+`4_-5` <br/>
+`5/-4` <br/>
+`5/-(x+1)` <br/>
+`int_-2^-1 x^2` <br/>
+`int -x^2 dx` <br/>
+`(-oo,oo)`<br/>
+`-hata - hatb`<br/>
+`-"cow"-"fish"`<br/>
+`-(x+4)/(x+4)-(x+3)/2` <br/>
+`(x+4)/(x-4)-(x+3)/2` <br/>
+`(x+4)/(x-4/(x-2))-(x+3)/2` <br/>
+`2/3-3` <br/>
+`2/3-3/4` <br/>
+`(x+4)/(x-4)-(x+3)/2` <br/>
+`5 gt -3` <br/>
+`-sqrt(5) - sqrt(4) - vec a - sin(-4) - sin-4-5 and -4 in -5`<br/>
+`[(-2,4,3-2),(3-5,-2,-2-5/4)]`<br/>
+
+
+
+
+</body>
+</html>

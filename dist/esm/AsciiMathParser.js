@@ -346,7 +346,12 @@ export class AsciiMathParser {
             case 0 /* TokenType.CONST */:
                 str = this.removeCharsAndBlanks(str, symbol.input.length);
                 node = this.configuration.create(symbol.tag);
-                node.appendChild(this.configuration.createText(symbol.output));
+                if (symbol.tag === 'mspace') {
+                    node.setAttribute('width', symbol.output + 'em');
+                }
+                else {
+                    node.appendChild(this.configuration.createText(symbol.output));
+                }
                 return [node, str];
             case 4 /* TokenType.LEFTBRACKET */:
                 this.nestingDepth++;

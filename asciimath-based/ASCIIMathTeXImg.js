@@ -2,7 +2,7 @@
 ASCIIMathTeXImg.js
 Based on ASCIIMathML, Version 1.4.7 Aug 30, 2005, (c) Peter Jipsen http://www.chapman.edu/~jipsen
 Modified with TeX conversion for IMG rendering Sept 6, 2006 (c) David Lippman http://www.pierce.ctc.edu/dlippman
-  Updated to match ver 2.2 Mar 3, 2014
+  Updated to match ver 2.4 April 13 2026.
   Latest at https://github.com/mathjax/asciimathml
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -41,8 +41,8 @@ THE SOFTWARE.
 }
 }(typeof self !== 'undefined' ? self : this, function () {
 var config = {
+  translateOnLoad: (typeof AMTcgiloc === 'string'),		  //true to autotranslate
   AMTcgiloc: (typeof AMTcgiloc !== 'undefined' ? AMTcgiloc : ''), // use global variable if defined. image renderer, if using
-  translateOnLoad: true,		  //true to autotranslate
   mathcolor: "",       	      // defaults to back, or specify any other color
   displaystyle: true,         // puts limits above and below large operators
   showasciiformulaonhover: true, // helps students learn ASCIIMath
@@ -244,6 +244,8 @@ var AMsymbols = [
 {input:"%",  tag:"mo", output:"%", tex:"%", ttype:CONST, notexcopy:true},
 {input:"quad", tag:"mo", output:"\u00A0\u00A0", tex:null, ttype:CONST},
 {input:"qquad", tag:"mo", output:"\u00A0\u00A0\u00A0\u00A0", tex:null, ttype:CONST},
+{input:"enspace", tag:"mo", output:" ", tex:null, ttype:CONST},
+{input:"thinspace", tag:"mo", output:" ", tex:null, ttype:CONST},
 {input:"cdots", tag:"mo", output:"\u22EF", tex:null, ttype:CONST},
 {input:"vdots", tag:"mo", output:"\u22EE", tex:null, ttype:CONST},
 {input:"ddots", tag:"mo", output:"\u22F1", tex:null, ttype:CONST},
@@ -355,20 +357,19 @@ AMsqrt, AMroot, AMfrac, AMdiv, AMover, AMsub, AMsup,
 {input:"ubrace", tag:"munder", output:"\u23DF", tex:"underbrace", ttype:UNARY, acc:true},
 {input:"obrace", tag:"mover", output:"\u23DE", tex:"overbrace", ttype:UNARY, acc:true},
 AMtext, AMmbox, AMquote,
-//{input:"var", tag:"mstyle", atname:"fontstyle", atval:"italic", output:"var", tex:null, ttype:UNARY},
 {input:"color", tag:"mstyle", ttype:BINARY},
-{input:"bb", tag:"mstyle", atname:"mathvariant", atval:"bold", output:"bb", tex:"mathbf", ttype:UNARY, notexcopy:true},
-{input:"mathbf", tag:"mstyle", atname:"mathvariant", atval:"bold", output:"mathbf", tex:null, ttype:UNARY},
-{input:"sf", tag:"mstyle", atname:"mathvariant", atval:"sans-serif", output:"sf", tex:"mathsf", ttype:UNARY, notexcopy:true},
-{input:"mathsf", tag:"mstyle", atname:"mathvariant", atval:"sans-serif", output:"mathsf", tex:null, ttype:UNARY},
-{input:"bbb", tag:"mstyle", atname:"mathvariant", atval:"double-struck", output:"bbb", tex:"mathbb", ttype:UNARY, notexcopy:true},
-{input:"mathbb", tag:"mstyle", atname:"mathvariant", atval:"double-struck", output:"mathbb", tex:null, ttype:UNARY},
-{input:"cc",  tag:"mstyle", atname:"mathvariant", atval:"script", output:"cc", tex:"mathcal", ttype:UNARY, notexcopy:true},
-{input:"mathcal", tag:"mstyle", atname:"mathvariant", atval:"script", output:"mathcal", tex:null, ttype:UNARY},
-{input:"tt",  tag:"mstyle", atname:"mathvariant", atval:"monospace", output:"tt", tex:"mathtt", ttype:UNARY, notexcopy:true},
-{input:"mathtt", tag:"mstyle", atname:"mathvariant", atval:"monospace", output:"mathtt", tex:null, ttype:UNARY},
-{input:"fr",  tag:"mstyle", atname:"mathvariant", atval:"fraktur", output:"fr", tex:"mathfrak", ttype:UNARY, notexcopy:true},
-{input:"mathfrak",  tag:"mstyle", atname:"mathvariant", atval:"fraktur", output:"mathfrak", tex:null, ttype:UNARY}
+{input:"bb", tag:"mstyle", output:"bb", tex:"mathbf", ttype:UNARY},
+{input:"sf", tag:"mstyle", output:"sf", tex:"mathsf", ttype:UNARY},
+{input:"bbb", tag:"mstyle", output:"bbb", tex:"mathbb", ttype:UNARY},
+{input:"cc",  tag:"mstyle", output:"cc", tex:"mathcal", ttype:UNARY},
+{input:"tt",  tag:"mstyle", output:"tt", tex:"mathtt", ttype:UNARY},
+{input:"fr",  tag:"mstyle", output:"fr", tex:"mathfrak", ttype:UNARY},
+{input:"italic",  tag:"mstyle", output:"italic", tex:"mathit", ttype:UNARY},
+// these don't all work right
+{input:"sfit", tag:"mstyle", output:"sf italic", tex:null, ttype:DEFINITION},
+{input:"bbit", tag:"mstyle", output:"bb italic", tex:null, ttype:DEFINITION},
+{input:"bbsfit", tag:"mstyle", output:"bb sf italic", tex:null, ttype:DEFINITION},
+{input:"bold", tag:"mstyle", output:"bb", tex:null, ttype:DEFINITION}
 ];
 
 function compareNames(s1,s2) {
@@ -530,7 +531,7 @@ function AMTremoveBrackets(node) {
     	    //st = node.charAt(node.length-7);
     	    st = node.substring(node.length-8);
     	    if (st=="\\right)}" || st=="\\right]}" || st=='\\right.}') {
-    	    	    node = '{'+node.substing(leftchop);
+    	    	    node = '{'+node.substring(leftchop);
     	    	    node = node.substring(0,node.length-8)+'}';
     	    } else if (st=='\\rbrace}') {
     	    	    node = '{'+node.substring(leftchop);

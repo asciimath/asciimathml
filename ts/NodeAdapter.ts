@@ -15,6 +15,7 @@ export interface INodeAdapter {
   getAttribute(name: string): string | number | boolean | undefined;
   appendChild(child: INodeAdapter): void;
   replaceChild(newChild: INodeAdapter, oldChild: INodeAdapter): void;
+  setStyle(prop: string, value: string): void;
 }
 
 export interface IParseOptions<T extends INodeAdapter> {

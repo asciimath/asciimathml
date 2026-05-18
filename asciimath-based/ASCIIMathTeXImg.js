@@ -231,6 +231,8 @@ var AMsymbols = [
 {input:"%",  tag:"mo", output:"%", tex:"%", ttype:CONST, notexcopy:true},
 {input:"quad", tag:"mo", output:"\u00A0\u00A0", tex:null, ttype:CONST},
 {input:"qquad", tag:"mo", output:"\u00A0\u00A0\u00A0\u00A0", tex:null, ttype:CONST},
+{input:"enspace", tag:"mo", output:" ", tex:null, ttype:CONST},
+{input:"thinspace", tag:"mo", output:" ", tex:null, ttype:CONST},
 {input:"cdots", tag:"mo", output:"\u22EF", tex:null, ttype:CONST},
 {input:"vdots", tag:"mo", output:"\u22EE", tex:null, ttype:CONST},
 {input:"ddots", tag:"mo", output:"\u22F1", tex:null, ttype:CONST},

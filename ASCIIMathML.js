@@ -412,10 +412,12 @@ var AMsymbols = [
 {input:"/_\\",  tag:"mo", output:"\u25B3",  tex:"triangle", ttype:CONST},
 {input:"'",   tag:"mo", output:"\u2032",  tex:"prime", ttype:CONST},
 {input:"tilde", tag:"mover", output:"~", tex:null, ttype:UNARY, acc:true},
-{input:"\\ ",  tag:"mo", output:"\u00A0", tex:null, ttype:CONST},
+{input:"\\ ",  tag:"mtext", output:"\u00A0", tex:null, ttype:CONST},
 {input:"frown",  tag:"mo", output:"\u2322", tex:null, ttype:CONST},
-{input:"quad", tag:"mo", output:"\u00A0\u00A0", tex:null, ttype:CONST},
-{input:"qquad", tag:"mo", output:"\u00A0\u00A0\u00A0\u00A0", tex:null, ttype:CONST},
+{input:"quad", tag:"mspace", output:"1", tex:null, ttype:CONST},
+{input:"qquad", tag:"mspace", output:"2", tex:null, ttype:CONST},
+{input:"enspace", tag:"mspace", output:"0.5", tex:null, ttype:CONST},
+{input:"thinspace", tag:"mspace", output:"0.17", tex:null, ttype:CONST},
 {input:"cdots", tag:"mo", output:"\u22EF", tex:null, ttype:CONST},
 {input:"vdots", tag:"mo", output:"\u22EE", tex:null, ttype:CONST},
 {input:"ddots", tag:"mo", output:"\u22F1", tex:null, ttype:CONST},
@@ -714,8 +716,14 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
   switch (symbol.ttype) {  case UNDEROVER:
   case CONST:
     str = AMremoveCharsAndBlanks(str,symbol.input.length);
-    return [createMmlNode(symbol.tag,        //its a constant
+    if (symbol.tag === 'mspace') {
+      node = createMmlNode(symbol.tag);
+      node.setAttribute("width", symbol.output + "em");
+      return [node, str];
+    } else {
+      return [createMmlNode(symbol.tag,        //its a constant
                              document.createTextNode(symbol.output)),str];
+    }
   case LEFTBRACKET:   //read (expr+)
     AMnestingDepth++;
     str = AMremoveCharsAndBlanks(str,symbol.input.length);

@@ -2,7 +2,7 @@
 ASCIIMathTeXImg.js
 Based on ASCIIMathML, Version 1.4.7 Aug 30, 2005, (c) Peter Jipsen http://www.chapman.edu/~jipsen
 Modified with TeX conversion for IMG rendering Sept 6, 2006 (c) David Lippman http://www.pierce.ctc.edu/dlippman
-  Updated to match ver 2.2 Mar 3, 2014
+  Updated to match ver 2.4 April 13 2026.
   Latest at https://github.com/mathjax/asciimathml
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,12 +24,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-//var AMTcgiloc = '';			//set to the URL of your LaTex renderer
-var noMathRender = false;
-
-(function() {
+// UMD export from https://github.com/umdjs/umd/blob/master/templates/returnExports.js
+// if the module has no dependencies, the above pattern can be simplified to
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) {
+      // AMD. Register as an anonymous module.
+      define([], factory);
+  } else if (typeof module === 'object' && module.exports) {
+      // Node. Does not work with strict CommonJS, but
+      // only CommonJS-like environments that support module.exports,
+      // like Node.
+      module.exports = factory();
+  } else {
+      // Browser globals (root is window)
+      root.returnExports = factory();
+}
+}(typeof self !== 'undefined' ? self : this, function () {
 var config = {
   translateOnLoad: (typeof AMTcgiloc === 'string'),		  //true to autotranslate
+  AMTcgiloc: (typeof AMTcgiloc !== 'undefined' ? AMTcgiloc : ''), // use global variable if defined. image renderer, if using
   mathcolor: "",       	      // defaults to back, or specify any other color
   displaystyle: true,         // puts limits above and below large operators
   showasciiformulaonhover: true, // helps students learn ASCIIMath
@@ -901,6 +914,29 @@ function AMTparseAMtoTeX(str) {
   return AMTparseExpr(str.replace(/^\s+/g,""),false)[0];
 }
 
+AMinitSymbols();
+
+return {
+  parse: AMTparseAMtoTeX,
+  config: config,
+}
+
+}));
+// end asciimath-to-tex conversion functions
+
+// start browser parsing
+(function() {
+
+// Return if AMD, CommonJS or not browser
+// I.e. only run when imported using "script" tag
+if (typeof define === 'function' && define.amd) return;
+if (typeof module === 'object' && module.exports) return;
+if (typeof window === 'undefined') return; // Not browser
+
+// "Import" UMD exports. Exported as window.* later
+var AMTparseAMtoTeX = window.returnExports.parse;
+var config = window.returnExports.config;
+
 function AMparseMath(str) {
  //DLMOD to remove &nbsp;, which editor adds on multiple spaces
   str = str.replace(/(&nbsp;|\u00a0|&#160;)/g,"");
@@ -930,7 +966,7 @@ function AMparseMath(str) {
   } else {
 	  texstring = escape(texstring);
   }
-  node.src = AMTcgiloc + '?' + texstring;
+  node.src = config.AMTcgiloc + '?' + texstring;
   node.style.verticalAlign = "middle";
   if (config.showasciiformulaonhover)                      //fixed by djhsu so newline
     node.setAttribute("title",str.replace(/\s+/g," "));//does not show in Gecko
@@ -1042,8 +1078,6 @@ function translate(spanclassAM) {
 var AMbody;
 var AMtranslated = false;
 var AMnoMathML = true;
-
-AMinitSymbols();
 
 window.translate = translate;
 window.AMTconfig = config;

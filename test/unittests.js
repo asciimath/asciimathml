@@ -551,6 +551,7 @@ function runTests() {
 	})
 	var res,tr,td,lastdec;
 	var tbody = document.getElementById("testout");
+	var startTime = performance.now()
 	for (var i=0;i<unittests.length;i++) {
 		if (unittests[i].decimal !== undefined) {
 			asciimath.setdecimal(unittests[i].decimal);
@@ -559,6 +560,7 @@ function runTests() {
 			asciimath.setlistseparator(unittests[i].list);
 		}
 		res = asciimath.parseMath(unittests[i].input);
+
 		if (unittests[i].decimal !== undefined) {
 			asciimath.setdecimal(".");
 		}
@@ -601,6 +603,8 @@ function runTests() {
 		}
 		tbody.appendChild(tr);
 	}
+	var endTime = performance.now();
+	console.log("execution time:" + (endTime - startTime));
 };
 
 function generateSymbolTests() {

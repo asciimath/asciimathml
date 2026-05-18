@@ -1,0 +1,4 @@
+/*
+ * AsciiMath Node Adapter
+ */
+export {};

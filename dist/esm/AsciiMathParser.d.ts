@@ -59,6 +59,12 @@ export declare class AsciiMathParser {
      */
     private addmathvariant;
     /**
+     * Whether to use CSS for bold() vs character mapping
+     *
+     * @type {boolean}
+     */
+    private useCSS;
+    /**
      * @constructor
      * @param {IParseOptions} configuration A parser configuration.
      */

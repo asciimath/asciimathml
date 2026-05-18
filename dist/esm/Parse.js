@@ -1,92 +1,108 @@
 /*
- * AsciiMath DOM Parser
+ * AsciiMath Parser using browser DOM
  */
 import { AsciiMathParser } from './AsciiMathParser.js';
-var DOMNodeAdapter = /** @class */ (function () {
-    function DOMNodeAdapter(element) {
+export class DOMNodeAdapter {
+    element;
+    constructor(element) {
         this.element = element;
     }
-    Object.defineProperty(DOMNodeAdapter.prototype, "kind", {
-        get: function () {
-            if (this.element instanceof Element) {
-                return this.element.localName || this.element.nodeName.toLowerCase();
-            }
-            else {
-                return 'text';
-            }
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(DOMNodeAdapter.prototype, "text", {
-        get: function () {
-            return this.element.textContent;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(DOMNodeAdapter.prototype, "childNodes", {
-        get: function () {
-            return Array.prototype.slice.call(this.element.childNodes)
-                .filter(function (n) { return n.nodeType === 1 || n.nodeType === 3; })
-                .map(function (n) { return new DOMNodeAdapter(n); });
-        },
-        enumerable: false,
-        configurable: true
-    });
-    DOMNodeAdapter.prototype.removeFirstChild = function () {
+    get kind() {
         if (this.element instanceof Element) {
-            var first = this.element.firstElementChild;
+            return this.element.localName || this.element.nodeName.toLowerCase();
+        }
+        else {
+            return 'text';
+        }
+    }
+    get text() {
+        return this.element.textContent;
+    }
+    get childNodes() {
+        return Array.prototype.slice.call(this.element.childNodes)
+            .filter(function (n) { return n.nodeType === 1 || n.nodeType === 3; })
+            .map(function (n) { return new DOMNodeAdapter(n); });
+    }
+    get firstChild() {
+        if (this.element.childNodes.length === 0) {
+            return undefined;
+        }
+        else {
+            return new DOMNodeAdapter(this.element.childNodes[0]);
+        }
+    }
+    get lastChild() {
+        if (this.element.childNodes.length === 0) {
+            return undefined;
+        }
+        else {
+            return new DOMNodeAdapter(this.element.childNodes[this.element.childNodes.length - 1]);
+        }
+    }
+    hasChildNodes() {
+        return this.element.hasChildNodes();
+    }
+    removeFirstChild() {
+        if (this.element instanceof Element) {
+            const first = this.element.firstElementChild;
             if (first) {
                 this.element.removeChild(first);
             }
         }
-    };
-    DOMNodeAdapter.prototype.removeLastChild = function () {
+    }
+    removeLastChild() {
         if (this.element instanceof Element) {
-            var last = this.element.lastElementChild;
+            const last = this.element.lastElementChild;
             if (last) {
                 this.element.removeChild(last);
             }
         }
-    };
-    DOMNodeAdapter.prototype.appendChild = function (child) {
-        this.element.appendChild(child.element);
-    };
-    DOMNodeAdapter.prototype.replaceChild = function (newChild, oldChild) {
+    }
+    appendChild(child) {
+        if (child.kind === 'inferredMrow') { // 
+            for (const sub of child.childNodes) {
+                this.element.appendChild(sub.element);
+            }
+        }
+        else {
+            this.element.appendChild(child.element);
+        }
+    }
+    replaceChild(newChild, oldChild) {
         this.element.replaceChild(newChild.element, oldChild.element);
-    };
-    DOMNodeAdapter.prototype.setAttribute = function (name, value) {
+    }
+    setAttribute(name, value) {
         if (this.element instanceof Element) {
             this.element.setAttribute(name, value);
         }
-    };
-    DOMNodeAdapter.prototype.getAttribute = function (name) {
+    }
+    getAttribute(name) {
         if (this.element instanceof Element) {
             return this.element.getAttribute(name) || undefined;
         }
-    };
-    Object.defineProperty(DOMNodeAdapter.prototype, "underlyingNode", {
-        get: function () {
-            return this.element;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    return DOMNodeAdapter;
-}());
-export { DOMNodeAdapter };
-var AsciiMath = /** @class */ (function () {
-    function AsciiMath() {
-        this.AMdelimiter1 = "`";
-        this.AMescape1 = "\\\\`";
+    }
+    setStyle(prop, value) {
+        if (this.element instanceof MathMLElement) {
+            this.element.style[prop] = value;
+        }
+    }
+    get underlyingNode() {
+        return this.element;
+    }
+}
+export class AsciiMath {
+    parser;
+    domConfig;
+    AMdelimiter1 = "`";
+    AMescape1 = "\\\\`";
+    constructor() {
         this.domConfig = {
-            create: function (tag) {
-                var el = document.createElementNS('http://www.w3.org/1998/Math/MathML', tag);
+            create: (tag) => {
+                const el = document.createElementNS('http://www.w3.org/1998/Math/MathML', tag);
                 return new DOMNodeAdapter(el);
             },
-            createText: function (text) {
-                var textNode = document.createTextNode(text);
+            createText: (text) => {
+                const textNode = document.createTextNode(text);
                 return new DOMNodeAdapter(textNode);
             },
             options: {
@@ -98,22 +114,22 @@ var AsciiMath = /** @class */ (function () {
         };
         this.parser = new AsciiMathParser(this.domConfig);
     }
-    AsciiMath.prototype.setdecimal = function (input) {
+    setdecimal(input) {
         this.domConfig.options.decimalsign = input;
         this.parser = new AsciiMathParser(this.domConfig);
-    };
-    AsciiMath.prototype.setlistseparator = function (input) {
+    }
+    setlistseparator(input) {
         this.domConfig.options.listseparator = input;
         this.parser = new AsciiMathParser(this.domConfig);
-    };
-    AsciiMath.prototype.parseMath = function (input) {
-        var result = this.parser.mml(input);
-        var domElement = result.underlyingNode; // Get the actual DOM element
-        var node = document.createElementNS('http://www.w3.org/1998/Math/MathML', 'math');
+    }
+    parseMath(input) {
+        const result = this.parser.mml(input);
+        const domElement = result.underlyingNode; // Get the actual DOM element
+        const node = document.createElementNS('http://www.w3.org/1998/Math/MathML', 'math');
         node.appendChild(domElement);
         return node;
-    };
-    AsciiMath.prototype.AMprocessNode = function (n, linebreaks, spanclassAM) {
+    }
+    AMprocessNode(n, linebreaks, spanclassAM) {
         var frag, st;
         if (spanclassAM != null) {
             frag = document.getElementsByTagName("span");
@@ -133,8 +149,8 @@ var AsciiMath = /** @class */ (function () {
                 this.processNodeR(n, linebreaks, false);
             }
         }
-    };
-    AsciiMath.prototype.processNodeR = function (n, linebreaks, latex) {
+    }
+    processNodeR(n, linebreaks, latex) {
         var mtch, str, arr, frg, i;
         if (n.childNodes.length == 0) {
             if ((n.nodeType != 8 || linebreaks) &&
@@ -189,8 +205,8 @@ var AsciiMath = /** @class */ (function () {
             }
         }
         return 0;
-    };
-    AsciiMath.prototype.strarr2docFrag = function (arr, linebreaks, latex) {
+    }
+    strarr2docFrag(arr, linebreaks, latex) {
         var newFrag = document.createDocumentFragment();
         var expr = false;
         for (var i = 0; i < arr.length; i++) {
@@ -210,16 +226,14 @@ var AsciiMath = /** @class */ (function () {
             expr = !expr;
         }
         return newFrag;
-    };
-    return AsciiMath;
-}());
-export { AsciiMath };
+    }
+}
 // --- Compatibility exports for browser & module users ---
 // Create and export a singleton named `asciimath` (keeps the old API)
-export var asciimath = new AsciiMath();
+export const asciimath = new AsciiMath();
 export default asciimath;
 // Convenience top-level exports (call into the singleton)
-export var parseMath = function (input) { return asciimath.parseMath(input); };
-export var AMprocessNode = function (n, linebreaks, spanclassAM) { return asciimath.AMprocessNode(n, linebreaks, spanclassAM); };
-export var setdecimal = function (input) { return asciimath.setdecimal(input); };
-export var setlistseparator = function (input) { return asciimath.setlistseparator(input); };
+export const parseMath = (input) => asciimath.parseMath(input);
+export const AMprocessNode = (n, linebreaks, spanclassAM) => asciimath.AMprocessNode(n, linebreaks, spanclassAM);
+export const setdecimal = (input) => asciimath.setdecimal(input);
+export const setlistseparator = (input) => asciimath.setlistseparator(input);

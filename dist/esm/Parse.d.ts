@@ -5,12 +5,16 @@ export declare class DOMNodeAdapter implements INodeAdapter {
     get kind(): string;
     get text(): string | null;
     get childNodes(): INodeAdapter[];
+    get firstChild(): INodeAdapter | undefined;
+    get lastChild(): INodeAdapter | undefined;
+    hasChildNodes(): boolean;
     removeFirstChild(): void;
     removeLastChild(): void;
     appendChild(child: INodeAdapter): void;
     replaceChild(newChild: INodeAdapter, oldChild: INodeAdapter): void;
     setAttribute(name: string, value: string): void;
     getAttribute(name: string): string | undefined;
+    setStyle(prop: string, value: string): void;
     get underlyingNode(): Node;
 }
 export declare class AsciiMath {

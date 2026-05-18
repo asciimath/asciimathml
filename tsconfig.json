@@ -10,7 +10,8 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
-    "noEmitOnError": false
+    "noEmitOnError": false,
+    "ignoreDeprecations": "6.0"
   },
   "include": ["ts/**/*"]
 }

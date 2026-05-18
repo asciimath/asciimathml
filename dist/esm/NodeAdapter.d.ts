@@ -4,10 +4,14 @@ export interface INodeAdapter {
     childNodes: INodeAdapter[];
     removeFirstChild(): void;
     removeLastChild(): void;
+    firstChild: INodeAdapter | undefined;
+    lastChild: INodeAdapter | undefined;
+    hasChildNodes(): boolean;
     setAttribute(name: string, value: string): void;
     getAttribute(name: string): string | number | boolean | undefined;
     appendChild(child: INodeAdapter): void;
     replaceChild(newChild: INodeAdapter, oldChild: INodeAdapter): void;
+    setStyle(prop: string, value: string): void;
 }
 export interface IParseOptions<T extends INodeAdapter> {
     create(tag: string, children?: T[]): T;
@@ -17,6 +21,7 @@ export interface IParseOptions<T extends INodeAdapter> {
         listseparator?: string;
         displaystyle?: boolean;
         addmathvariant?: boolean;
+        useCSS?: boolean;
         additionalSymbols?: AdditionalSymbol[];
     };
 }

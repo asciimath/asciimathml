@@ -342,20 +342,19 @@ AMsqrt, AMroot, AMfrac, AMdiv, AMover, AMsub, AMsup,
 {input:"ubrace", tag:"munder", output:"\u23DF", tex:"underbrace", ttype:UNARY, acc:true},
 {input:"obrace", tag:"mover", output:"\u23DE", tex:"overbrace", ttype:UNARY, acc:true},
 AMtext, AMmbox, AMquote,
-//{input:"var", tag:"mstyle", atname:"fontstyle", atval:"italic", output:"var", tex:null, ttype:UNARY},
 {input:"color", tag:"mstyle", ttype:BINARY},
-{input:"bb", tag:"mstyle", atname:"mathvariant", atval:"bold", output:"bb", tex:"mathbf", ttype:UNARY, notexcopy:true},
-{input:"mathbf", tag:"mstyle", atname:"mathvariant", atval:"bold", output:"mathbf", tex:null, ttype:UNARY},
-{input:"sf", tag:"mstyle", atname:"mathvariant", atval:"sans-serif", output:"sf", tex:"mathsf", ttype:UNARY, notexcopy:true},
-{input:"mathsf", tag:"mstyle", atname:"mathvariant", atval:"sans-serif", output:"mathsf", tex:null, ttype:UNARY},
-{input:"bbb", tag:"mstyle", atname:"mathvariant", atval:"double-struck", output:"bbb", tex:"mathbb", ttype:UNARY, notexcopy:true},
-{input:"mathbb", tag:"mstyle", atname:"mathvariant", atval:"double-struck", output:"mathbb", tex:null, ttype:UNARY},
-{input:"cc",  tag:"mstyle", atname:"mathvariant", atval:"script", output:"cc", tex:"mathcal", ttype:UNARY, notexcopy:true},
-{input:"mathcal", tag:"mstyle", atname:"mathvariant", atval:"script", output:"mathcal", tex:null, ttype:UNARY},
-{input:"tt",  tag:"mstyle", atname:"mathvariant", atval:"monospace", output:"tt", tex:"mathtt", ttype:UNARY, notexcopy:true},
-{input:"mathtt", tag:"mstyle", atname:"mathvariant", atval:"monospace", output:"mathtt", tex:null, ttype:UNARY},
-{input:"fr",  tag:"mstyle", atname:"mathvariant", atval:"fraktur", output:"fr", tex:"mathfrak", ttype:UNARY, notexcopy:true},
-{input:"mathfrak",  tag:"mstyle", atname:"mathvariant", atval:"fraktur", output:"mathfrak", tex:null, ttype:UNARY}
+{input:"bb", tag:"mstyle", output:"bb", tex:"mathbf", ttype:UNARY},
+{input:"sf", tag:"mstyle", output:"sf", tex:"mathsf", ttype:UNARY},
+{input:"bbb", tag:"mstyle", output:"bbb", tex:"mathbb", ttype:UNARY},
+{input:"cc",  tag:"mstyle", output:"cc", tex:"mathcal", ttype:UNARY},
+{input:"tt",  tag:"mstyle", output:"tt", tex:"mathtt", ttype:UNARY},
+{input:"fr",  tag:"mstyle", output:"fr", tex:"mathfrak", ttype:UNARY},
+{input:"italic",  tag:"mstyle", output:"italic", tex:"mathit", ttype:UNARY},
+// these don't all work right
+{input:"sfit", tag:"mstyle", output:"sf italic", tex:null, ttype:DEFINITION},
+{input:"bbit", tag:"mstyle", output:"bb italic", tex:null, ttype:DEFINITION},
+{input:"bbsfit", tag:"mstyle", output:"bb sf italic", tex:null, ttype:DEFINITION},
+{input:"bold", tag:"mstyle", output:"bb", tex:null, ttype:DEFINITION}
 ];
 
 function compareNames(s1,s2) {

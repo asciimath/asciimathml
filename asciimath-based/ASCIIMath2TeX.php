@@ -343,8 +343,13 @@ array('input'=>'sf', 'tex'=>'mathsf', 'unary'=>TRUE),
 array('input'=>'bbb', 'tex'=>'mathbb', 'unary'=>TRUE),
 array('input'=>'cc', 'tex'=>'mathcal', 'unary'=>TRUE),
 array('input'=>'tt', 'tex'=>'mathtt', 'unary'=>TRUE),
-array('input'=>'fr', 'tex'=>'mathfrak', 'unary'=>TRUE)
-
+array('input'=>'fr', 'tex'=>'mathfrak', 'unary'=>TRUE),
+array('input'=>'italic', 'tex'=>'mathit', 'unary'=>TRUE),
+// these don't all work right
+array('input'=>'sfit', 'output'=>'sf italic', 'definition'=>TRUE),
+array('input'=>'bbit', 'output'=>'bb italic', 'definition'=>TRUE),
+array('input'=>'bbsfit', 'output'=>'bb sf italic', 'definition'=>TRUE),
+array('input'=>'bold', 'output'=>'bb', 'definition'=>TRUE)
 );
 function AMcompareNames($a,$b) {
 	if ($a['input']>$b['input']) {return 1;} else {return -1;}

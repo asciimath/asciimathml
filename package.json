@@ -1,0 +1,27 @@
+{
+  "name": "asciimath",
+  "version": "1.0.0",
+  "description": "ASCIIMath parser and TeX renderer",
+  "main": "asciimath-based/ASCIIMathTeXImg.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/asciimath/asciimathml.git"
+  },
+  "keywords": [
+    "ASCIIMath",
+    "LaTeX",
+    "math"
+  ],
+  "author": "David Lippman",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/asciimath/asciimathml/issues"
+  },
+  "homepage": "https://github.com/asciimath/asciimathml#readme"
+}

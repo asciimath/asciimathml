@@ -631,23 +631,23 @@ var AsciiMathParser = class {
    * @param {INodeAdapter} node The node to remove brackets from
    */
   removeBrackets(node) {
-    if (!node || !node.childNodes || node.childNodes.length === 0) {
+    if (!node || !node.hasChildNodes()) {
       return;
     }
     if (node.kind === "mrow" || node.kind === "inferredMrow") {
-      const first = node.childNodes[0];
+      const first = node.firstChild;
       if (node.childNodes.length > 1 && node.childNodes[1].kind === "mtable") {
         return;
       }
-      const last = node.childNodes[node.childNodes.length - 1];
-      if (first && first.childNodes[0]) {
-        const text = first.childNodes[0].text;
+      const last = node.lastChild;
+      if (first && first.hasChildNodes()) {
+        const text = first.firstChild.text;
         if (text === "(" || text === "[" || text === "{") {
           node.removeFirstChild();
         }
       }
-      if (last && last.childNodes[0]) {
-        const text = last.childNodes[0].text;
+      if (last && last.hasChildNodes()) {
+        const text = last.firstChild.text;
         if (text === ")" || text === "]" || text === "}") {
           node.removeLastChild();
         }
@@ -661,7 +661,7 @@ var AsciiMathParser = class {
    * @returns {ParseResult} [node, remaining string]
    */
   parseSexpr(str) {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e;
     let symbol;
     let node;
     let result;
@@ -800,7 +800,7 @@ var AsciiMathParser = class {
           let accstretchy = "true";
           if (symbol.input === "vec") {
             const r0 = result[0];
-            if (r0.kind === "mrow" && r0.childNodes.length === 1 && ((_a = r0.childNodes[0].childNodes[0]) == null ? void 0 : _a.kind) === "text" && ((_b = r0.childNodes[0].childNodes[0].text) == null ? void 0 : _b.length) === 1 || ((_c = r0.childNodes[0]) == null ? void 0 : _c.kind) === "text" && ((_d = r0.childNodes[0].text) == null ? void 0 : _d.length) === 1) {
+            if (r0.kind === "mrow" && r0.childNodes.length === 1 && ((_b = (_a = r0.firstChild) == null ? void 0 : _a.firstChild) == null ? void 0 : _b.kind) === "text" && ((_c = r0.firstChild.firstChild.text) == null ? void 0 : _c.length) === 1 || ((_d = r0.firstChild) == null ? void 0 : _d.kind) === "text" && ((_e = r0.firstChild.text) == null ? void 0 : _e.length) === 1) {
               accstretchy = "false";
             }
           }
@@ -894,10 +894,10 @@ var AsciiMathParser = class {
         result = this.parseExpr(str, false);
         this.nestingDepth--;
         st = "";
-        if (result[0] && result[0].childNodes.length > 0 && result[0].childNodes[result[0].childNodes.length - 1]) {
-          const lastChild = result[0].childNodes[result[0].childNodes.length - 1];
-          if (lastChild.kind === "mo" && lastChild.childNodes[0] && lastChild.childNodes[0].text) {
-            st = lastChild.childNodes[0].text;
+        if (result[0] && result[0].hasChildNodes() && result[0].lastChild) {
+          const lastChild = result[0].lastChild;
+          if (lastChild.kind === "mo" && lastChild.hasChildNodes() && lastChild.firstChild.text) {
+            st = lastChild.firstChild.text;
           }
         }
         if (st === "|" && str.charAt(0) !== this.listseparator && result[0]) {
@@ -952,7 +952,7 @@ var AsciiMathParser = class {
       if (this.addmathvariant) {
         node.setAttribute("mathvariant", variant);
       }
-      const st = node.childNodes[0].text;
+      const st = node.firstChild.text;
       let newst = "";
       let didmap, charcode, map;
       for (let j = 0; j < st.length; j++) {
@@ -985,7 +985,7 @@ var AsciiMathParser = class {
           newst += st.charAt(j);
         }
       }
-      node.replaceChild(this.configuration.createText(newst), node.childNodes[0]);
+      node.replaceChild(this.configuration.createText(newst), node.firstChild);
     } else {
       for (let i = 0; i < node.childNodes.length; i++) {
         this.AMmapChars(node.childNodes[i], variant, inputsym);
@@ -1093,6 +1093,7 @@ var AsciiMathParser = class {
    * @returns {ParseResult} [node, remaining string]
    */
   parseExpr(str, rightbracket) {
+    var _a, _b, _c;
     let symbol;
     let node;
     let result;
@@ -1126,13 +1127,13 @@ var AsciiMathParser = class {
     } while (symbol !== null && (symbol.ttype !== 5 /* RIGHTBRACKET */ && (symbol.ttype !== 9 /* LEFTRIGHT */ || rightbracket) || this.nestingDepth === 0) && symbol.output !== "");
     if (symbol !== null && (symbol.ttype === 5 /* RIGHTBRACKET */ || symbol.ttype === 9 /* LEFTRIGHT */)) {
       const len = newFrag.childNodes.length;
-      if (len > 0 && newFrag.childNodes[len - 1].kind === "mrow" && newFrag.childNodes[len - 1].childNodes.length > 0) {
-        const lastMrow = newFrag.childNodes[len - 1];
-        const lastChild = lastMrow.childNodes[lastMrow.childNodes.length - 1];
-        const firstChild = lastMrow.childNodes[0];
-        if (lastChild && lastChild.childNodes.length > 0 && firstChild && firstChild.childNodes.length > 0) {
-          const right = lastChild.childNodes[0].text;
-          const left = firstChild.childNodes[0].text;
+      if (len > 0 && newFrag.childNodes[len - 1].kind === "mrow" && newFrag.childNodes[len - 1].hasChildNodes()) {
+        const lastMrow = newFrag.lastChild;
+        const lastChild = lastMrow.lastChild;
+        const firstChild = lastMrow.firstChild;
+        if (lastChild && lastChild.hasChildNodes() && firstChild && firstChild.hasChildNodes() > 0) {
+          const right = lastChild.firstChild.text;
+          const left = firstChild.firstChild.text;
           if (right === ")" || right === "]") {
             if (left === "(" && right === ")" && symbol.output !== "}" || left === "[" && right === "]") {
               const pos = [];
@@ -1145,12 +1146,12 @@ var AsciiMathParser = class {
                 if (matrix) {
                   matrix = node.kind === "mrow" && // current el is row
                   node.childNodes.length > 0 && (i === m - 1 || // last row, or next el is comma
-                  newFrag.childNodes[i + 1] && newFrag.childNodes[i + 1].kind === "mo" && newFrag.childNodes[i + 1].childNodes[0].text === this.listseparator) && // row starts and ends with left/right brackets
-                  node.childNodes[0].childNodes[0].text === left && node.childNodes[node.childNodes.length - 1].childNodes[0].text === right;
+                  newFrag.childNodes[i + 1] && newFrag.childNodes[i + 1].kind === "mo" && newFrag.childNodes[i + 1].firstChild.text === this.listseparator) && // row starts and ends with left/right brackets
+                  ((_a = node.firstChild) == null ? void 0 : _a.firstChild).text === left && ((_b = node.lastChild) == null ? void 0 : _b.firstChild).text === right;
                 }
                 if (matrix) {
                   for (j = 0; j < node.childNodes.length; j++) {
-                    if (node.childNodes[j].childNodes.length > 0 && node.childNodes[j].childNodes[0].text === this.listseparator) {
+                    if (node.childNodes[j].hasChildNodes() && node.childNodes[j].firstChild.text === this.listseparator) {
                       pos[i][pos[i].length] = j;
                     }
                   }
@@ -1173,7 +1174,7 @@ var AsciiMathParser = class {
                   for (j = 1; j < n - 1; j++) {
                     if (typeof pos[i][k] !== "undefined" && j === pos[i][k]) {
                       node.removeFirstChild();
-                      if (node.childNodes[0] && node.childNodes[0].kind === "mrow" && node.childNodes[0].childNodes.length === 1 && node.childNodes[0].childNodes[0].childNodes.length > 0 && node.childNodes[0].childNodes[0].childNodes[0].text === "\u2223") {
+                      if (node.firstChild && node.firstChild.kind === "mrow" && node.firstChild.childNodes.length === 1 && ((_c = node.firstChild.firstChild) == null ? void 0 : _c.hasChildNodes()) && node.firstChild.firstChild.firstChild.text === "\u2223") {
                         if (i === 0) {
                           columnlines.push("solid");
                         }
@@ -1192,7 +1193,7 @@ var AsciiMathParser = class {
                       frag = this.configuration.create("inferredMrow");
                       k++;
                     } else {
-                      frag.appendChild(node.childNodes[0]);
+                      frag.appendChild(node.firstChild);
                     }
                   }
                   const mtd = this.configuration.create("mtd");
@@ -1221,7 +1222,7 @@ var AsciiMathParser = class {
                 for (const child of table.childNodes) {
                   node.appendChild(child);
                 }
-                newFrag.replaceChild(node, newFrag.childNodes[0]);
+                newFrag.replaceChild(node, newFrag.firstChild);
               }
             }
           }
@@ -1378,6 +1379,23 @@ var AMNodeAdapter = class _AMNodeAdapter {
     return Array.prototype.slice.call(this.element.childNodes).map(function(n) {
       return new _AMNodeAdapter(n);
     });
+  }
+  get firstChild() {
+    if (this.element.childNodes.length === 0) {
+      return void 0;
+    } else {
+      return new _AMNodeAdapter(this.element.childNodes[0]);
+    }
+  }
+  get lastChild() {
+    if (this.element.childNodes.length === 0) {
+      return void 0;
+    } else {
+      return new _AMNodeAdapter(this.element.childNodes[this.element.childNodes.length - 1]);
+    }
+  }
+  hasChildNodes() {
+    return this.element.hasChildNodes();
   }
   removeFirstChild() {
     this.element.removeChild(this.element.firstChild);

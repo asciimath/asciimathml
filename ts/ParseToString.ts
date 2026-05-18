@@ -1,5 +1,5 @@
 /*
- * AsciiMath DOM Parser
+ * AsciiMath Parser to HTML using a lite DOM, suitable for node
  */
 
 import { INodeAdapter, IParseOptions } from './NodeAdapter.js';
@@ -143,6 +143,26 @@ export class AMNodeAdapter implements INodeAdapter {
         return Array.prototype.slice.call(this.element.childNodes)
         .map(function(n) { return new AMNodeAdapter(n); });
     }
+
+    get firstChild(): INodeAdapter | undefined {
+        if (this.element.childNodes.length === 0) {
+            return undefined;
+        } else {
+            return new AMNodeAdapter(this.element.childNodes[0]);
+        }
+    }
+    get lastChild(): INodeAdapter | undefined {
+        if (this.element.childNodes.length === 0) {
+            return undefined;
+        } else {
+            return new AMNodeAdapter(this.element.childNodes[this.element.childNodes.length - 1]);
+        }
+    }
+
+    hasChildNodes(): boolean {
+        return this.element.hasChildNodes();
+    }
+
     removeFirstChild(): void {
         this.element.removeChild(this.element.firstChild);
     }

@@ -560,6 +560,7 @@ function runTests() {
 			asciimath.setlistseparator(unittests[i].list);
 		}
 		res = asciimath.parseMath(unittests[i].input);
+
 		if (unittests[i].decimal !== undefined) {
 			asciimath.setdecimal(".");
 		}

@@ -1,5 +1,5 @@
 /*
- * AsciiMath DOM Parser
+ * AsciiMath Parser using browser DOM
  */
 
 import { INodeAdapter, IParseOptions } from './NodeAdapter.js';
@@ -23,6 +23,25 @@ export class DOMNodeAdapter implements INodeAdapter {
     .filter(function(n) { return n.nodeType === 1 || n.nodeType === 3; })
     .map(function(n) { return new DOMNodeAdapter(n); });
   }
+
+  get firstChild(): INodeAdapter | undefined {
+    if (this.element.childNodes.length === 0) {
+        return undefined;
+    } else {
+        return new DOMNodeAdapter(this.element.childNodes[0]);
+    }
+  }
+  get lastChild(): INodeAdapter | undefined {
+    if (this.element.childNodes.length === 0) {
+        return undefined;
+    } else {
+        return new DOMNodeAdapter(this.element.childNodes[this.element.childNodes.length - 1]);
+    }
+  }
+
+  hasChildNodes(): boolean {
+    return this.element.hasChildNodes();
+  }
   
   removeFirstChild(): void {
     if (this.element instanceof Element) {
@@ -42,7 +61,13 @@ export class DOMNodeAdapter implements INodeAdapter {
   }
 
   appendChild(child: INodeAdapter): void {
-    this.element.appendChild((child as DOMNodeAdapter).element);
+    if (child.kind === 'inferredMrow') { // 
+      for (const sub of child.childNodes) {
+        this.element.appendChild((sub as DOMNodeAdapter).element);
+      }
+    } else {
+        this.element.appendChild((child as DOMNodeAdapter).element);
+    }
   }
   
   replaceChild(newChild: INodeAdapter, oldChild: INodeAdapter): void {

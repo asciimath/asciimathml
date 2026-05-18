@@ -8,6 +8,9 @@ export interface INodeAdapter {
   childNodes: INodeAdapter[];
   removeFirstChild(): void;
   removeLastChild(): void;
+  firstChild: INodeAdapter | undefined;
+  lastChild: INodeAdapter | undefined;
+  hasChildNodes(): boolean;
   setAttribute(name: string, value: string): void;
   getAttribute(name: string): string | number | boolean | undefined;
   appendChild(child: INodeAdapter): void;

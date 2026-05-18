@@ -95,7 +95,7 @@ export class AsciiMath {
     domConfig;
     AMdelimiter1 = "`";
     AMescape1 = "\\\\`";
-    constructor() {
+    constructor(options) {
         this.domConfig = {
             create: (tag) => {
                 const el = document.createElementNS('http://www.w3.org/1998/Math/MathML', tag);
@@ -109,7 +109,9 @@ export class AsciiMath {
                 decimalsign: '.',
                 listseparator: ',',
                 displaystyle: true,
-                addmathvariant: false
+                useCSS: true,
+                addmathvariant: false,
+                ...options
             }
         };
         this.parser = new AsciiMathParser(this.domConfig);

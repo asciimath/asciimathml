@@ -73,11 +73,11 @@ export class AsciiMathParser {
      */
     constructor(configuration) {
         this.configuration = configuration;
-        this.decimalsign = configuration.options.decimalsign || '.';
-        this.listseparator = configuration.options.listseparator || ',';
-        this.displaystyle = configuration.options.displaystyle || true;
-        this.addmathvariant = configuration.options.addmathvariant || false;
-        this.useCSS = configuration.options.useCSS || true;
+        this.decimalsign = configuration.options.decimalsign ?? '.';
+        this.listseparator = configuration.options.listseparator ?? ',';
+        this.displaystyle = configuration.options.displaystyle ?? true;
+        this.addmathvariant = configuration.options.addmathvariant ?? false;
+        this.useCSS = configuration.options.useCSS ?? true;
         this.initSymbols(configuration.options?.additionalSymbols);
     }
     TokenTypeMap = {

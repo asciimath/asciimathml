@@ -98,11 +98,11 @@ export class AsciiMathParser {
   constructor(
     public configuration: IParseOptions<INodeAdapter>
   ) {
-    this.decimalsign = configuration.options.decimalsign || '.';
-    this.listseparator = configuration.options.listseparator || ',';
-    this.displaystyle = configuration.options.displaystyle || true;
-    this.addmathvariant = configuration.options.addmathvariant || false;
-    this.useCSS = configuration.options.useCSS || true;
+    this.decimalsign = configuration.options.decimalsign ?? '.';
+    this.listseparator = configuration.options.listseparator ?? ',';
+    this.displaystyle = configuration.options.displaystyle ?? true;
+    this.addmathvariant = configuration.options.addmathvariant ?? false;
+    this.useCSS = configuration.options.useCSS ?? true;
 
     this.initSymbols(configuration.options?.additionalSymbols);
   }

@@ -480,13 +480,13 @@ var asciimath = (() => {
         TEXT: 10 /* TEXT */,
         UNARYUNDEROVER: 15 /* UNARYUNDEROVER */
       });
-      var _a;
-      this.decimalsign = configuration.options.decimalsign || ".";
-      this.listseparator = configuration.options.listseparator || ",";
-      this.displaystyle = configuration.options.displaystyle || true;
-      this.addmathvariant = configuration.options.addmathvariant || false;
-      this.useCSS = configuration.options.useCSS || true;
-      this.initSymbols((_a = configuration.options) == null ? void 0 : _a.additionalSymbols);
+      var _a, _b, _c, _d, _e, _f;
+      this.decimalsign = (_a = configuration.options.decimalsign) != null ? _a : ".";
+      this.listseparator = (_b = configuration.options.listseparator) != null ? _b : ",";
+      this.displaystyle = (_c = configuration.options.displaystyle) != null ? _c : true;
+      this.addmathvariant = (_d = configuration.options.addmathvariant) != null ? _d : false;
+      this.useCSS = (_e = configuration.options.useCSS) != null ? _e : true;
+      this.initSymbols((_f = configuration.options) == null ? void 0 : _f.additionalSymbols);
     }
     /**
      * Initialize the symbol table
@@ -1390,7 +1390,7 @@ var asciimath = (() => {
     }
   };
   var AsciiMath = class {
-    constructor() {
+    constructor(options) {
       __publicField(this, "parser");
       __publicField(this, "domConfig");
       __publicField(this, "AMdelimiter1", "`");
@@ -1404,12 +1404,13 @@ var asciimath = (() => {
           const textNode = document.createTextNode(text);
           return new DOMNodeAdapter(textNode);
         },
-        options: {
+        options: __spreadValues({
           decimalsign: ".",
           listseparator: ",",
           displaystyle: true,
+          useCSS: true,
           addmathvariant: false
-        }
+        }, options)
       };
       this.parser = new AsciiMathParser(this.domConfig);
     }

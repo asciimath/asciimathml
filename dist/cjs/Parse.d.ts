@@ -22,7 +22,7 @@ export declare class AsciiMath {
     private domConfig;
     private AMdelimiter1;
     private AMescape1;
-    constructor();
+    constructor(options?: Partial<typeof this.domConfig.options>);
     setdecimal(input: string): void;
     setlistseparator(input: string): void;
     parseMath(input: string): MathMLElement;

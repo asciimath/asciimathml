@@ -192,7 +192,7 @@ export class AsciiMath {
     private AMdelimiter1 = "`";
     private AMescape1 = "\\\\`";
 
-    constructor() {  
+    constructor(options?: Partial<typeof this.domConfig.options>) {  
         this.domConfig = {
             create: (tag) => {
                 const el = new AMNode(tag);
@@ -202,11 +202,13 @@ export class AsciiMath {
                 const textNode = new AMNode('#text', text);
                 return new AMNodeAdapter(textNode);
             },
-            options: { 
+            options: {
                 decimalsign: '.', 
                 listseparator: ',',
                 displaystyle: true, 
-                addmathvariant: false 
+                useCSS: true,
+                addmathvariant: false,
+                ...options 
             }
         };
         this.parser = new AsciiMathParser(this.domConfig);

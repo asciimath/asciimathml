@@ -70,3 +70,6 @@ compatibility, accuracy, or anything else):
   An alternate typescript implementation of an AsciiMath parser.
 - [widcardw/asciimath-parser](https://github.com/widcardw/asciimath-parser): 
   An alternate typescript implementation of an AsciiMath parser.
+- [ad-si/asciimath](https://github.com/ad-si/asciimath):
+  An alternate typescript implementation of an AsciiMath parser, as well as 
+  a AsciiMath to TeX converter.

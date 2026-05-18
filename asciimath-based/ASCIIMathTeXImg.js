@@ -2,7 +2,7 @@
 ASCIIMathTeXImg.js
 Based on ASCIIMathML, Version 1.4.7 Aug 30, 2005, (c) Peter Jipsen http://www.chapman.edu/~jipsen
 Modified with TeX conversion for IMG rendering Sept 6, 2006 (c) David Lippman http://www.pierce.ctc.edu/dlippman
-  Updated to match ver 2.2 Mar 3, 2014
+  Updated to match Version 2.5 May 18 2026.
   Latest at https://github.com/mathjax/asciimathml
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

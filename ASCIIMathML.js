@@ -418,6 +418,7 @@ var AMsymbols = [
 {input:"qquad", tag:"mspace", output:"2", tex:null, ttype:CONST},
 {input:"enspace", tag:"mspace", output:"0.5", tex:null, ttype:CONST},
 {input:"thinspace", tag:"mspace", output:"0.17", tex:null, ttype:CONST},
+{input:"mspace", tag:"mspace", output:"mspace", tex:null, ttype:UNARY},
 {input:"cdots", tag:"mo", output:"\u22EF", tex:null, ttype:CONST},
 {input:"vdots", tag:"mo", output:"\u22EE", tex:null, ttype:CONST},
 {input:"ddots", tag:"mo", output:"\u22F1", tex:null, ttype:CONST},
@@ -794,6 +795,16 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
           node.appendChild(result[0]);
           node.appendChild(createMmlNode("mo",document.createTextNode(symbol.rewriteleftright[1])));
           return [node,result[1]];
+      } else if (symbol.input == "mspace") {
+        st = result[0].textContent;
+        if (st.match(/^-?[\d\.]+$/)) {
+          st += "em";
+        } else if (!st.match(/^-?[\d\.]+\s*[a-z]{2}$/)) {
+          st = "0em";
+        }
+        node = createMmlNode(symbol.tag);
+        node.setAttribute("width", st);
+        return [node, result[1]];
       } else if (symbol.input == "cancel") {   // cancel
         node = createMmlNode(symbol.tag,result[0]);
 	node.setAttribute("notation","updiagonalstrike");

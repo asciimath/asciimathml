@@ -9,7 +9,7 @@ Use:
 	$tex = $AMT->convert($AMstring); //convert ASCIIMath string to TeX
 	
 Based on ASCIIMathML, Version 1.4.7 Aug 30, 2005, (c) Peter Jipsen http://www.chapman.edu/~jipsen
-  updated to match 2.2
+  updated to match Version 2.5 May 18 2026.
   
 This is a PHP port of a Javascript modification of ASCIIMathML
 Modified with TeX conversion for IMG rendering 

@@ -797,10 +797,11 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
           return [node,result[1]];
       } else if (symbol.input == "mspace") {
         st = result[0].textContent;
-        if (st.match(/^-?[\d\.]+$/)) {
-          st += "em";
-        } else if (!st.match(/^-?[\d\.]+\s*[a-z]{2}$/)) {
+        var m = st.match(/^(-?[\d\.]+)\s*(em|\u03BC)?$/);
+        if (!m) {
           st = "0em";
+        } else if (!m[2] || m[2] == "\u03BC") {
+          st = (m[1]/16) + "em";
         }
         node = createMmlNode(symbol.tag);
         node.setAttribute("width", st);

@@ -21,6 +21,15 @@ recommended, as [MathJax](http://docs.mathjax.org/en/latest/asciimath.html)
 will provide far better results.  This script may still be useful for general
 conversion tasks, or in rich text editors.
 
+This can be imported into Node using import or require, which will only provide 
+a function for translating from AsciiMath to TeX. A function `parse` and 
+object `config` are exposed. If you've run `npm install asciimathml`, here's an example:
+```
+import asciimath from 'asciimathml/asciimath-based/ASCIIMathTeXImg.js';
+asciimath.config.decimalsign = ',';
+console.log(asciimath.parse('2/3'));
+```
+
 ASCIIMath2TeX.php
 -----------------
 This is a PHP port of ASCIIMathTeXImg.js, and provides a function for converting

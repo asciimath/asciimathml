@@ -52,7 +52,7 @@ See the README in the directory for more details.  This directory includes
 alternate implementations of AsciiMath parsers.
 
 - ASCIIMath2TeX.js: A javascript script with functions to convert AsciiMath 
-  notation to TeX.
+  notation to TeX.  This can also be imported into Node; see the README for info.
 - ASCIIMath2TeX.php: A PHP port of the above, to convert AsciiMath notation
   to TeX.
 

@@ -399,6 +399,19 @@ class AsciiMathParser {
                 if (i === -1)
                     i = str.length;
                 st = str.slice(1, i);
+                if (symbol.input === 'mspace') { // special case
+                    var m = st.match(/^(-?[\d\.]+)\s*(em|mu)?$/);
+                    if (!m) {
+                        st = "0em";
+                    }
+                    else if ((!m[2] || m[2] === "mu") && !isNaN(parseFloat(m[1]))) {
+                        st = (parseFloat(m[1]) / 16) + "em";
+                    }
+                    node = this.configuration.create(symbol.tag);
+                    node.setAttribute("width", st);
+                    str = this.removeCharsAndBlanks(str, i + 1);
+                    return [node, str];
+                }
                 node = this.configuration.create('mrow');
                 if (st.charAt(0) === ' ') {
                     const mspace = this.configuration.create('mspace');

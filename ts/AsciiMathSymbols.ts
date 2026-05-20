@@ -249,6 +249,7 @@ export const AMsymbols: Symbol[] = [
   {input:"qquad", tag:"mspace", output:"2", tex:null, ttype:TokenType.CONST},
   {input:"enspace", tag:"mspace", output:"0.5", tex:null, ttype:TokenType.CONST},
   {input:"thinspace", tag:"mspace", output:"0.17", tex:null, ttype:TokenType.CONST},
+  {input:"mspace", tag:"mspace", output:"mspace", tex:null, ttype:TokenType.TEXT},
   {input:"cdots", tag:"mo", output:"\u22EF", tex:null, ttype:TokenType.CONST},
   {input:"vdots", tag:"mo", output:"\u22EE", tex:null, ttype:TokenType.CONST},
   {input:"ddots", tag:"mo", output:"\u22F1", tex:null, ttype:TokenType.CONST},

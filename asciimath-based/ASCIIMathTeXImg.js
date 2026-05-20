@@ -2,7 +2,7 @@
 ASCIIMathTeXImg.js
 Based on ASCIIMathML, Version 1.4.7 Aug 30, 2005, (c) Peter Jipsen http://www.chapman.edu/~jipsen
 Modified with TeX conversion for IMG rendering Sept 6, 2006 (c) David Lippman http://www.pierce.ctc.edu/dlippman
-  Updated to match Version 2.5 May 18 2026.
+  Updated to match Version 2.5.1 May 20 2026.
   Latest at https://github.com/mathjax/asciimathml
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -246,6 +246,7 @@ var AMsymbols = [
 {input:"qquad", tag:"mo", output:"\u00A0\u00A0\u00A0\u00A0", tex:null, ttype:CONST},
 {input:"enspace", tag:"mo", output:" ", tex:null, ttype:CONST},
 {input:"thinspace", tag:"mo", output:" ", tex:null, ttype:CONST},
+{input:"mspace", tag:"mspace", output:"mspace", tex:null, ttype:TEXT},
 {input:"cdots", tag:"mo", output:"\u22EF", tex:null, ttype:CONST},
 {input:"vdots", tag:"mo", output:"\u22EE", tex:null, ttype:CONST},
 {input:"ddots", tag:"mo", output:"\u22F1", tex:null, ttype:CONST},
@@ -634,6 +635,19 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
       else i = 0;
       if (i==-1) i = str.length;
       st = str.slice(1,i);
+      if (symbol.input === 'mspace') { // special case
+        var m = st.match(/^(-?[\d\.]+)\s*(em|mu)?$/);
+        newFrag = '';
+        if (m) {
+          if ((!m[2] || m[2] === "mu") && !isNaN(parseFloat(m[1]))) {
+            newFrag = "\\mspace{"+parseFloat(m[1])+ "mu}";
+          } else if (m[2] === "em" && !isNaN(parseFloat(m[1]))) {
+            newFrag = "\\mspace{"+(parseFloat(m[1])*16)+ "mu}";
+          }
+        }
+        str = AMremoveCharsAndBlanks(str,i+1);
+        return [newFrag, str];
+      }
       if (st.charAt(0) == " ") {
 	      newFrag = '\\ ';
       }

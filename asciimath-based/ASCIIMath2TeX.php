@@ -9,7 +9,7 @@ Use:
 	$tex = $AMT->convert($AMstring); //convert ASCIIMath string to TeX
 	
 Based on ASCIIMathML, Version 1.4.7 Aug 30, 2005, (c) Peter Jipsen http://www.chapman.edu/~jipsen
-  updated to match Version 2.5 May 18 2026.
+  updated to match Version 2.5.1 May 20 2026.
   
 This is a PHP port of a Javascript modification of ASCIIMathML
 Modified with TeX conversion for IMG rendering 
@@ -193,6 +193,7 @@ array( 'input'=>'quad'),
 array( 'input'=>'qquad'),
 array( 'input'=>'enspace'),
 array( 'input'=>'thinspace'),
+array( 'input'=>'mspace', 'text'=>TRUE),
 array( 'input'=>'cdots'),
 array( 'input'=>'vdots'), 
 array( 'input'=>'ddots'), 
@@ -605,6 +606,18 @@ function AMTparseSexpr($str) {
 		} else { $i = 0;}
 		if ($i==-1) { $i = strlen($str);}
 		$st = substr($str,1,$i-1);
+		$newFrag = '';
+		if ($symbol['input'] === 'mspace') { // special case
+			if (preg_match('/^(-?[\d\.]+)\s*(em|mu)?$/', $st, $m)) {
+				if ((empty($m[2]) || $m[2] === "mu") && is_numeric($m[1])) {
+					$newFrag = "\\mspace{" . floatval($m[1]) . "mu}";
+				} else if (!empty($m[2]) && $m[2] === "em" && is_numeric($m[1])) {
+					$newFrag = "\\mspace{" . (floatval($m[1])*16) . "mu}";
+				}
+			}
+			$str = $this->AMremoveCharsAndBlanks($str,$i+1);
+			return array($newFrag, $str);
+		}
 		if (strlen($st)>0 && $st[0]== " ") {
 			$newFrag .= '\\ ';
 		}

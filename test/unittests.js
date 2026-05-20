@@ -534,6 +534,15 @@ var unittests = [
 {input: "2^+3", output:"<msup><mn>2</mn><mo>+</mo></msup><mn>3</mn>"},
 {input: "/4", output:"<mo>/</mo><mn>4</mn>"},
 {input: "lim_(x rarr 2^-) f(x)", output:"<munder><mo>lim</mo><mrow><mi>x</mi><mo>→</mo><msup><mn>2</mn><mo>−</mo></msup></mrow></munder><mrow><mi>f</mi><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow>"},
+
+// pr 165
+{input: "a mspace(8)b", output:"<mi>a</mi><mspace width=\"0.5em\"></mspace><mi>b</mi>"}, // no units treated as mu
+{input: "a mspace(8mu) b", output:"<mi>a</mi><mspace width=\"0.5em\"></mspace><mi>b</mi>"}, //mu ok
+{input: "a mspace(8 mu) b", output:"<mi>a</mi><mspace width=\"0.5em\"></mspace><mi>b</mi>"}, //space between number and units ok
+{input: "a mspace{0.3em} b", output:"<mi>a</mi><mspace width=\"0.3em\"></mspace><mi>b</mi>"}, // braces ok, em units ok
+{input: "a mspace(0.3ch) b", output:"<mi>a</mi><mspace width=\"0em\"></mspace><mi>b</mi>"}, // ch not supported; produces 0 width
+{input: "a mspace(-0.2em) b", output:"<mi>a</mi><mspace width=\"-0.2em\"></mspace><mi>b</mi>"}, // negative decimal ok, though browser may not support
+{input: "a mspace3 b", output:"<mi>a</mi><mspace width=\"0em\"></mspace><mi>b</mi>"}, // braces/parens required
 ];
 
 function htmlEntities(str) {

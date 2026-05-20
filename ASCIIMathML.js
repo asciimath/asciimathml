@@ -751,8 +751,8 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
         var m = st.match(/^(-?[\d\.]+)\s*(em|mu)?$/);
         if (!m) {
           st = "0em";
-        } else if (!m[2] || m[2] == "mu") {
-          st = (m[1]/16) + "em";
+        } else if ((!m[2] || m[2] === "mu") && !isNaN(parseFloat(m[1]))) {
+          st = (parseFloat(m[1])/16) + "em";
         }
         node = createMmlNode(symbol.tag);
         node.setAttribute("width", st);

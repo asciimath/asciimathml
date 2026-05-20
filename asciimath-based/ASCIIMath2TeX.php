@@ -193,6 +193,7 @@ array( 'input'=>'quad'),
 array( 'input'=>'qquad'),
 array( 'input'=>'enspace'),
 array( 'input'=>'thinspace'),
+array( 'input'=>'mspace', 'text'=>TRUE),
 array( 'input'=>'cdots'),
 array( 'input'=>'vdots'), 
 array( 'input'=>'ddots'), 
@@ -605,6 +606,18 @@ function AMTparseSexpr($str) {
 		} else { $i = 0;}
 		if ($i==-1) { $i = strlen($str);}
 		$st = substr($str,1,$i-1);
+		$newFrag = '';
+		if ($symbol['input'] === 'mspace') { // special case
+			if (preg_match('/^(-?[\d\.]+)\s*(em|mu)?$/', $st, $m)) {
+				if ((empty($m[2]) || $m[2] === "mu") && is_numeric($m[1])) {
+					$newFrag = "\\mspace{" . floatval($m[1]) . "mu}";
+				} else if (!empty($m[2]) && $m[2] === "em" && is_numeric($m[1])) {
+					$newFrag = "\\mspace{" . (floatval($m[1])*16) . "mu}";
+				}
+			}
+			$str = $this->AMremoveCharsAndBlanks($str,$i+1);
+			return array($newFrag, $str);
+		}
 		if (strlen($st)>0 && $st[0]== " ") {
 			$newFrag .= '\\ ';
 		}

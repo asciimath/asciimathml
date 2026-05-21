@@ -37,10 +37,6 @@ THE SOFTWARE.
 var asciimath = {};
 
 (function(){
-var mathcolor = "";            // change it to "" (to inherit) or another color
-var mathfontsize = "";         // change to e.g. 1.2em for larger math
-var mathfontfamily = "";       // change to "" to inherit (works in IE)
-                               // or another family (e.g. "arial")
 var automathrecognize = false; // writing "amath" on page makes this true
 var checkForMathML = true;     // check if browser can display MathML
 var notifyIfNoMathML = true;   // display note at top if no MathML capability
@@ -120,11 +116,11 @@ function checkMathML(){
   var mtext = container.querySelector("mtext");
   var supportsMenclose = menclose && mtext &&
     menclose.getBoundingClientRect().height > mtext.getBoundingClientRect().height;
-  if (!supportsMenclose) {
+  if (supported && !supportsMenclose) {
     // fake support for cancel with some CSS
-    var stroke = mathcolor=="" ? "black" : mathcolor;
+    var stroke = getComputedStyle(math).color;
     setStylesheet("menclose[notation=updiagonalstrike] {background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none' viewBox='0 0 100 100'%3E%3Cline x1='0' y1='100' x2='100' y2='0' stroke='"+stroke+"' stroke-width='1' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E\");}");
-    }
+  }
   document.body.removeChild(container);
   noMathML = !supported;
 
@@ -1140,15 +1136,6 @@ function parseMath(str,latex) {
   str = str.replace(/&lt;/g,"<");
   frag = AMparseExpr(str.replace(/^\s+/g,""),false)[0];
   node = createMmlNode("mstyle",frag);
-  if (mathcolor != "") node.setAttribute("mathcolor",mathcolor);
-  if (mathfontsize != "") {
-	  node.setAttribute("fontsize", mathfontsize);
-	  node.setAttribute("mathsize", mathfontsize);
-  }
-  if (mathfontfamily != "") {
-	  node.setAttribute("fontfamily", mathfontfamily);
-	  node.setAttribute("mathvariant", mathfontfamily);
-  }
 
   if (displaystyle) node.setAttribute("displaystyle","true");
   node = createMmlNode("math",node);

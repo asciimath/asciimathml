@@ -372,6 +372,7 @@ export class AsciiMathParser {
 
     str = this.removeCharsAndBlanks(str, 0);
     symbol = this.getSymbol(str);
+    console.log(symbol);
 
     if (
       symbol === null ||
@@ -567,7 +568,7 @@ export class AsciiMathParser {
           result[0].setStyle("fontWeight", "bold");
           return [result[0],result[1]];
         } else {
-          // New Font change method
+          // New Font change metho
           // if useCSS is not enabled, this handles "bold" differently than AsciiMathML.js
           //   this maps symbols using the bold or bold-italic codes based
           //   on tag type, rather than using CSS for the bolding. This 

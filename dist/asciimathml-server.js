@@ -356,19 +356,19 @@ var AMsymbols = [
   { input: "class", tag: "mrow", output: "class", tex: null, ttype: 2 /* BINARY */ },
   { input: "cancel", tag: "menclose", output: "cancel", tex: null, ttype: 1 /* UNARY */ },
   AMquote,
-  { input: "bb", ttype: 1 /* UNARY */, tex: "mathbf", codes: "bold", tag: "", output: "" },
-  { input: "sf", ttype: 1 /* UNARY */, tex: "mathsf", codes: "sans-serif", tag: "", output: "" },
-  { input: "sfit", ttype: 1 /* UNARY */, tex: null, codes: "sans-serif-italic", tag: "", output: "" },
-  { input: "bbsf", ttype: 1 /* UNARY */, tex: null, codes: "bold-sans-serif", tag: "", output: "" },
-  { input: "bbb", ttype: 1 /* UNARY */, tex: "mathbb", codes: "double-struck", tag: "", output: "" },
-  { input: "cc", ttype: 1 /* UNARY */, tex: "mathcal", codes: "script", tag: "", output: "" },
-  { input: "bbcc", ttype: 1 /* UNARY */, tex: null, codes: "bold-script", tag: "", output: "" },
-  { input: "tt", ttype: 1 /* UNARY */, tex: "mathtt", codes: "monospace", tag: "", output: "" },
-  { input: "fr", ttype: 1 /* UNARY */, tex: "mathfrak", codes: "fraktur", tag: "", output: "" },
-  { input: "bbfr", ttype: 1 /* UNARY */, tex: null, codes: "bold-fraktur", tag: "", output: "" },
-  { input: "bbit", ttype: 1 /* UNARY */, tex: null, codes: "bold-italic", tag: "", output: "" },
-  { input: "bbsfit", ttype: 1 /* UNARY */, tex: null, codes: "sans-serif-bold-italic", tag: "", output: "" },
-  { input: "bold", tex: null, ttype: 1 /* UNARY */, codes: "bold", tag: "", output: "" }
+  { input: "bb", ttype: 1 /* UNARY */, tex: "mathbf", codes: "bold", tag: "", output: "bb" },
+  { input: "sf", ttype: 1 /* UNARY */, tex: "mathsf", codes: "sans-serif", tag: "", output: "sf" },
+  { input: "sfit", ttype: 1 /* UNARY */, tex: null, codes: "sans-serif-italic", tag: "", output: "sfit" },
+  { input: "bbsf", ttype: 1 /* UNARY */, tex: null, codes: "bold-sans-serif", tag: "", output: "bbsf" },
+  { input: "bbb", ttype: 1 /* UNARY */, tex: "mathbb", codes: "double-struck", tag: "", output: "bbb" },
+  { input: "cc", ttype: 1 /* UNARY */, tex: "mathcal", codes: "script", tag: "", output: "cc" },
+  { input: "bbcc", ttype: 1 /* UNARY */, tex: null, codes: "bold-script", tag: "", output: "bbcc" },
+  { input: "tt", ttype: 1 /* UNARY */, tex: "mathtt", codes: "monospace", tag: "", output: "tt" },
+  { input: "fr", ttype: 1 /* UNARY */, tex: "mathfrak", codes: "fraktur", tag: "", output: "fr" },
+  { input: "bbfr", ttype: 1 /* UNARY */, tex: null, codes: "bold-fraktur", tag: "", output: "bbfr" },
+  { input: "bbit", ttype: 1 /* UNARY */, tex: null, codes: "bold-italic", tag: "", output: "bbit" },
+  { input: "bbsfit", ttype: 1 /* UNARY */, tex: null, codes: "sans-serif-bold-italic", tag: "", output: "bbsfit" },
+  { input: "bold", tex: null, ttype: 1 /* UNARY */, codes: "bold", tag: "", output: "bold" }
 ];
 
 // ts/AsciiMathParser.ts
@@ -681,6 +681,7 @@ var AsciiMathParser = class {
     let newFrag;
     str = this.removeCharsAndBlanks(str, 0);
     symbol = this.getSymbol(str);
+    console.log(symbol);
     if (symbol === null || symbol.ttype === 5 /* RIGHTBRACKET */ && this.nestingDepth > 0) {
       return [null, str];
     }

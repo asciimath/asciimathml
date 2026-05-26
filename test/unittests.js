@@ -543,6 +543,9 @@ var unittests = [
 {input: "a mspace(0.3ch) b", output:"<mi>a</mi><mspace width=\"0em\"></mspace><mi>b</mi>"}, // ch not supported; produces 0 width
 {input: "a mspace(-0.2em) b", output:"<mi>a</mi><mspace width=\"-0.2em\"></mspace><mi>b</mi>"}, // negative decimal ok, though browser may not support
 {input: "a mspace3 b", output:"<mi>a</mi><mspace width=\"0em\"></mspace><mi>b</mi>"}, // braces/parens required
+
+// issue 169
+{input: "a bb c", output:"<mi>a</mi><mi>𝐜</mi>"} // font following stuff
 ];
 
 function htmlEntities(str) {

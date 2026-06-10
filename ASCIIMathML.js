@@ -1044,79 +1044,42 @@ function AMparseExpr(str,rightbracket) {
            || AMnestingDepth == 0) && symbol!=null && symbol.output!="");
   if (symbol.ttype == RIGHTBRACKET || symbol.ttype == LEFTRIGHT) {
 //    if (AMnestingDepth > 0) AMnestingDepth--;
-    var len = newFrag.childNodes.length;
-    if (len>0 && newFrag.childNodes[len-1].nodeName == "mrow"
-    	    && newFrag.childNodes[len-1].lastChild
-    	    && newFrag.childNodes[len-1].lastChild.firstChild ) { //matrix
-    	    //removed to allow row vectors: //&& len>1 &&
-    	    //newFrag.childNodes[len-2].nodeName == "mo" &&
-    	    //newFrag.childNodes[len-2].firstChild.nodeValue == ","
-      var right = newFrag.childNodes[len-1].lastChild.firstChild.nodeValue;
-      if (right==")" || right=="]") {
-        var left = newFrag.childNodes[len-1].firstChild.firstChild.nodeValue;
-        if (left=="(" && right==")" && symbol.output != "}" ||
-            left=="[" && right=="]") {
-        var pos = []; // positions of commas
-        var matrix = true;
-        var m = newFrag.childNodes.length;
-        for (i=0; matrix && i<m; i=i+2) {
-          pos[i] = [];
-          node = newFrag.childNodes[i];
-          if (matrix) matrix = node.nodeName=="mrow" &&
-            (i==m-1 || node.nextSibling.nodeName=="mo" &&
-            node.nextSibling.firstChild.nodeValue==listseparator)&&
-            node.firstChild.firstChild &&
-            node.firstChild.firstChild.nodeValue==left &&
-            node.lastChild.firstChild &&
-            node.lastChild.firstChild.nodeValue==right;
-          if (matrix)
-            for (var j=0; j<node.childNodes.length; j++)
-              if (node.childNodes[j].firstChild.nodeValue==listseparator)
-                pos[i][pos[i].length]=j;
-          if (matrix && i>1) matrix = pos[i].length == pos[i-2].length;
-        }
-        matrix = matrix && (pos.length>1 || pos[0].length>0);
-        var columnlines = [];
-        if (matrix) {
-          var row, frag, n, k, table = document.createDocumentFragment();
-          for (i=0; i<m; i=i+2) {
-            row = document.createDocumentFragment();
-            frag = document.createDocumentFragment();
-            node = newFrag.firstChild; // <mrow>(-,-,...,-,-)</mrow>
-            n = node.childNodes.length;
-            k = 0;
-            node.removeChild(node.firstChild); //remove (
-            for (j=1; j<n-1; j++) {
-              if (typeof pos[i][k] != "undefined" && j==pos[i][k]){
-                node.removeChild(node.firstChild); //remove ,
-                if (node.firstChild.nodeName=="mrow" && node.firstChild.childNodes.length==1 &&
-         	  node.firstChild.firstChild.firstChild.nodeValue=="\u2223") {
-         	    //is columnline marker - skip it
-         	    if (i==0) { columnlines.push("solid"); }
-         	    node.removeChild(node.firstChild); //remove mrow
-         	    node.removeChild(node.firstChild); //remove ,
-         	    j+=2;
-         	    k++;
-            	} else if (i==0) { columnlines.push("none"); }
-                row.appendChild(createMmlNode("mtd",frag));
-                k++;
-              } else frag.appendChild(node.firstChild);
+    var res = detectMatrix(newFrag, symbol.output);
+    if (res.isMatrix) {
+      var r,c,row;
+      var columnlines = [];
+      var table = createMmlNode('mtable');
+      for (r=0;r<res.rows.length;r++) {
+        row = createMmlNode('mtr');
+        for (c=0;c<res.rows[r].length;c++) {
+          if (res.rows[r][c].length==1 && 
+            res.rows[r][c][0].nodeName=="mrow" && 
+            res.rows[r][c][0].childNodes.length==1 &&
+         	  res.rows[r][c][0].firstChild.firstChild.nodeValue=="\u2223"
+          ) {
+            // found columnline marker
+            if (r==0) { 
+              columnlines.pop();
+              columnlines.push("solid"); 
             }
-            row.appendChild(createMmlNode("mtd",frag));
-            if (i==0) { columnlines.push("none"); }
-            if (newFrag.childNodes.length>2) {
-              newFrag.removeChild(newFrag.firstChild); //remove <mrow>)</mrow>
-              newFrag.removeChild(newFrag.firstChild); //remove <mo>,</mo>
+          } else {
+            const cell = createMmlNode('mtd');
+            for (i=0;i<res.rows[r][c].length;i++) {
+              cell.appendChild(res.rows[r][c][i]);
             }
-            table.appendChild(createMmlNode("mtr",row));
+            row.appendChild(cell);
+            if (r==0 && c < res.rows[r].length - 1) {
+              columnlines.push("none");
+            }
           }
-          node = createMmlNode("mtable",table);
-          node.setAttribute("columnlines", columnlines.join(" "));
-          if (typeof symbol.invisible == "boolean" && symbol.invisible) node.setAttribute("columnalign","left");
-          newFrag.replaceChild(node,newFrag.firstChild);
         }
-       }
+        table.appendChild(row);
       }
+      table.setAttribute("columnlines", columnlines.join(" "));
+      if (typeof symbol.invisible == "boolean" && symbol.invisible) {
+        table.setAttribute("columnalign","left");
+      }
+      newFrag.replaceChildren(table);
     }
     str = AMremoveCharsAndBlanks(str,symbol.input.length);
     if (typeof symbol.invisible != "boolean" || !symbol.invisible) {
@@ -1126,6 +1089,125 @@ function AMparseExpr(str,rightbracket) {
   }
   return [newFrag,str];
 }
+
+function detectMatrix(newFrag, endsymbol) {
+  const BRACKET_PAIRS = { '(': ')', '[': ']'};
+
+  const children = Array.from(newFrag.childNodes);
+  if (children.length === 0) return { isMatrix: false, rows: null };
+
+  // Split children into segments divided by top-level comma <mo> nodes.
+  // Valid shape: [mrow, mo(","), mrow, mo(","), mrow, ...]
+  const rows = [];
+  let expecting = 'mrow'; // alternates between 'mrow' and 'comma'
+
+  for (const node of children) {
+    if (expecting === 'mrow') {
+      if (node.nodeType !== 1 || node.nodeName.toLowerCase() !== 'mrow') {
+        return { isMatrix: false, rows: null };
+      }
+      rows.push(node);
+      expecting = 'comma';
+    } else {
+      // Must be a top-level comma separator: <mo>,</mo>
+      if (
+        node.nodeType !== 1 ||
+        node.nodeName.toLowerCase() !== 'mo' ||
+        node.textContent.trim() !== listseparator
+      ) {
+        return { isMatrix: false, rows: null };
+      }
+      expecting = 'mrow';
+    }
+  }
+
+  // Must end on a row, not a dangling comma
+  if (expecting !== 'comma') return { isMatrix: false, rows: null };
+
+  if (rows.length < 1) return { isMatrix: false, rows: null };
+
+  // Inspect each mrow: check opening bracket, closing bracket, and element count
+  let expectedOpen = null;
+  let expectedClose = null;
+  let expectedCount = null;
+
+  const rowsout = [];
+  for (const row of rows) {
+    const cells = Array.from(row.childNodes);
+
+    if (cells.length < 2) return { isMatrix: false, rows: null };
+
+    // First child must be an <mo> with a recognized opening bracket
+    const firstNode = cells[0];
+    if (
+      firstNode.nodeType !== 1 ||
+      firstNode.nodeName.toLowerCase() !== 'mo'
+    ) {
+      return { isMatrix: false, rows: null };
+    }
+    const openBracket = firstNode.textContent.trim();
+    if (!(openBracket in BRACKET_PAIRS)) return { isMatrix: false, rows: null };
+    if (openBracket == '(' && endsymbol == '}') {
+      // special treatment for set of ordered ntuples
+      return { isMatrix: false, rows: null };
+    }
+
+    // Last child must be the matching closing bracket
+    const lastNode = cells[cells.length - 1];
+    if (
+      lastNode.nodeType !== 1 ||
+      lastNode.nodeName.toLowerCase() !== 'mo'
+    ) {
+      return { isMatrix: false, rows: null };
+    }
+    const closeBracket = lastNode.textContent.trim();
+    if (closeBracket !== BRACKET_PAIRS[openBracket]) {
+      return { isMatrix: false, rows: null };
+    }
+
+    // Count comma-separated elements between the brackets
+    // and collect cells for return
+    // (commas as direct <mo> children of this mrow are separators)
+    const inner = cells.slice(1, -1);
+    let elementCount = 1;
+    const cellsout = [];
+    const curcell = [];
+    for (const cell of inner) {
+      if (
+        cell.nodeType === 1 &&
+        cell.nodeName.toLowerCase() === 'mo' &&
+        cell.textContent.trim() === listseparator
+      ) {
+        elementCount++;
+        cellsout.push([...curcell]);
+        curcell.length = 0;
+      } else {
+        curcell.push(cell);
+      }
+    }
+    cellsout.push([...curcell]);
+    // if 1 element inside braces and it's mtable, it's seeing a matrix, not a row
+    // if 1 element and 1 row, it's just double-parens
+    if (elementCount == 1 && (cellsout[0][0].nodeName == 'mtable' || rows.length == 1)) {
+      return { isMatrix: false, rows: null };
+    }
+    rowsout.push(cellsout);
+
+    // Check consistency across rows
+    if (expectedOpen === null) {
+      expectedOpen = openBracket;
+      expectedClose = closeBracket;
+      expectedCount = elementCount;
+    } else {
+      if (openBracket !== expectedOpen) return { isMatrix: false, rows: null };
+      if (closeBracket !== expectedClose) return { isMatrix: false, rows: null };
+      if (elementCount !== expectedCount) return { isMatrix: false, rows: null };
+    }
+  }
+
+  return { isMatrix: true, rows: rowsout };
+}
+
 
 function parseMath(str,latex) {
   var frag, node;

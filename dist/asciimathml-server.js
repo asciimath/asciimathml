@@ -1266,7 +1266,7 @@ var AsciiMathParser = class {
         }
       }
       cellsout.push([...curcell]);
-      if (elementCount == 1 && (cellsout[0][0].kind == "mtable" || rows.length == 1)) {
+      if (elementCount == 1 && cellsout[0].length > 0 && (cellsout[0][0].kind == "mtable" || rows.length == 1)) {
         return { isMatrix: false, rows: null };
       }
       rowsout.push(cellsout);

@@ -560,6 +560,9 @@ var unittests = [
 // with outside curly braces, treat as parens as set of ordered pairs, but square brackets as matrix
 {input: "{(1,2),(3,4)}", output:"<mrow><mo>{</mo><mrow><mo>(</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>)</mo></mrow><mo>,</mo><mrow><mo>(</mo><mn>3</mn><mo>,</mo><mn>4</mn><mo>)</mo></mrow><mo>}</mo></mrow>"},
 {input: "{[1,2],[3,4]}", output:"<mrow><mo>{</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>}</mo></mrow>"},
+// matrices and column vectors with empty elements
+{input: "[(,2),(3,)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none\"><mtr><mtd></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "[(1),()]", output:"<mrow><mo>[</mo><mtable columnlines=\"\"><mtr><mtd><mn>1</mn></mtd></mtr><mtr><mtd></mtd></mtr></mtable><mo>]</mo></mrow>"},
 
 ];
 

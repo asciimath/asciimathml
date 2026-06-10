@@ -1088,7 +1088,7 @@ export class AsciiMathParser {
       cellsout.push([...curcell]);
       // if 1 element inside braces and it's mtable, it's seeing a matrix, not a row
       // if 1 element and 1 row, it's just double-parens
-      if (elementCount == 1 && (cellsout[0][0].kind == 'mtable' || rows.length == 1)) {
+      if (elementCount == 1 && cellsout[0].length > 0 && (cellsout[0][0].kind == 'mtable' || rows.length == 1)) {
         return { isMatrix: false, rows: null };
       }
       rowsout.push(cellsout);

@@ -711,7 +711,6 @@ var asciimath = (() => {
       let newFrag;
       str = this.removeCharsAndBlanks(str, 0);
       symbol = this.getSymbol(str);
-      console.log(symbol);
       if (symbol === null || symbol.ttype === 5 /* RIGHTBRACKET */ && this.nestingDepth > 0) {
         return [null, str];
       }
@@ -1231,7 +1230,7 @@ var asciimath = (() => {
       return [newFrag, str];
     }
     detectMatrix(newFrag, endsymbol) {
-      var _a, _b;
+      var _a, _b, _c, _d, _e, _f;
       const children = Array.from(newFrag.childNodes);
       if (children.length === 0) return { isMatrix: false, rows: null };
       const rows = [];
@@ -1244,7 +1243,7 @@ var asciimath = (() => {
           rows.push(node);
           expecting = "comma";
         } else {
-          if (node.kind !== "mo" || node.text !== this.listseparator) {
+          if (node.kind !== "mo" || ((_a = node.firstChild) == null ? void 0 : _a.text) !== this.listseparator) {
             return { isMatrix: false, rows: null };
           }
           expecting = "mrow";
@@ -1263,7 +1262,7 @@ var asciimath = (() => {
         if (firstNode.kind !== "mo") {
           return { isMatrix: false, rows: null };
         }
-        const openBracket = (_a = firstNode.text) != null ? _a : "";
+        const openBracket = (_c = (_b = firstNode.firstChild) == null ? void 0 : _b.text) != null ? _c : "";
         let targetEndBracket = "";
         if (openBracket == "(") {
           targetEndBracket = ")";
@@ -1279,7 +1278,7 @@ var asciimath = (() => {
         if (lastNode.kind !== "mo") {
           return { isMatrix: false, rows: null };
         }
-        const closeBracket = (_b = lastNode.text) != null ? _b : "";
+        const closeBracket = (_e = (_d = lastNode.firstChild) == null ? void 0 : _d.text) != null ? _e : "";
         if (closeBracket !== targetEndBracket) {
           return { isMatrix: false, rows: null };
         }
@@ -1288,7 +1287,7 @@ var asciimath = (() => {
         const cellsout = [];
         const curcell = [];
         for (const cell of inner) {
-          if (cell.kind === "mo" && cell.text === this.listseparator) {
+          if (cell.kind === "mo" && ((_f = cell.firstChild) == null ? void 0 : _f.text) === this.listseparator) {
             elementCount++;
             cellsout.push([...curcell]);
             curcell.length = 0;

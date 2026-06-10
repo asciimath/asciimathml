@@ -379,7 +379,6 @@ export class AsciiMathParser {
 
     str = this.removeCharsAndBlanks(str, 0);
     symbol = this.getSymbol(str);
-    console.log(symbol);
 
     if (
       symbol === null ||
@@ -1014,7 +1013,7 @@ export class AsciiMathParser {
         // Must be a top-level comma separator: <mo>,</mo>
         if (
           node.kind !== 'mo' ||
-          node.text !== this.listseparator
+          node.firstChild?.text !== this.listseparator
         ) {
           return { isMatrix: false, rows: null };
         }
@@ -1043,7 +1042,7 @@ export class AsciiMathParser {
       if (firstNode.kind !== 'mo') {
         return { isMatrix: false, rows: null };
       }
-      const openBracket = firstNode.text ?? '';
+      const openBracket = firstNode.firstChild?.text ?? '';
       let targetEndBracket = '';
       if (openBracket == '(') {
         targetEndBracket = ')';
@@ -1062,7 +1061,7 @@ export class AsciiMathParser {
       if (lastNode.kind !== 'mo') {
         return { isMatrix: false, rows: null };
       }
-      const closeBracket = lastNode.text ?? '';
+      const closeBracket = lastNode.firstChild?.text ?? '';
       if (closeBracket !== targetEndBracket) {
         return { isMatrix: false, rows: null };
       }
@@ -1077,7 +1076,7 @@ export class AsciiMathParser {
       for (const cell of inner) {
         if (
           cell.kind === 'mo' &&
-          cell.text === this.listseparator
+          cell.firstChild?.text === this.listseparator
         ) {
           elementCount++;
           cellsout.push([...curcell]);

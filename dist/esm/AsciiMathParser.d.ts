@@ -142,6 +142,7 @@ export declare class AsciiMathParser {
      * @returns {ParseResult} [node, remaining string]
      */
     private parseExpr;
+    private detectMatrix;
     /**
      * Main parse method - returns the MML tree
      *

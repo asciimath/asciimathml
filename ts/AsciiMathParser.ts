@@ -18,6 +18,13 @@ import {
 type ParseResult = [INodeAdapter | null, string];
 
 /**
+ * Result type from Matrix detection function
+ */
+type MatrixDetectionResult =
+  | { isMatrix: false; rows: null }
+  | { isMatrix: true; rows: INodeAdapter[][][] };
+
+/**
  * The main AsciiMath Parser class.
  */
 export class AsciiMathParser {
@@ -935,147 +942,46 @@ export class AsciiMathParser {
       symbol.ttype === TokenType.RIGHTBRACKET ||
       symbol.ttype === TokenType.LEFTRIGHT)
     ) {
-      // Matrix detection logic
-      const len = newFrag.childNodes.length;
-      if (
-        len > 0 &&
-        newFrag.childNodes[len - 1].kind === 'mrow' &&
-        newFrag.childNodes[len - 1].hasChildNodes()
-      ) {
-        const lastMrow = (newFrag.lastChild as any);
-        const lastChild = lastMrow.lastChild;
-        const firstChild = lastMrow.firstChild;
-        if (
-          lastChild &&
-          lastChild.hasChildNodes() &&
-          firstChild &&
-          firstChild.hasChildNodes() > 0
-        ) {
-          const right = (lastChild.firstChild as any).text;
-          const left = (firstChild.firstChild as any).text;
-          if (
-            right === ')' || right === ']'
-          ) {
-            if (
-              (left === '(' && right === ')' && symbol.output !== '}') ||
-              (left === '[' && right === ']')
+      const res = this.detectMatrix(newFrag, symbol.output);
+      if (res.isMatrix) {
+        let i,r,c,row;
+        const columnlines = [];
+        const table = this.configuration.create('mtable');
+        for (r=0;r<res.rows.length;r++) {
+          row = this.configuration.create('mtr');
+          for (c=0;c<res.rows[r].length;c++) {
+            if (res.rows[r][c].length==1 && 
+              res.rows[r][c][0].kind=="mrow" && 
+              res.rows[r][c][0].childNodes.length==1 &&
+              res.rows[r][c][0].firstChild?.firstChild?.text=="\u2223"
             ) {
-              const pos: number[][] = []; // positions of commas
-              let matrix = true;
-              const m = newFrag.childNodes.length;
-              let i: number, j: number;
-              for (i = 0; matrix && i < m; i = i + 2) {
-                pos[i] = [];
-                node = newFrag.childNodes[i];
-                if (matrix) {
-                  matrix =
-                    node.kind === 'mrow' && // current el is row
-                    node.childNodes.length > 0 &&
-                    (i === m - 1 ||  // last row, or next el is comma
-                      (newFrag.childNodes[i + 1] &&
-                        newFrag.childNodes[i + 1].kind === 'mo' &&
-                        (newFrag.childNodes[i + 1].firstChild as any).text === this.listseparator
-                      )
-                    ) && // row starts and ends with left/right brackets
-                    (node.firstChild?.firstChild as any).text === left &&
-                    (node.lastChild?.firstChild as any).text === right;
-                }
-                if (matrix) {
-                  // record positions of commas
-                  for (j = 0; j < node.childNodes.length; j++) {
-                    if (
-                      node.childNodes[j].hasChildNodes() &&
-                      (node.childNodes[j].firstChild as any).text === this.listseparator
-                    ) {
-                      pos[i][pos[i].length] = j;
-                    }
-                  }
-                }
-                if (matrix && i > 1) {
-                  // check that number of commas matches previous row
-                  matrix = pos[i].length === pos[i - 2].length;
-                }
+              // found columnline marker
+              if (r==0) { 
+                columnlines.pop();
+                columnlines.push("solid"); 
               }
-              // At least two rows or two columns
-              matrix = matrix && (pos.length > 1 || pos[0].length > 0);
-              const columnlines: string[] = [];
-              if (matrix) {
-                const table = this.configuration.create('inferredMrow');
-                for (i = 0; i < m; i = i + 2) {
-                  const row = this.configuration.create('inferredMrow');
-                  let frag = this.configuration.create('inferredMrow');
-                  node = newFrag.childNodes[0]; // <mrow>(-,-,...,-,-)</mrow>
-                  const n = node.childNodes.length;
-                  let k = 0;
-                  node.removeFirstChild(); // remove (
-                  for (j = 1; j < n - 1; j++) {
-                    if (typeof pos[i][k] !== 'undefined' && j === pos[i][k]) {
-                      node.removeFirstChild(); // remove ,
-                      if (
-                        node.firstChild &&
-                        node.firstChild.kind === 'mrow' &&
-                        node.firstChild.childNodes.length === 1 &&
-                        node.firstChild.firstChild?.hasChildNodes() &&
-                        (node.firstChild.firstChild.firstChild as any).text === '\u2223'
-                      ) {
-                        // is columnline marker - skip it
-                        if (i === 0) {
-                          columnlines.push('solid');
-                        }
-                        node.removeFirstChild(); // remove mrow
-                        node.removeFirstChild(); // remove ,
-                        j += 2;
-                        k++;
-                      } else if (i === 0) {
-                        columnlines.push('none');
-                      }
-                      const mtd = this.configuration.create('mtd');
-                      for (const child of frag.childNodes) {
-                        mtd.appendChild(child);
-                      }
-                      row.appendChild(mtd);
-                      frag = this.configuration.create('inferredMrow'); // reset frag
-                      k++;
-                    } else {
-                      frag.appendChild((node.firstChild as any));
-                    }
-                  }
-                  const mtd = this.configuration.create('mtd');
-                  for (const child of frag.childNodes) {
-                    mtd.appendChild(child);
-                  }
-                  row.appendChild(mtd);
-                  if (i === 0) {
-                    columnlines.push('none');
-                  }
-                  
-                  if (newFrag.childNodes.length > 2) {
-                    newFrag.removeFirstChild(); // remove <mrow>)</mrow>
-                    newFrag.removeFirstChild(); // remove <mo>,</mo>
-                  }
-                  const mtr = this.configuration.create('mtr');
-                  for (const child of row.childNodes) {
-                    mtr.appendChild(child);
-                  }
-                  table.appendChild(mtr);
-                }
-
-                node = this.configuration.create('mtable');
-                node.setAttribute('columnlines', columnlines.join(' '));
-                if (
-                  typeof symbol.invisible === 'boolean' &&
-                  symbol.invisible
-                ) {
-                  node.setAttribute('columnalign', 'left');
-                }
-                for (const child of table.childNodes) {
-                  node.appendChild(child);
-                }
-                newFrag.replaceChild(node, (newFrag.firstChild as any));
+            } else {
+              const cell = this.configuration.create('mtd');
+              for (i=0;i<res.rows[r][c].length;i++) {
+                cell.appendChild(res.rows[r][c][i]);
+              }
+              row.appendChild(cell);
+              if (r==0 && c < res.rows[r].length - 1) {
+                columnlines.push("none");
               }
             }
           }
+          table.appendChild(row);
         }
+        table.setAttribute("columnlines", columnlines.join(" "));
+        if (typeof symbol.invisible == "boolean" && symbol.invisible) {
+          table.setAttribute("columnalign","left");
+        }
+        // empty newFrag
+        while (newFrag.hasChildNodes()) {
+          newFrag.removeLastChild();
+        }
+        newFrag.appendChild(table);
       }
       str = this.removeCharsAndBlanks(str, symbol.input.length);
       if (!symbol.invisible) {
@@ -1086,6 +992,121 @@ export class AsciiMathParser {
     }
 
     return [newFrag, str];
+  }
+  
+  private detectMatrix(newFrag: INodeAdapter, endsymbol: string): MatrixDetectionResult {
+    const children = Array.from(newFrag.childNodes);
+    if (children.length === 0) return { isMatrix: false, rows: null };
+
+    // Split children into segments divided by top-level comma <mo> nodes.
+    // Valid shape: [mrow, mo(","), mrow, mo(","), mrow, ...]
+    const rows = [];
+    let expecting = 'mrow'; // alternates between 'mrow' and 'comma'
+
+    for (const node of children) {
+      if (expecting === 'mrow') {
+        if (node.kind !== 'mrow') {
+          return { isMatrix: false, rows: null };
+        }
+        rows.push(node);
+        expecting = 'comma';
+      } else {
+        // Must be a top-level comma separator: <mo>,</mo>
+        if (
+          node.kind !== 'mo' ||
+          node.text !== this.listseparator
+        ) {
+          return { isMatrix: false, rows: null };
+        }
+        expecting = 'mrow';
+      }
+    }
+
+    // Must end on a row, not a dangling comma
+    if (expecting !== 'comma') return { isMatrix: false, rows: null };
+
+    if (rows.length < 1) return { isMatrix: false, rows: null };
+
+    // Inspect each mrow: check opening bracket, closing bracket, and element count
+    let expectedOpen = null;
+    let expectedClose = null;
+    let expectedCount = null;
+
+    const rowsout = [];
+    for (const row of rows) {
+      const cells = Array.from(row.childNodes);
+
+      if (cells.length < 2) return { isMatrix: false, rows: null };
+
+      // First child must be an <mo> with a recognized opening bracket
+      const firstNode = cells[0];
+      if (firstNode.kind !== 'mo') {
+        return { isMatrix: false, rows: null };
+      }
+      const openBracket = firstNode.text ?? '';
+      let targetEndBracket = '';
+      if (openBracket == '(') {
+        targetEndBracket = ')';
+      } else if (openBracket == '[') {
+        targetEndBracket = ']';
+      } else {
+        return { isMatrix: false, rows: null };
+      }
+      if (openBracket == '(' && endsymbol == '}') {
+        // special treatment for set of ordered ntuples
+        return { isMatrix: false, rows: null };
+      }
+
+      // Last child must be the matching closing bracket
+      const lastNode = cells[cells.length - 1];
+      if (lastNode.kind !== 'mo') {
+        return { isMatrix: false, rows: null };
+      }
+      const closeBracket = lastNode.text ?? '';
+      if (closeBracket !== targetEndBracket) {
+        return { isMatrix: false, rows: null };
+      }
+
+      // Count comma-separated elements between the brackets
+      // and collect cells for return
+      // (commas as direct <mo> children of this mrow are separators)
+      const inner = cells.slice(1, -1);
+      let elementCount = 1;
+      const cellsout = [];
+      const curcell = [];
+      for (const cell of inner) {
+        if (
+          cell.kind === 'mo' &&
+          cell.text === this.listseparator
+        ) {
+          elementCount++;
+          cellsout.push([...curcell]);
+          curcell.length = 0;
+        } else {
+          curcell.push(cell);
+        }
+      }
+      cellsout.push([...curcell]);
+      // if 1 element inside braces and it's mtable, it's seeing a matrix, not a row
+      // if 1 element and 1 row, it's just double-parens
+      if (elementCount == 1 && (cellsout[0][0].kind == 'mtable' || rows.length == 1)) {
+        return { isMatrix: false, rows: null };
+      }
+      rowsout.push(cellsout);
+
+      // Check consistency across rows
+      if (expectedOpen === null) {
+        expectedOpen = openBracket;
+        expectedClose = closeBracket;
+        expectedCount = elementCount;
+      } else {
+        if (openBracket !== expectedOpen) return { isMatrix: false, rows: null };
+        if (closeBracket !== expectedClose) return { isMatrix: false, rows: null };
+        if (elementCount !== expectedCount) return { isMatrix: false, rows: null };
+      }
+    }
+
+    return { isMatrix: true, rows: rowsout };
   }
 
   /**

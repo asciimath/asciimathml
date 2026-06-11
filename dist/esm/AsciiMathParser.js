@@ -881,6 +881,9 @@ export class AsciiMathParser {
                                 columnlines.pop();
                                 columnlines.push("solid");
                             }
+                            if (this.useCSS) {
+                                row.lastChild?.setAttribute("data-am-columnlines", "1");
+                            }
                         }
                         else {
                             const cell = this.configuration.create('mtd');

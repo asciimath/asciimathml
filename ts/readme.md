@@ -53,3 +53,12 @@ menclose[notation=updiagonalstrike] {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none' viewBox='0 0 100 100'%3E%3Cline x1='0' y1='100' x2='100' y2='0' stroke='"+stroke+"' stroke-width='1' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
 }
 ```
+
+Also, columnlines used in augmented matrices are not supported by all browsers.
+When the useCSS option is enabled, a data attribute will be added to mtd elements to 
+allow emulating columnlines by adding to your page CSS:
+```
+mtd[data-am-columnlines] { 
+  border-right: 1px solid currentColor;
+}
+```

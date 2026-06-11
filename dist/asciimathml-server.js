@@ -1122,7 +1122,7 @@ var AsciiMathParser = class {
    * @returns {ParseResult} [node, remaining string]
    */
   parseExpr(str, rightbracket) {
-    var _a, _b;
+    var _a, _b, _c;
     let symbol;
     let node;
     let result;
@@ -1167,6 +1167,9 @@ var AsciiMathParser = class {
               if (r == 0) {
                 columnlines.pop();
                 columnlines.push("solid");
+              }
+              if (this.useCSS) {
+                (_c = row.lastChild) == null ? void 0 : _c.setAttribute("data-am-columnlines", "1");
               }
             } else {
               const cell = this.configuration.create("mtd");

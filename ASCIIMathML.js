@@ -103,7 +103,7 @@ function checkMathML(){
   container.style.visibility = "hidden";
   container.style.whiteSpace = "nowrap";
 
-  container.innerHTML = '<math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mi>a</mi><mi>b</mi></mfrac><menclose notation="box"><mtext>X</mtext></menclose></math>';
+  container.innerHTML = '<math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mi>a</mi><mi>b</mi></mfrac><menclose notation="box"><mtext>X</mtext></menclose><mtable><mtr><mtd>1</mtd><mtd>2</mtd></mtr></mtable><mtable columnlines="solid"><mtr><mtd>1</mtd><mtd>2</mtd></mtr></mtable></math>';
   document.body.appendChild(container);
 
   var math = container.querySelector("math");
@@ -120,6 +120,12 @@ function checkMathML(){
     // fake support for cancel with some CSS
     var stroke = getComputedStyle(math).color;
     setStylesheet("menclose[notation=updiagonalstrike] {background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none' viewBox='0 0 100 100'%3E%3Cline x1='0' y1='100' x2='100' y2='0' stroke='"+stroke+"' stroke-width='1' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E\");}");
+  }
+  var mtables = container.querySelectorAll("mtable");
+  var supportsColumnlines = mtables.length == 2 && 
+    mtables[0].getBoundingClientRect().width < mtables[1].getBoundingClientRect().width;
+  if (supported && !supportsColumnlines) {
+    setStylesheet("mtd[data-am-columnlines] { border-right: 1px solid currentColor;}");
   }
   document.body.removeChild(container);
   noMathML = !supported;
@@ -1061,6 +1067,9 @@ function AMparseExpr(str,rightbracket) {
             if (r==0) { 
               columnlines.pop();
               columnlines.push("solid"); 
+            }
+            if (c > 0) {
+              row.lastChild.setAttribute("data-am-columnlines",1);
             }
           } else {
             const cell = createMmlNode('mtd');

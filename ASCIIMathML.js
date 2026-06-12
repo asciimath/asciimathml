@@ -1069,7 +1069,7 @@ function AMparseExpr(str,rightbracket) {
               columnlines.push("solid"); 
             }
             if (c > 0) {
-              row.lastChild.setAttribute("data-am-columnlines",1);
+              row.lastChild.setAttribute("data-am-columnlines","solid");
             }
           } else {
             const cell = createMmlNode('mtd');

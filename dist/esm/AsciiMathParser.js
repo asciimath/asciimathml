@@ -882,7 +882,7 @@ export class AsciiMathParser {
                                 columnlines.push("solid");
                             }
                             if (this.useCSS) {
-                                row.lastChild?.setAttribute("data-am-columnlines", "1");
+                                row.lastChild?.setAttribute("data-am-columnlines", "solid");
                             }
                         }
                         else {

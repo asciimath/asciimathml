@@ -1199,7 +1199,7 @@ var asciimath = (() => {
                   columnlines.push("solid");
                 }
                 if (this.useCSS) {
-                  (_c = row.lastChild) == null ? void 0 : _c.setAttribute("data-am-columnlines", "1");
+                  (_c = row.lastChild) == null ? void 0 : _c.setAttribute("data-am-columnlines", "solid");
                 }
               } else {
                 const cell = this.configuration.create("mtd");

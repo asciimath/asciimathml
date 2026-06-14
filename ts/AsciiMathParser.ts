@@ -21,8 +21,8 @@ type ParseResult = [INodeAdapter | null, string];
  * Result type from Matrix detection function
  */
 type MatrixDetectionResult =
-  | { isMatrix: false; rows: null }
-  | { isMatrix: true; rows: INodeAdapter[][][] };
+  | { isMatrix: false; }
+  | { isMatrix: true; rows: INodeAdapter[][][], columnlinelocs: Map<number, boolean> };
 
 /**
  * The main AsciiMath Parser class.
@@ -949,11 +949,7 @@ export class AsciiMathParser {
         for (r=0;r<res.rows.length;r++) {
           row = this.configuration.create('mtr');
           for (c=0;c<res.rows[r].length;c++) {
-            if (res.rows[r][c].length==1 && 
-              res.rows[r][c][0].kind=="mrow" && 
-              res.rows[r][c][0].childNodes.length==1 &&
-              res.rows[r][c][0].firstChild?.firstChild?.text=="\u2223"
-            ) {
+            if (res.columnlinelocs.has(c)) {
               // found columnline marker
               if (r==0) { 
                 columnlines.pop();
@@ -998,7 +994,7 @@ export class AsciiMathParser {
   
   private detectMatrix(newFrag: INodeAdapter, endsymbol: string): MatrixDetectionResult {
     const children = Array.from(newFrag.childNodes);
-    if (children.length === 0) return { isMatrix: false, rows: null };
+    if (children.length === 0) return { isMatrix: false };
 
     // Split children into segments divided by top-level comma <mo> nodes.
     // Valid shape: [mrow, mo(","), mrow, mo(","), mrow, ...]
@@ -1008,7 +1004,7 @@ export class AsciiMathParser {
     for (const node of children) {
       if (expecting === 'mrow') {
         if (node.kind !== 'mrow') {
-          return { isMatrix: false, rows: null };
+          return { isMatrix: false };
         }
         rows.push(node);
         expecting = 'comma';
@@ -1018,16 +1014,16 @@ export class AsciiMathParser {
           node.kind !== 'mo' ||
           node.firstChild?.text !== this.listseparator
         ) {
-          return { isMatrix: false, rows: null };
+          return { isMatrix: false };
         }
         expecting = 'mrow';
       }
     }
 
     // Must end on a row, not a dangling comma
-    if (expecting !== 'comma') return { isMatrix: false, rows: null };
+    if (expecting !== 'comma') return { isMatrix: false };
 
-    if (rows.length < 1) return { isMatrix: false, rows: null };
+    if (rows.length < 1) return { isMatrix: false };
 
     // Inspect each mrow: check opening bracket, closing bracket, and element count
     let expectedOpen = null;
@@ -1035,15 +1031,16 @@ export class AsciiMathParser {
     let expectedCount = null;
 
     const rowsout = [];
+    const columnlinelocs = new Map<number, boolean>();
     for (const row of rows) {
       const cells = Array.from(row.childNodes);
 
-      if (cells.length < 2) return { isMatrix: false, rows: null };
+      if (cells.length < 2) return { isMatrix: false };
 
       // First child must be an <mo> with a recognized opening bracket
       const firstNode = cells[0];
       if (firstNode.kind !== 'mo') {
-        return { isMatrix: false, rows: null };
+        return { isMatrix: false };
       }
       const openBracket = firstNode.firstChild?.text ?? '';
       let targetEndBracket = '';
@@ -1052,21 +1049,21 @@ export class AsciiMathParser {
       } else if (openBracket == '[') {
         targetEndBracket = ']';
       } else {
-        return { isMatrix: false, rows: null };
+        return { isMatrix: false };
       }
       if (openBracket == '(' && endsymbol == '}') {
         // special treatment for set of ordered ntuples
-        return { isMatrix: false, rows: null };
+        return { isMatrix: false };
       }
 
       // Last child must be the matching closing bracket
       const lastNode = cells[cells.length - 1];
       if (lastNode.kind !== 'mo') {
-        return { isMatrix: false, rows: null };
+        return { isMatrix: false };
       }
       const closeBracket = lastNode.firstChild?.text ?? '';
       if (closeBracket !== targetEndBracket) {
-        return { isMatrix: false, rows: null };
+        return { isMatrix: false };
       }
 
       // Count comma-separated elements between the brackets
@@ -1081,6 +1078,19 @@ export class AsciiMathParser {
           cell.kind === 'mo' &&
           cell.firstChild?.text === this.listseparator
         ) {
+          // check for columnline marker
+          if (curcell.length === 1 &&
+              curcell[0].kind === 'mrow' &&
+              curcell[0].childNodes.length === 1 && 
+              (curcell[0].firstChild?.text?.trim() === "\u2223" || curcell[0].firstChild?.text?.trim() === "|")
+          ) {
+            // found mid; may be columnline marker
+            if (expectedOpen === null) { // first row, mark as columnline
+              columnlinelocs.set(cellsout.length, true);
+            } 
+          } else if (columnlinelocs.has(cellsout.length)) { //columnline was set; remove it
+            columnlinelocs.delete(cellsout.length);
+          }
           elementCount++;
           cellsout.push([...curcell]);
           curcell.length = 0;
@@ -1092,7 +1102,7 @@ export class AsciiMathParser {
       // if 1 element inside braces and it's mtable, it's seeing a matrix, not a row
       // if 1 element and 1 row, it's just double-parens
       if (elementCount == 1 && cellsout[0].length > 0 && (cellsout[0][0].kind == 'mtable' || rows.length == 1)) {
-        return { isMatrix: false, rows: null };
+        return { isMatrix: false };
       }
       rowsout.push(cellsout);
 
@@ -1102,13 +1112,13 @@ export class AsciiMathParser {
         expectedClose = closeBracket;
         expectedCount = elementCount;
       } else {
-        if (openBracket !== expectedOpen) return { isMatrix: false, rows: null };
-        if (closeBracket !== expectedClose) return { isMatrix: false, rows: null };
-        if (elementCount !== expectedCount) return { isMatrix: false, rows: null };
+        if (openBracket !== expectedOpen) return { isMatrix: false };
+        if (closeBracket !== expectedClose) return { isMatrix: false };
+        if (elementCount !== expectedCount) return { isMatrix: false };
       }
     }
 
-    return { isMatrix: true, rows: rowsout };
+    return { isMatrix: true, rows: rowsout, columnlinelocs: columnlinelocs };
   }
 
   /**

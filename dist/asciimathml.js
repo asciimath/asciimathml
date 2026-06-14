@@ -408,7 +408,7 @@ var asciimath = (() => {
      * @param {IParseOptions} configuration A parser configuration.
      */
     constructor(configuration) {
-      this.configuration = configuration;
+      __publicField(this, "configuration", configuration);
       /**
        * Current nesting depth for tracking brackets
        *
@@ -1152,7 +1152,7 @@ var asciimath = (() => {
      * @returns {ParseResult} [node, remaining string]
      */
     parseExpr(str, rightbracket) {
-      var _a, _b, _c;
+      var _a;
       let symbol;
       let node;
       let result;
@@ -1193,13 +1193,13 @@ var asciimath = (() => {
           for (r = 0; r < res.rows.length; r++) {
             row = this.configuration.create("mtr");
             for (c = 0; c < res.rows[r].length; c++) {
-              if (res.rows[r][c].length == 1 && res.rows[r][c][0].kind == "mrow" && res.rows[r][c][0].childNodes.length == 1 && ((_b = (_a = res.rows[r][c][0].firstChild) == null ? void 0 : _a.firstChild) == null ? void 0 : _b.text) == "\u2223") {
+              if (res.columnlinelocs.has(c)) {
                 if (r == 0) {
                   columnlines.pop();
                   columnlines.push("solid");
                 }
                 if (this.useCSS) {
-                  (_c = row.lastChild) == null ? void 0 : _c.setAttribute("data-am-columnlines", "solid");
+                  (_a = row.lastChild) == null ? void 0 : _a.setAttribute("data-am-columnlines", "solid");
                 }
               } else {
                 const cell = this.configuration.create("mtd");
@@ -1233,37 +1233,38 @@ var asciimath = (() => {
       return [newFrag, str];
     }
     detectMatrix(newFrag, endsymbol) {
-      var _a, _b, _c, _d, _e, _f;
+      var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
       const children = Array.from(newFrag.childNodes);
-      if (children.length === 0) return { isMatrix: false, rows: null };
+      if (children.length === 0) return { isMatrix: false };
       const rows = [];
       let expecting = "mrow";
       for (const node of children) {
         if (expecting === "mrow") {
           if (node.kind !== "mrow") {
-            return { isMatrix: false, rows: null };
+            return { isMatrix: false };
           }
           rows.push(node);
           expecting = "comma";
         } else {
           if (node.kind !== "mo" || ((_a = node.firstChild) == null ? void 0 : _a.text) !== this.listseparator) {
-            return { isMatrix: false, rows: null };
+            return { isMatrix: false };
           }
           expecting = "mrow";
         }
       }
-      if (expecting !== "comma") return { isMatrix: false, rows: null };
-      if (rows.length < 1) return { isMatrix: false, rows: null };
+      if (expecting !== "comma") return { isMatrix: false };
+      if (rows.length < 1) return { isMatrix: false };
       let expectedOpen = null;
       let expectedClose = null;
       let expectedCount = null;
       const rowsout = [];
+      const columnlinelocs = /* @__PURE__ */ new Map();
       for (const row of rows) {
         const cells = Array.from(row.childNodes);
-        if (cells.length < 2) return { isMatrix: false, rows: null };
+        if (cells.length < 2) return { isMatrix: false };
         const firstNode = cells[0];
         if (firstNode.kind !== "mo") {
-          return { isMatrix: false, rows: null };
+          return { isMatrix: false };
         }
         const openBracket = (_c = (_b = firstNode.firstChild) == null ? void 0 : _b.text) != null ? _c : "";
         let targetEndBracket = "";
@@ -1272,18 +1273,18 @@ var asciimath = (() => {
         } else if (openBracket == "[") {
           targetEndBracket = "]";
         } else {
-          return { isMatrix: false, rows: null };
+          return { isMatrix: false };
         }
         if (openBracket == "(" && endsymbol == "}") {
-          return { isMatrix: false, rows: null };
+          return { isMatrix: false };
         }
         const lastNode = cells[cells.length - 1];
         if (lastNode.kind !== "mo") {
-          return { isMatrix: false, rows: null };
+          return { isMatrix: false };
         }
         const closeBracket = (_e = (_d = lastNode.firstChild) == null ? void 0 : _d.text) != null ? _e : "";
         if (closeBracket !== targetEndBracket) {
-          return { isMatrix: false, rows: null };
+          return { isMatrix: false };
         }
         const inner = cells.slice(1, -1);
         let elementCount = 1;
@@ -1291,6 +1292,13 @@ var asciimath = (() => {
         const curcell = [];
         for (const cell of inner) {
           if (cell.kind === "mo" && ((_f = cell.firstChild) == null ? void 0 : _f.text) === this.listseparator) {
+            if (curcell.length === 1 && curcell[0].kind === "mrow" && curcell[0].childNodes.length === 1 && (((_h = (_g = curcell[0].firstChild) == null ? void 0 : _g.text) == null ? void 0 : _h.trim()) === "\u2223" || ((_j = (_i = curcell[0].firstChild) == null ? void 0 : _i.text) == null ? void 0 : _j.trim()) === "|")) {
+              if (expectedOpen === null) {
+                columnlinelocs.set(cellsout.length, true);
+              }
+            } else if (columnlinelocs.has(cellsout.length)) {
+              columnlinelocs.delete(cellsout.length);
+            }
             elementCount++;
             cellsout.push([...curcell]);
             curcell.length = 0;
@@ -1300,7 +1308,7 @@ var asciimath = (() => {
         }
         cellsout.push([...curcell]);
         if (elementCount == 1 && cellsout[0].length > 0 && (cellsout[0][0].kind == "mtable" || rows.length == 1)) {
-          return { isMatrix: false, rows: null };
+          return { isMatrix: false };
         }
         rowsout.push(cellsout);
         if (expectedOpen === null) {
@@ -1308,12 +1316,12 @@ var asciimath = (() => {
           expectedClose = closeBracket;
           expectedCount = elementCount;
         } else {
-          if (openBracket !== expectedOpen) return { isMatrix: false, rows: null };
-          if (closeBracket !== expectedClose) return { isMatrix: false, rows: null };
-          if (elementCount !== expectedCount) return { isMatrix: false, rows: null };
+          if (openBracket !== expectedOpen) return { isMatrix: false };
+          if (closeBracket !== expectedClose) return { isMatrix: false };
+          if (elementCount !== expectedCount) return { isMatrix: false };
         }
       }
-      return { isMatrix: true, rows: rowsout };
+      return { isMatrix: true, rows: rowsout, columnlinelocs };
     }
     /**
      * Main parse method - returns the MML tree
@@ -1341,7 +1349,7 @@ var asciimath = (() => {
   // ts/Parse.ts
   var DOMNodeAdapter = class _DOMNodeAdapter {
     constructor(element) {
-      this.element = element;
+      __publicField(this, "element", element);
     }
     get kind() {
       if (this.element instanceof Element) {

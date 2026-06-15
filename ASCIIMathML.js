@@ -1108,7 +1108,7 @@ function detectMatrix(newFrag, endsymbol) {
 
   for (const node of children) {
     if (expecting === 'mrow') {
-      if (node.nodeType !== 1 || node.nodeName.toLowerCase() !== 'mrow') {
+      if (node.nodeName.toLowerCase() !== 'mrow') {
         return { isMatrix: false };
       }
       rows.push(node);
@@ -1116,7 +1116,6 @@ function detectMatrix(newFrag, endsymbol) {
     } else {
       // Must be a top-level comma separator: <mo>,</mo>
       if (
-        node.nodeType !== 1 ||
         node.nodeName.toLowerCase() !== 'mo' ||
         node.textContent.trim() !== listseparator
       ) {
@@ -1145,10 +1144,7 @@ function detectMatrix(newFrag, endsymbol) {
 
     // First child must be an <mo> with a recognized opening bracket
     const firstNode = cells[0];
-    if (
-      firstNode.nodeType !== 1 ||
-      firstNode.nodeName.toLowerCase() !== 'mo'
-    ) {
+    if (firstNode.nodeName.toLowerCase() !== 'mo') {
       return { isMatrix: false };
     }
     const openBracket = firstNode.textContent.trim();
@@ -1160,10 +1156,7 @@ function detectMatrix(newFrag, endsymbol) {
 
     // Last child must be the matching closing bracket
     const lastNode = cells[cells.length - 1];
-    if (
-      lastNode.nodeType !== 1 ||
-      lastNode.nodeName.toLowerCase() !== 'mo'
-    ) {
+    if (lastNode.nodeName.toLowerCase() !== 'mo') {
       return { isMatrix: false };
     }
     const closeBracket = lastNode.textContent.trim();
@@ -1180,13 +1173,11 @@ function detectMatrix(newFrag, endsymbol) {
     const curcell = [];
     for (const cell of inner) {
       if (
-        cell.nodeType === 1 &&
         cell.nodeName.toLowerCase() === 'mo' &&
         cell.textContent.trim() === listseparator
       ) {
         // check for columnline marker
         if (curcell.length === 1 &&
-            curcell[0].nodeType === 1 &&
             curcell[0].nodeName.toLowerCase() === 'mrow' &&
             curcell[0].childNodes.length === 1 && 
          	  (curcell[0].textContent.trim() === "\u2223" || curcell[0].textContent.trim() === "|")

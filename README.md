@@ -68,8 +68,8 @@ compatibility, accuracy, or anything else):
   AsciiMath parser and MathML/TeX generator.
 - [andrewlock/AsciiMath](https://github.com/andrewlock/AsciiMath): A .NET
   AsciiMath converter.
-- [tom-berend/asciimathml-ts](https://github.com/tom-berend/asciimathml-ts):
-  An alternate typescript implementation of an AsciiMath parser.
+- [tom-berend/asciimathml-php](https://github.com/tom-berend/asciimathml-php):
+  A PHP implementation of an AsciiMath parser.
 - [widcardw/asciimath-parser](https://github.com/widcardw/asciimath-parser): 
   An alternate typescript implementation of an AsciiMath parser.
 - [ad-si/asciimath](https://github.com/ad-si/asciimath):

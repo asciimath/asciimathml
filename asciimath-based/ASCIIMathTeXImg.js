@@ -835,7 +835,13 @@ function AMTparseExpr(str,rightbracket) {
 							subpos[lastsubposstart] = [i+2];
 						}
 					}
-					if (newFrag.charAt(i)=='[' || newFrag.charAt(i)=='(' || newFrag.charAt(i)=='{') { mxanynestingd++;}
+					if (newFrag.charAt(i)=='[' || newFrag.charAt(i)=='(' || newFrag.charAt(i)=='{') { 
+            // check if this is really part of a matrix
+            if (mxanynestingd == 0 && newFrag.substring(i+1,i+7)=='\\begin') {
+              matrix = false;
+            }
+            mxanynestingd++;
+          }
 					if (newFrag.charAt(i)==']' || newFrag.charAt(i)==')' || newFrag.charAt(i)=='}') { mxanynestingd--;}
 					if (newFrag.charAt(i)==config.listseparator && mxanynestingd==1) {
 						subpos[lastsubposstart].push(i);

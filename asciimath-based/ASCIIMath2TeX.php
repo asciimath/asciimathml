@@ -816,7 +816,13 @@ function AMTparseExpr($str,$rightbracket) {
 								$matrix = false;
 							}
 						}
-						if ($newFrag[$i]=='[' || $newFrag[$i]=='(' || $newFrag[$i]=='{') {$mxanynestingd++;}
+						if ($newFrag[$i]=='[' || $newFrag[$i]=='(' || $newFrag[$i]=='{') {
+							// check if this is really part of a matrix
+							if ($mxanynestingd == 0 && substr($newFrag,$i+1,6)=='\\begin') {
+								$matrix = false;
+							}
+							$mxanynestingd++;
+						}
 						if ($newFrag[$i]==']' || $newFrag[$i]==')' || $newFrag[$i]=='}') {$mxanynestingd--;}
 						if ($newFrag[$i]==$this->listseparator && $mxanynestingd==1) {
 							$subpos[$lastsubposstart][] = $i;

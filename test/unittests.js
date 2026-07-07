@@ -374,11 +374,11 @@ var unittests = [
 {input: "(:2,3:)", output:"<mrow><mo>〈</mo><mn>2</mn><mo>,</mo><mn>3</mn><mo>〉</mo></mrow>"},
 
 //matrices and arrays
-{input: "[(2,3),(4,5)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none\"><mtr><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd></mtr><mtr><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
-{input: "[(2,3,4,5)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none none none\"><mtr><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
-{input: "((1),(2))", output:"<mrow><mo>(</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1</mn></mtd></mtr><mtr><mtd><mn>2</mn></mtd></mtr></mtable><mo>)</mo></mrow>"},
-{input: "{(1,if,x ge 3),(2,if,x gt 3):}", output:"<mrow><mo>{</mo><mtable columnlines=\"none none none\" columnalign=\"left\"><mtr><mtd><mn>1</mn></mtd><mtd><mrow><mspace width=\"1ex\"></mspace><mo>if</mo><mspace width=\"1ex\"></mspace></mrow></mtd><mtd><mi>x</mi><mo>≥</mo><mn>3</mn></mtd></mtr><mtr><mtd><mn>2</mn></mtd><mtd><mrow><mspace width=\"1ex\"></mspace><mo>if</mo><mspace width=\"1ex\"></mspace></mrow></mtd><mtd><mi>x</mi><mo>&gt;</mo><mn>3</mn></mtd></mtr></mtable></mrow>"},
-{input: "[(1,2,|,3),(4,5,|,6)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none solid none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd></mtr><mtr><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd><mtd><mn>6</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "[(2,3),(4,5)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none\"><mtr><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd></mtr><mtr><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "[(2,3,4,5)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none none\"><mtr><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "((1),(2))", output:"<mrow><mo>(</mo><mtable columnlines=\"\"><mtr><mtd><mn>1</mn></mtd></mtr><mtr><mtd><mn>2</mn></mtd></mtr></mtable><mo>)</mo></mrow>"},
+{input: "{(1,if,x ge 3),(2,if,x gt 3):}", output:"<mrow><mo>{</mo><mtable columnlines=\"none none\" columnalign=\"left\"><mtr><mtd><mn>1</mn></mtd><mtd><mrow><mspace width=\"1ex\"></mspace><mo>if</mo><mspace width=\"1ex\"></mspace></mrow></mtd><mtd><mi>x</mi><mo>≥</mo><mn>3</mn></mtd></mtr><mtr><mtd><mn>2</mn></mtd><mtd><mrow><mspace width=\"1ex\"></mspace><mo>if</mo><mspace width=\"1ex\"></mspace></mrow></mtd><mtd><mi>x</mi><mo>&gt;</mo><mn>3</mn></mtd></mtr></mtable></mrow>"},
+{input: "[(1,2,|,3),(4,5,|,6)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none solid\"><mtr><mtd><mn>1</mn></mtd><mtd data-am-columnlines=\"solid\"><mn>2</mn></mtd><mtd><mn>3</mn></mtd></mtr><mtr><mtd><mn>4</mn></mtd><mtd data-am-columnlines=\"solid\"><mn>5</mn></mtd><mtd><mn>6</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
 
 //from the existing demos
 {input: "int_2^3 3dx", output:"<mrow><msubsup><mo>∫</mo><mn>2</mn><mn>3</mn></msubsup></mrow><mn>3</mn><mrow><mi>d</mi><mi>x</mi></mrow>"},
@@ -448,17 +448,20 @@ var unittests = [
 {input: "(2,3", output:"<mrow><mo>(</mo><mn>2</mn><mo>,</mo><mn>3</mn></mrow>"},
 
 //issue42
-{input: "[(1,2,3,|,4),(5,6,7, |,8)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none solid none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr><mtr><mtd><mn>5</mn></mtd><mtd><mn>6</mn></mtd><mtd><mn>7</mn></mtd><mtd><mn>8</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
-{input: "[(1,2,3, | ,4,5),(5,6,7, | ,8,9)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none solid none none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd></mtr><mtr><mtd><mn>5</mn></mtd><mtd><mn>6</mn></mtd><mtd><mn>7</mn></mtd><mtd><mn>8</mn></mtd><mtd><mn>9</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
-{input: "[(1,|,2,3,4),(5,|,6,7,8)]", output:"<mrow><mo>[</mo><mtable columnlines=\"solid none none none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr><mtr><mtd><mn>5</mn></mtd><mtd><mn>6</mn></mtd><mtd><mn>7</mn></mtd><mtd><mn>8</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
-{input: "[(1,|,3,|,4),(5,|,7,|,8)]", output:"<mrow><mo>[</mo><mtable columnlines=\"solid solid none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr><mtr><mtd><mn>5</mn></mtd><mtd><mn>7</mn></mtd><mtd><mn>8</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
-{input: "[(2,|x|,5),(3,|y|,4)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none none\"><mtr><mtd><mn>2</mn></mtd><mtd><mrow><mo>|</mo><mi>x</mi><mo>|</mo></mrow></mtd><mtd><mn>5</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mrow><mo>|</mo><mi>y</mi><mo>|</mo></mrow></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
-{input: "[(1,|,2,|x|,5),(3,|,4,|y|,7)]", output:"<mrow><mo>[</mo><mtable columnlines=\"solid none none none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd><mrow><mo>|</mo><mi>x</mi><mo>|</mo></mrow></mtd><mtd><mn>5</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd><mtd><mrow><mo>|</mo><mi>y</mi><mo>|</mo></mrow></mtd><mtd><mn>7</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
-{input: "[(1,2,3,|,4),(5,6,7,8,9)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none solid none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr><mtr><mtd><mn>5</mn></mtd><mtd><mn>6</mn></mtd><mtd><mn>7</mn></mtd><mtd><mn>8</mn></mtd><mtd><mn>9</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "[(1,2,3,|,4),(5,6,7, |,8)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none solid\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd data-am-columnlines=\"solid\"><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr><mtr><mtd><mn>5</mn></mtd><mtd><mn>6</mn></mtd><mtd data-am-columnlines=\"solid\"><mn>7</mn></mtd><mtd><mn>8</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "[(1,2,3, | ,4,5),(5,6,7, | ,8,9)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none solid none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd data-am-columnlines=\"solid\"><mn>3</mn></mtd><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd></mtr><mtr><mtd><mn>5</mn></mtd><mtd><mn>6</mn></mtd><mtd data-am-columnlines=\"solid\"><mn>7</mn></mtd><mtd><mn>8</mn></mtd><mtd><mn>9</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "[(1,|,2,3,4),(5,|,6,7,8)]", output:"<mrow><mo>[</mo><mtable columnlines=\"solid none none\"><mtr><mtd data-am-columnlines=\"solid\"><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr><mtr><mtd data-am-columnlines=\"solid\"><mn>5</mn></mtd><mtd><mn>6</mn></mtd><mtd><mn>7</mn></mtd><mtd><mn>8</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "[(1,|,3,|,4),(5,|,7,|,8)]", output:"<mrow><mo>[</mo><mtable columnlines=\"solid solid\"><mtr><mtd data-am-columnlines=\"solid\"><mn>1</mn></mtd><mtd data-am-columnlines=\"solid\"><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr><mtr><mtd data-am-columnlines=\"solid\"><mn>5</mn></mtd><mtd data-am-columnlines=\"solid\"><mn>7</mn></mtd><mtd><mn>8</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "[(2,|x|,5),(3,|y|,4)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none\"><mtr><mtd><mn>2</mn></mtd><mtd><mrow><mo>|</mo><mi>x</mi><mo>|</mo></mrow></mtd><mtd><mn>5</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mrow><mo>|</mo><mi>y</mi><mo>|</mo></mrow></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "[(1,|,2,|x|,5),(3,|,4,|y|,7)]", output:"<mrow><mo>[</mo><mtable columnlines=\"solid none none\"><mtr><mtd data-am-columnlines=\"solid\"><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd><mrow><mo>|</mo><mi>x</mi><mo>|</mo></mrow></mtd><mtd><mn>5</mn></mtd></mtr><mtr><mtd data-am-columnlines=\"solid\"><mn>3</mn></mtd><mtd><mn>4</mn></mtd><mtd><mrow><mo>|</mo><mi>y</mi><mo>|</mo></mrow></mtd><mtd><mn>7</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+// bad mis-matched column line markers; should not parse as matrix
 {input: "[(1,2,3,|,4),(5,6,7,8)]", output:"<mrow><mo>[</mo><mrow><mo>(</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mn>3</mn><mo>,</mo><mrow><mo>∣</mo></mrow><mo>,</mo><mn>4</mn><mo>)</mo></mrow><mo>,</mo><mrow><mo>(</mo><mn>5</mn><mo>,</mo><mn>6</mn><mo>,</mo><mn>7</mn><mo>,</mo><mn>8</mn><mo>)</mo></mrow><mo>]</mo></mrow>"},
-{input: "[(1,2,3,4,5),(5,6,7,|,9)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none none none none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd></mtr><mtr><mtd><mn>5</mn></mtd><mtd><mn>6</mn></mtd><mtd><mn>7</mn></mtd><mtd><mn>9</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
 {input: "[(1,2,3,4),(5,6,7,|,9)]", output:"<mrow><mo>[</mo><mrow><mo>(</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mn>3</mn><mo>,</mo><mn>4</mn><mo>)</mo></mrow><mo>,</mo><mrow><mo>(</mo><mn>5</mn><mo>,</mo><mn>6</mn><mo>,</mo><mn>7</mn><mo>,</mo><mrow><mo>∣</mo></mrow><mo>,</mo><mn>9</mn><mo>)</mo></mrow><mo>]</mo></mrow>"},
-{input: "[(1,2,3,|),(5,6,7,|)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none solid none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd><mtd></mtd></mtr><mtr><mtd><mn>5</mn></mtd><mtd><mn>6</mn></mtd><mtd><mn>7</mn></mtd><mtd></mtd></mtr></mtable><mo>]</mo></mrow>"},
+// columnline marker in one row, not in other; | should be parsed as \mid or plain |
+{input: "[(1,2,3,4,5),(5,6,7,|,9)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none none none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd></mtr><mtr><mtd><mn>5</mn></mtd><mtd><mn>6</mn></mtd><mtd><mn>7</mn></mtd><mtd><mrow><mo>∣</mo></mrow></mtd><mtd><mn>9</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "[(1,2,3,|,4),(5,6,7,8,9)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none none none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd><mtd><mrow><mo>∣</mo></mrow></mtd><mtd><mn>4</mn></mtd></mtr><mtr><mtd><mn>5</mn></mtd><mtd><mn>6</mn></mtd><mtd><mn>7</mn></mtd><mtd><mn>8</mn></mtd><mtd><mn>9</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+//removed with issue 171; columnline marker not between columns doesn't appear to be intended by MathML specs
+//{input: "[(1,2,3,|),(5,6,7,|)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none solid none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd><mtd><mn>3</mn></mtd><mtd></mtd></mtr><mtr><mtd><mn>5</mn></mtd><mtd><mn>6</mn></mtd><mtd><mn>7</mn></mtd><mtd></mtd></mtr></mtable><mo>]</mo></mrow>"},
 {input: "|x/2+3|,|x-4/5|", output:"<mrow><mo>|</mo><mfrac><mi>x</mi><mn>2</mn></mfrac><mo>+</mo><mn>3</mn><mo>|</mo></mrow><mo>,</mo><mrow><mo>|</mo><mi>x</mi><mo>−</mo><mfrac><mn>4</mn><mn>5</mn></mfrac><mo>|</mo></mrow>"},
 {input: "int_2^4 2x dx = x^2|_2^4", output:"<mrow><msubsup><mo>∫</mo><mn>2</mn><mn>4</mn></msubsup></mrow><mn>2</mn><mi>x</mi><mrow><mi>d</mi><mi>x</mi></mrow><mo>=</mo><msup><mi>x</mi><mn>2</mn></msup><mrow><msubsup><mrow><mo>∣</mo></mrow><mn>2</mn><mn>4</mn></msubsup></mrow>"},
 
@@ -479,7 +482,7 @@ var unittests = [
 {input: "f'(x)/5", output:"<mi>f</mi><mo>′</mo><mfrac><mrow><mi>x</mi></mrow><mn>5</mn></mfrac>"},
 
 // issue 113
-{input: "[[1,2]]/4", output:"<mfrac><mrow><mo>[</mo><mtable columnlines=\"none none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr></mtable><mo>]</mo></mrow><mn>4</mn></mfrac>"},
+{input: "[[1,2]]/4", output:"<mfrac><mrow><mo>[</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr></mtable><mo>]</mo></mrow><mn>4</mn></mfrac>"},
 {input: "(x+2)/3", output:"<mfrac><mrow><mi>x</mi><mo>+</mo><mn>2</mn></mrow><mn>3</mn></mfrac>"},
 
 // issue 114
@@ -492,9 +495,9 @@ var unittests = [
 {input: "3/4. ", output:"<mfrac><mn>3</mn><mn>4.</mn></mfrac>"},
 {input: "1 1, 1,2 ,3 1,2,3", output:"<mn>1</mn><mn>1</mn><mo>,</mo><mn>1,2</mn><mn>,3</mn><mn>1,2</mn><mn>,3</mn>", decimal: ","}, 
 {input: "1 1, 1,2 ,3 1,2,3 1,2;3", output:"<mn>1</mn><mn>1,</mn><mn>1,2</mn><mn>,3</mn><mn>1,2</mn><mn>,3</mn><mn>1,2</mn><mo>;</mo><mn>3</mn>", decimal: ",", list: ";"},
-{input: "[(1,2),(3,4)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1,2</mn></mtd></mtr><mtr><mtd><mn>3,4</mn></mtd></mtr></mtable><mo>]</mo></mrow>", decimal: ","},
-{input: "[(1, 2),(3, 4)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>]</mo></mrow>", decimal: ","},
-{input: "[(1;3);(3;5)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>3</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>5</mn></mtd></mtr></mtable><mo>]</mo></mrow>", decimal: ",", list: ";"},
+{input: "[(1,2),(3,4)]", output:"<mrow><mo>[</mo><mtable columnlines=\"\"><mtr><mtd><mn>1,2</mn></mtd></mtr><mtr><mtd><mn>3,4</mn></mtd></mtr></mtable><mo>]</mo></mrow>", decimal: ","},
+{input: "[(1, 2),(3, 4)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>]</mo></mrow>", decimal: ","},
+{input: "[(1;3);(3;5)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>3</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>5</mn></mtd></mtr></mtable><mo>]</mo></mrow>", decimal: ",", list: ";"},
 
 // issue 133
 {input: "!-=", output:"<mo>≢</mo>"},
@@ -545,7 +548,26 @@ var unittests = [
 {input: "a mspace3 b", output:"<mi>a</mi><mspace width=\"0em\"></mspace><mi>b</mi>"}, // braces/parens required
 
 // issue 169
-{input: "a bb c", output:"<mi>a</mi><mi>𝐜</mi>"} // font following stuff
+{input: "a bb c", output:"<mi>a</mi><mi>𝐜</mi>"}, // font following stuff
+
+// issue 171
+// treat as set of matrices
+{input: "{[(1,2),(3,4)],[(1,2),(3,4)]}", output:"<mrow><mo>{</mo><mrow><mo>[</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>]</mo></mrow><mo>,</mo><mrow><mo>[</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>]</mo></mrow><mo>}</mo></mrow>"},
+{input: "{((1,2),(3,4)),((1,2),(3,4))}", output:"<mrow><mo>{</mo><mrow><mo>(</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>)</mo></mrow><mo>,</mo><mrow><mo>(</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>)</mo></mrow><mo>}</mo></mrow>"},
+{input: "[((1,2),(3,4)),((1,2),(3,4))]", output:"<mrow><mo>[</mo><mrow><mo>(</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>)</mo></mrow><mo>,</mo><mrow><mo>(</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>)</mo></mrow><mo>]</mo></mrow>"},
+// column or row vector or matrix of matrices
+{input: "[([(1,2),(3,4)]),([(1,2),(3,4)])]", output:"<mrow><mo>[</mo><mtable columnlines=\"\"><mtr><mtd><mrow><mo>[</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>]</mo></mrow></mtd></mtr><mtr><mtd><mrow><mo>[</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>]</mo></mrow></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "[([(1,2),(3,4)],[(1,2),(3,4)])]", output:"<mrow><mo>[</mo><mtable columnlines=\"none\"><mtr><mtd><mrow><mo>[</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>]</mo></mrow></mtd><mtd><mrow><mo>[</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>]</mo></mrow></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "[([(1,2),(3,4)],[(1,2),(3,4)]),(3,4)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none\"><mtr><mtd><mrow><mo>[</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>]</mo></mrow></mtd><mtd><mrow><mo>[</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>]</mo></mrow></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>]</mo></mrow>"},
+// with outside curly braces, treat as parens as set of ordered pairs, but square brackets as matrix
+{input: "{(1,2),(3,4)}", output:"<mrow><mo>{</mo><mrow><mo>(</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>)</mo></mrow><mo>,</mo><mrow><mo>(</mo><mn>3</mn><mo>,</mo><mn>4</mn><mo>)</mo></mrow><mo>}</mo></mrow>"},
+{input: "{[1,2],[3,4]}", output:"<mrow><mo>{</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>}</mo></mrow>"},
+// matrices and column vectors with empty elements
+{input: "[(,2),(3,)]", output:"<mrow><mo>[</mo><mtable columnlines=\"none\"><mtr><mtd></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd></mtd></mtr></mtable><mo>]</mo></mrow>"},
+{input: "[(1),()]", output:"<mrow><mo>[</mo><mtable columnlines=\"\"><mtr><mtd><mn>1</mn></mtd></mtr><mtr><mtd></mtd></mtr></mtable><mo>]</mo></mrow>"},
+// a matrix with grouping symbols and multiple operations in cells
+{input: "[(1+(3+4)/5,sin(5)+|x|),(root[3][x],3^{4})]", output:"<mrow><mo>[</mo><mtable columnlines=\"none\"><mtr><mtd><mn>1</mn><mo>+</mo><mfrac><mrow><mn>3</mn><mo>+</mo><mn>4</mn></mrow><mn>5</mn></mfrac></mtd><mtd><mrow><mo>sin</mo><mrow><mo>(</mo><mn>5</mn><mo>)</mo></mrow></mrow><mo>+</mo><mrow><mo>|</mo><mi>x</mi><mo>|</mo></mrow></mtd></mtr><mtr><mtd><mroot><mrow><mi>x</mi></mrow><mrow><mn>3</mn></mrow></mroot></mtd><mtd><msup><mn>3</mn><mrow><mn>4</mn></mrow></msup></mtd></mtr></mtable><mo>]</mo></mrow>"},
+
 ];
 
 function htmlEntities(str) {
@@ -563,7 +585,7 @@ function runTests() {
 		var outstr = '{input: "'+txt.replace(/\\/g,"\\\\").replace(/"/g,'\\"')+'", output:"'+out+'"},\n';
 		$("#newtestout").text($("#newtestout").text()+outstr);		
 	})
-	var res,tr,td,lastdec;
+	var res,tr,td,lastdec,successes=0,failures=0;
 	var tbody = document.getElementById("testout");
 	var startTime = performance.now()
 	for (var i=0;i<unittests.length;i++) {
@@ -612,13 +634,16 @@ function runTests() {
 		
 		if (unittests[i].output == outhtml) {
 			tr.className = "success";
+			successes++;
 		} else {
 			tr.className = "failed";
+			failures++;
 		}
 		tbody.appendChild(tr);
 	}
 	var endTime = performance.now();
 	console.log("execution time:" + (endTime - startTime));
+	document.getElementById("testresultsummary").textContent = failures + ' failures, ' + successes + ' successes';
 };
 
 function generateSymbolTests() {

@@ -408,7 +408,7 @@ var asciimath = (() => {
      * @param {IParseOptions} configuration A parser configuration.
      */
     constructor(configuration) {
-      this.configuration = configuration;
+      __publicField(this, "configuration", configuration);
       /**
        * Current nesting depth for tracking brackets
        *
@@ -711,7 +711,6 @@ var asciimath = (() => {
       let newFrag;
       str = this.removeCharsAndBlanks(str, 0);
       symbol = this.getSymbol(str);
-      console.log(symbol);
       if (symbol === null || symbol.ttype === 5 /* RIGHTBRACKET */ && this.nestingDepth > 0) {
         return [null, str];
       }
@@ -1153,7 +1152,7 @@ var asciimath = (() => {
      * @returns {ParseResult} [node, remaining string]
      */
     parseExpr(str, rightbracket) {
-      var _a, _b, _c;
+      var _a;
       let symbol;
       let node;
       let result;
@@ -1186,107 +1185,43 @@ var asciimath = (() => {
         }
       } while (symbol !== null && (symbol.ttype !== 5 /* RIGHTBRACKET */ && (symbol.ttype !== 9 /* LEFTRIGHT */ || rightbracket) || this.nestingDepth === 0) && symbol.output !== "");
       if (symbol !== null && (symbol.ttype === 5 /* RIGHTBRACKET */ || symbol.ttype === 9 /* LEFTRIGHT */)) {
-        const len = newFrag.childNodes.length;
-        if (len > 0 && newFrag.childNodes[len - 1].kind === "mrow" && newFrag.childNodes[len - 1].hasChildNodes()) {
-          const lastMrow = newFrag.lastChild;
-          const lastChild = lastMrow.lastChild;
-          const firstChild = lastMrow.firstChild;
-          if (lastChild && lastChild.hasChildNodes() && firstChild && firstChild.hasChildNodes() > 0) {
-            const right = lastChild.firstChild.text;
-            const left = firstChild.firstChild.text;
-            if (right === ")" || right === "]") {
-              if (left === "(" && right === ")" && symbol.output !== "}" || left === "[" && right === "]") {
-                const pos = [];
-                let matrix = true;
-                const m = newFrag.childNodes.length;
-                let i, j;
-                for (i = 0; matrix && i < m; i = i + 2) {
-                  pos[i] = [];
-                  node = newFrag.childNodes[i];
-                  if (matrix) {
-                    matrix = node.kind === "mrow" && // current el is row
-                    node.childNodes.length > 0 && (i === m - 1 || // last row, or next el is comma
-                    newFrag.childNodes[i + 1] && newFrag.childNodes[i + 1].kind === "mo" && newFrag.childNodes[i + 1].firstChild.text === this.listseparator) && // row starts and ends with left/right brackets
-                    ((_a = node.firstChild) == null ? void 0 : _a.firstChild).text === left && ((_b = node.lastChild) == null ? void 0 : _b.firstChild).text === right;
-                  }
-                  if (matrix) {
-                    for (j = 0; j < node.childNodes.length; j++) {
-                      if (node.childNodes[j].hasChildNodes() && node.childNodes[j].firstChild.text === this.listseparator) {
-                        pos[i][pos[i].length] = j;
-                      }
-                    }
-                  }
-                  if (matrix && i > 1) {
-                    matrix = pos[i].length === pos[i - 2].length;
-                  }
+        const res = this.detectMatrix(newFrag, symbol.output);
+        if (res.isMatrix) {
+          let i, r, c, row;
+          const columnlines = [];
+          const table = this.configuration.create("mtable");
+          for (r = 0; r < res.rows.length; r++) {
+            row = this.configuration.create("mtr");
+            for (c = 0; c < res.rows[r].length; c++) {
+              if (res.columnlinelocs.has(c)) {
+                if (r == 0) {
+                  columnlines.pop();
+                  columnlines.push("solid");
                 }
-                matrix = matrix && (pos.length > 1 || pos[0].length > 0);
-                const columnlines = [];
-                if (matrix) {
-                  const table = this.configuration.create("inferredMrow");
-                  for (i = 0; i < m; i = i + 2) {
-                    const row = this.configuration.create("inferredMrow");
-                    let frag = this.configuration.create("inferredMrow");
-                    node = newFrag.childNodes[0];
-                    const n = node.childNodes.length;
-                    let k = 0;
-                    node.removeFirstChild();
-                    for (j = 1; j < n - 1; j++) {
-                      if (typeof pos[i][k] !== "undefined" && j === pos[i][k]) {
-                        node.removeFirstChild();
-                        if (node.firstChild && node.firstChild.kind === "mrow" && node.firstChild.childNodes.length === 1 && ((_c = node.firstChild.firstChild) == null ? void 0 : _c.hasChildNodes()) && node.firstChild.firstChild.firstChild.text === "\u2223") {
-                          if (i === 0) {
-                            columnlines.push("solid");
-                          }
-                          node.removeFirstChild();
-                          node.removeFirstChild();
-                          j += 2;
-                          k++;
-                        } else if (i === 0) {
-                          columnlines.push("none");
-                        }
-                        const mtd2 = this.configuration.create("mtd");
-                        for (const child of frag.childNodes) {
-                          mtd2.appendChild(child);
-                        }
-                        row.appendChild(mtd2);
-                        frag = this.configuration.create("inferredMrow");
-                        k++;
-                      } else {
-                        frag.appendChild(node.firstChild);
-                      }
-                    }
-                    const mtd = this.configuration.create("mtd");
-                    for (const child of frag.childNodes) {
-                      mtd.appendChild(child);
-                    }
-                    row.appendChild(mtd);
-                    if (i === 0) {
-                      columnlines.push("none");
-                    }
-                    if (newFrag.childNodes.length > 2) {
-                      newFrag.removeFirstChild();
-                      newFrag.removeFirstChild();
-                    }
-                    const mtr = this.configuration.create("mtr");
-                    for (const child of row.childNodes) {
-                      mtr.appendChild(child);
-                    }
-                    table.appendChild(mtr);
-                  }
-                  node = this.configuration.create("mtable");
-                  node.setAttribute("columnlines", columnlines.join(" "));
-                  if (typeof symbol.invisible === "boolean" && symbol.invisible) {
-                    node.setAttribute("columnalign", "left");
-                  }
-                  for (const child of table.childNodes) {
-                    node.appendChild(child);
-                  }
-                  newFrag.replaceChild(node, newFrag.firstChild);
+                if (this.useCSS) {
+                  (_a = row.lastChild) == null ? void 0 : _a.setAttribute("data-am-columnlines", "solid");
+                }
+              } else {
+                const cell = this.configuration.create("mtd");
+                for (i = 0; i < res.rows[r][c].length; i++) {
+                  cell.appendChild(res.rows[r][c][i]);
+                }
+                row.appendChild(cell);
+                if (r == 0 && c < res.rows[r].length - 1) {
+                  columnlines.push("none");
                 }
               }
             }
+            table.appendChild(row);
           }
+          table.setAttribute("columnlines", columnlines.join(" "));
+          if (typeof symbol.invisible == "boolean" && symbol.invisible) {
+            table.setAttribute("columnalign", "left");
+          }
+          while (newFrag.hasChildNodes()) {
+            newFrag.removeLastChild();
+          }
+          newFrag.appendChild(table);
         }
         str = this.removeCharsAndBlanks(str, symbol.input.length);
         if (!symbol.invisible) {
@@ -1296,6 +1231,97 @@ var asciimath = (() => {
         }
       }
       return [newFrag, str];
+    }
+    detectMatrix(newFrag, endsymbol) {
+      var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
+      const children = Array.from(newFrag.childNodes);
+      if (children.length === 0) return { isMatrix: false };
+      const rows = [];
+      let expecting = "mrow";
+      for (const node of children) {
+        if (expecting === "mrow") {
+          if (node.kind !== "mrow") {
+            return { isMatrix: false };
+          }
+          rows.push(node);
+          expecting = "comma";
+        } else {
+          if (node.kind !== "mo" || ((_a = node.firstChild) == null ? void 0 : _a.text) !== this.listseparator) {
+            return { isMatrix: false };
+          }
+          expecting = "mrow";
+        }
+      }
+      if (expecting !== "comma") return { isMatrix: false };
+      if (rows.length < 1) return { isMatrix: false };
+      let expectedOpen = null;
+      let expectedClose = null;
+      let expectedCount = null;
+      const rowsout = [];
+      const columnlinelocs = /* @__PURE__ */ new Map();
+      for (const row of rows) {
+        const cells = Array.from(row.childNodes);
+        if (cells.length < 2) return { isMatrix: false };
+        const firstNode = cells[0];
+        if (firstNode.kind !== "mo") {
+          return { isMatrix: false };
+        }
+        const openBracket = (_c = (_b = firstNode.firstChild) == null ? void 0 : _b.text) != null ? _c : "";
+        let targetEndBracket = "";
+        if (openBracket == "(") {
+          targetEndBracket = ")";
+        } else if (openBracket == "[") {
+          targetEndBracket = "]";
+        } else {
+          return { isMatrix: false };
+        }
+        if (openBracket == "(" && endsymbol == "}") {
+          return { isMatrix: false };
+        }
+        const lastNode = cells[cells.length - 1];
+        if (lastNode.kind !== "mo") {
+          return { isMatrix: false };
+        }
+        const closeBracket = (_e = (_d = lastNode.firstChild) == null ? void 0 : _d.text) != null ? _e : "";
+        if (closeBracket !== targetEndBracket) {
+          return { isMatrix: false };
+        }
+        const inner = cells.slice(1, -1);
+        let elementCount = 1;
+        const cellsout = [];
+        const curcell = [];
+        for (const cell of inner) {
+          if (cell.kind === "mo" && ((_f = cell.firstChild) == null ? void 0 : _f.text) === this.listseparator) {
+            if (curcell.length === 1 && curcell[0].kind === "mrow" && curcell[0].childNodes.length === 1 && (((_h = (_g = curcell[0].firstChild) == null ? void 0 : _g.text) == null ? void 0 : _h.trim()) === "\u2223" || ((_j = (_i = curcell[0].firstChild) == null ? void 0 : _i.text) == null ? void 0 : _j.trim()) === "|")) {
+              if (expectedOpen === null) {
+                columnlinelocs.set(cellsout.length, true);
+              }
+            } else if (columnlinelocs.has(cellsout.length)) {
+              columnlinelocs.delete(cellsout.length);
+            }
+            elementCount++;
+            cellsout.push([...curcell]);
+            curcell.length = 0;
+          } else {
+            curcell.push(cell);
+          }
+        }
+        cellsout.push([...curcell]);
+        if (elementCount == 1 && cellsout[0].length > 0 && (cellsout[0][0].kind == "mtable" || rows.length == 1)) {
+          return { isMatrix: false };
+        }
+        rowsout.push(cellsout);
+        if (expectedOpen === null) {
+          expectedOpen = openBracket;
+          expectedClose = closeBracket;
+          expectedCount = elementCount;
+        } else {
+          if (openBracket !== expectedOpen) return { isMatrix: false };
+          if (closeBracket !== expectedClose) return { isMatrix: false };
+          if (elementCount !== expectedCount) return { isMatrix: false };
+        }
+      }
+      return { isMatrix: true, rows: rowsout, columnlinelocs };
     }
     /**
      * Main parse method - returns the MML tree
@@ -1323,7 +1349,7 @@ var asciimath = (() => {
   // ts/Parse.ts
   var DOMNodeAdapter = class _DOMNodeAdapter {
     constructor(element) {
-      this.element = element;
+      __publicField(this, "element", element);
     }
     get kind() {
       if (this.element instanceof Element) {

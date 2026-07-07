@@ -1233,7 +1233,7 @@ var asciimath = (() => {
       return [newFrag, str];
     }
     detectMatrix(newFrag, endsymbol) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
+      var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m;
       const children = Array.from(newFrag.childNodes);
       if (children.length === 0) return { isMatrix: false };
       const rows = [];
@@ -1292,7 +1292,7 @@ var asciimath = (() => {
         const curcell = [];
         for (const cell of inner) {
           if (cell.kind === "mo" && ((_f = cell.firstChild) == null ? void 0 : _f.text) === this.listseparator) {
-            if (curcell.length === 1 && curcell[0].kind === "mrow" && curcell[0].childNodes.length === 1 && (((_h = (_g = curcell[0].firstChild) == null ? void 0 : _g.text) == null ? void 0 : _h.trim()) === "\u2223" || ((_j = (_i = curcell[0].firstChild) == null ? void 0 : _i.text) == null ? void 0 : _j.trim()) === "|")) {
+            if (curcell.length === 1 && curcell[0].kind === "mrow" && curcell[0].childNodes.length === 1 && ((_g = curcell[0].firstChild) == null ? void 0 : _g.kind) === "mo" && (((_j = (_i = (_h = curcell[0].firstChild) == null ? void 0 : _h.firstChild) == null ? void 0 : _i.text) == null ? void 0 : _j.trim()) === "\u2223" || ((_m = (_l = (_k = curcell[0].firstChild) == null ? void 0 : _k.firstChild) == null ? void 0 : _l.text) == null ? void 0 : _m.trim()) === "|")) {
               if (expectedOpen === null) {
                 columnlinelocs.set(cellsout.length, true);
               }

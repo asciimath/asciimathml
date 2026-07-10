@@ -1,6 +1,6 @@
 {
   "name": "asciimathml",
-  "version": "2.5.1",
+  "version": "2.6.0",
   "private": false,
   "description": "ASCIIMathML scripts with typescript implementation",
   "homepage": "https://github.com/asciimath/asciimathml#readme",

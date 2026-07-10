@@ -352,7 +352,7 @@ var LMsymbols = [
 {input:"|",		tag:"mo", output:"\u2223", atval:"1", ttype:STRETCHY},
 {input:"\\|",		tag:"mo", output:"\u2225", atval:"1", ttype:STRETCHY},
 {input:"\\vert",	tag:"mo", output:"\u2223", atval:"1", ttype:STRETCHY},
-{input:"\\Vert",	tag:"mo", output:"\u2225", atval:"1", ttype:STRETCHY},
+{input:"\\Vert",	tag:"mo", output:"\u2016", atval:"1", ttype:STRETCHY},
 {input:"\\mid",		tag:"mo", output:"\u2223", atval:"1", ttype:STRETCHY},
 {input:"\\parallel",	tag:"mo", output:"\u2225", atval:"1", ttype:STRETCHY},
 {input:"/",		tag:"mo", output:"/",	atval:"1.01", ttype:STRETCHY},

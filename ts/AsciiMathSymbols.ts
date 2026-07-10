@@ -291,7 +291,7 @@ export const AMsymbols: Symbol[] = [
   {input:"csch",  tag:"mo", output:"csch", tex:null, ttype:TokenType.UNARY, func:true},
   {input:"exp",  tag:"mo", output:"exp", tex:null, ttype:TokenType.UNARY, func:true},
   {input:"abs",   tag:"mo", output:"abs",  tex:null, ttype:TokenType.UNARY, rewriteleftright:["|","|"]},
-  {input:"norm",   tag:"mo", output:"norm",  tex:null, ttype:TokenType.UNARY, rewriteleftright:["\u2225","\u2225"]},
+  {input:"norm",   tag:"mo", output:"norm",  tex:null, ttype:TokenType.UNARY, rewriteleftright:["\u2016","\u2016"]},
   {input:"floor",   tag:"mo", output:"floor",  tex:null, ttype:TokenType.UNARY, rewriteleftright:["\u230A","\u230B"]},
   {input:"ceil",   tag:"mo", output:"ceil",  tex:null, ttype:TokenType.UNARY, rewriteleftright:["\u2308","\u2309"]},
   {input:"log",  tag:"mo", output:"log", tex:null, ttype:TokenType.UNARY, func:true},

@@ -993,11 +993,12 @@ export class AsciiMathParser {
             for (const cell of inner) {
                 if (cell.kind === 'mo' &&
                     cell.firstChild?.text === this.listseparator) {
-                    // check for columnline marker
+                    // check for columnline marker: <mrow><mo>#text |
                     if (curcell.length === 1 &&
                         curcell[0].kind === 'mrow' &&
                         curcell[0].childNodes.length === 1 &&
-                        (curcell[0].firstChild?.text?.trim() === "\u2223" || curcell[0].firstChild?.text?.trim() === "|")) {
+                        curcell[0].firstChild?.kind === 'mo' &&
+                        (curcell[0].firstChild?.firstChild?.text?.trim() === "\u2223" || curcell[0].firstChild?.firstChild?.text?.trim() === "|")) {
                         // found mid; may be columnline marker
                         if (expectedOpen === null) { // first row, mark as columnline
                             columnlinelocs.set(cellsout.length, true);
